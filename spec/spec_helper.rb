@@ -6,7 +6,18 @@ require File.expand_path("config/environment", ENV['RAILS_ROOT'] || File.expand_
 require 'rspec/rails'
 require 'hydra-collections'
 
+FactoryGirl.definition_file_paths = [File.expand_path("../factories", __FILE__)]
+FactoryGirl.find_definitions
+
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
 end
+
+module FactoryGirl
+  def self.find_or_create(handle, by=:email)
+    tmpl = FactoryGirl.build(handle)
+    tmpl.class.send("find_by_#{by}".to_sym, tmpl.send(by)) || FactoryGirl.create(handle)
+  end
+end
+

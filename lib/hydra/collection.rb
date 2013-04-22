@@ -1,5 +1,4 @@
-require 'datastreams/collection_rdf_datastream'
-require 'datastreams/properties_datastream'
+require 'hydra/datastreams/collection_rdf_datastream'
 
 module Hydra
   module Collection
@@ -7,13 +6,13 @@ module Hydra
     extend ActiveSupport::Autoload
     autoload :Permissions
     #TODO Should we remove the three lines below
-    include Sufia::ModelMethods
-    include Sufia::Noid
-    include Sufia::GenericFile::Permissions
+    #include Sufia::ModelMethods
+    #include Sufia::Noid
+    #include Sufia::GenericFile::Permissions
 
     included do
       has_metadata :name => "descMetadata", :type => CollectionRdfDatastream
-      has_metadata :name => "properties", :type => PropertiesDatastream
+      has_metadata :name => "properties", :type => Hydra::Datastream::Properties
 
       has_and_belongs_to_many :generic_files, :property => :has_collection_member
 

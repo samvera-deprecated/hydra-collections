@@ -1,4 +1,6 @@
-require "hydra/collections_controller_behavior"
 require "hydra/collections"
+require "hydra/collections_controller_behavior"
+require "hydra/collection"
 require "bundler/setup"
 require "blacklight"
+require "hydra/head"

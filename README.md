@@ -23,7 +23,17 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Mount the engine to get the routes in config/routes.rb
+
+    mount Hydra::Collections::Engine => '/'mount Hydra::Collections::Engine => '/'
+
+### Call collections_add_collection view helper in your search result page template.
+  We recommend putting it in catalog/_sort_and_per_page.html.erb which you will manually override in you app.
+
+    <%= collections_add_collection %>
+
+### Any time you want to refer to the routes from hydra-collections use collections.
+    collections.new_collections_path
 
 ## Contributing
 

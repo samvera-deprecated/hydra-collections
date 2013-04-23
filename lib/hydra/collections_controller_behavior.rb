@@ -49,6 +49,7 @@ module Hydra
     end
     
     def create
+      @collection.apply_depositor_metadata(current_user.user_key)
       respond_to do |format|
         if @collection.save
           format.html { redirect_to catalog_index_path("f[collection][]"=>@collection.id), notice: 'Collection was successfully created.' }

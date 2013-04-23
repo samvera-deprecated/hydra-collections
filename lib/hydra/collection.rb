@@ -1,3 +1,4 @@
+require 'hydra/head'
 require 'hydra/datastreams/collection_rdf_datastream'
 
 module Hydra
@@ -5,10 +6,7 @@ module Hydra
     extend ActiveSupport::Concern
     extend ActiveSupport::Autoload
     autoload :Permissions
-    #TODO Should we remove the three lines below
-    #include Sufia::ModelMethods
-    #include Sufia::Noid
-    #include Sufia::GenericFile::Permissions
+    include Hydra::ModelMethods # for access to apply_depositor_metadata
 
     included do
       has_metadata :name => "descMetadata", :type => CollectionRdfDatastream
@@ -24,11 +22,12 @@ module Hydra
       before_save :set_date_modified
     end
 
-    def to_solr(solr_doc={}, opts={})
-      super(solr_doc, opts)
-      solr_doc[Solrizer.solr_name("noid", :text, :sortable)] = noid
-      return solr_doc
-    end
+    # TODO: Move this override into ScholarSphere
+    #def to_solr(solr_doc={}, opts={})
+    #  super(solr_doc, opts)
+    #  solr_doc[Solrizer.solr_name("noid", :sortable, :type => :text)] = noid
+    #  return solr_doc
+    #end
 
     def terms_for_editing
       terms_for_display - [:date_modified, :date_uploaded]

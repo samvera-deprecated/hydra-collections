@@ -17,20 +17,19 @@ require 'spec_helper'
 describe Collection do
   before(:all) do
     @user = FactoryGirl.find_or_create(:user)
+    class GenericFile < ActiveFedora::Base
+    end
   end
   after(:all) do
     @user.destroy
+    Object.send(:remove_const, :GenericFile)
   end
   before(:each) do
     @collection = Collection.new
     @collection.apply_depositor_metadata(@user.user_key)
     @collection.save
-    @gf1 = GenericFile.new
-    @gf1.apply_depositor_metadata(@user.user_key)
-    @gf1.save
-    @gf2 = GenericFile.new
-    @gf2.apply_depositor_metadata(@user.user_key)
-    @gf2.save
+    @gf1 = GenericFile.create
+    @gf2 = GenericFile.create
   end
   after(:each) do
     @collection.destroy rescue
@@ -55,10 +54,6 @@ describe Collection do
     @collection.generic_files << @gf2
     @collection.save
     Collection.find(@collection.pid).generic_files.should == [@gf1, @gf2]
-  end
-  it "should include the noid in solr" do
-    @collection.save
-    @collection.to_solr['noid_s'].should == @collection.noid
   end
   it "should set the date uploaded on create" do
     @collection.save

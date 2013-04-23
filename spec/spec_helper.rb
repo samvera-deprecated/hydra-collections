@@ -9,9 +9,9 @@ require 'hydra-collections'
 FactoryGirl.definition_file_paths = [File.expand_path("../factories", __FILE__)]
 FactoryGirl.find_definitions
 
-
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
+  config.include Devise::TestHelpers, :type => :controller
 end
 
 module FactoryGirl

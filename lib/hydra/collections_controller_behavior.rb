@@ -37,17 +37,31 @@ module Hydra
       end
 
       # actions: audit, index, create, new, edit, show, update, destroy, permissions, citation
-      before_filter :authenticate_user!, :except => [:show, :citation]
-      before_filter :has_access?, :except => [:show]
-      prepend_before_filter :normalize_identifier, :except => [:index, :create, :new]
-      load_resource :only=>[:audit]
-      load_and_authorize_resource :except=>[:index, :audit]
+      before_filter :authenticate_user!, :except => [:show]
+      load_and_authorize_resource :except=>[:index]
     end
 
     def new
-      @generic_file = ::Collection.new
+      #@collection = ::Collection.new
     end
+    
+    def edit
+    end
+    
     def create
+      respond_to do |format|
+        if @collection.save
+          format.html { redirect_to catalog_index_path("collection[]"=>@collection.id), notice: 'Collection was successfully created.' }
+          format.json { render json: @collection, status: :created, location: @collection }
+        else
+          format.html { render action: "new" }
+          format.json { render json: @collection.errors, status: :unprocessable_entity }
+        end
+      end
     end
+    
+    def update
+    end
+    
   end
 end

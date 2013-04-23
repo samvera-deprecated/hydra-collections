@@ -30,4 +30,15 @@ describe CollectionsController do
       expect(assigns(:collection)).to be_kind_of(Collection)
     end
   end
+  
+  describe '#create' do
+    it "should create a Collection" do
+      old_count = Collection.count
+      post :create, collection: {title: "My First Collection ", description: "The Description\r\n\r\nand more"}
+      Collection.count.should == old_count+1
+      assigns[:collection].title.should == "My First Collection "
+      assigns[:collection].description.should == "The Description\r\n\r\nand more"
+      response.should redirect_to(catalog_index_path("collection[]"=>assigns[:collection].id))
+    end
+  end
 end

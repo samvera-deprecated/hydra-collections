@@ -12,6 +12,7 @@ FactoryGirl.find_definitions
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.include Devise::TestHelpers, :type => :controller
+  config.before(:each, :type=>"controller") { @routes = Hydra::Collections::Engine.routes }
 end
 
 module FactoryGirl

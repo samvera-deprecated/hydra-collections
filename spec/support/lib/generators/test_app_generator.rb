@@ -14,12 +14,16 @@ class TestAppGenerator < Rails::Generators::Base
 
     generate 'hydra:head', '-f'
   end
+  
+  def run_migrations
+    rake("db:migrate")
+  end
 
   # Inject call to Hydra::Collections.add_routes in config/routes.rb
   def inject_routes
     insert_into_file "config/routes.rb", :after => '.draw do' do
       "\n  # Add Collections routes."
-      "\n  Hydra::Collections.add_routes(self)"
+      "\n  mount Hydra::Collections::Engine => '/'"
     end
   end
 
@@ -29,5 +33,13 @@ class TestAppGenerator < Rails::Generators::Base
 
   def copy_hydra_config
     copy_file "config/initializers/hydra_config.rb"
+  end
+  
+  def delete_static_index
+    remove_file("public/index.html")
+  end
+  
+  def copy_view_overrides
+    directory("app/views/catalog")
   end
 end

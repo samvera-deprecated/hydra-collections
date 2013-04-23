@@ -1,5 +1,6 @@
 <div class="container">
-<%= form_for(@collection) do |f| %>
+<%-# This syntax [collections, @collection] tells form_for to use the routes from the engine named collections %>
+<%= form_for([collections, @collection]) do |f| %>
   <% if @collection.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@collection.errors.count, "error") %> prohibited this topic from being saved:</h2>

@@ -38,7 +38,7 @@ describe CollectionsController do
       Collection.count.should == old_count+1
       assigns[:collection].title.should == "My First Collection "
       assigns[:collection].description.should == "The Description\r\n\r\nand more"
-      response.should redirect_to(catalog_index_path("collection[]"=>assigns[:collection].id))
+      response.should redirect_to(Rails.application.routes.url_helpers.catalog_index_path("f[collection][]"=>assigns[:collection].id))
     end
   end
 end

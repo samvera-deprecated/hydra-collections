@@ -51,7 +51,7 @@ module Hydra
     def create
       respond_to do |format|
         if @collection.save
-          format.html { redirect_to catalog_index_path("collection[]"=>@collection.id), notice: 'Collection was successfully created.' }
+          format.html { redirect_to catalog_index_path("f[collection][]"=>@collection.id), notice: 'Collection was successfully created.' }
           format.json { render json: @collection, status: :created, location: @collection }
         else
           format.html { render action: "new" }

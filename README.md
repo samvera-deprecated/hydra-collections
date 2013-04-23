@@ -2,6 +2,11 @@
 
 TODO: Write a gem description
 
+## Code Status
+
+[![Build Status](https://travis-ci.org/psu-stewardship/hydra-collections.png?branch=master)](https://travis-ci.org/psu-stewardship/hydra-collections)
+[![Dependencies Status](https://gemnasium.com/psu-stewardship/hydra-collections.png)](https://gemnasium.com/psu-stewardship/hydra-collections)
+
 ## Installation
 
 Add this line to your application's Gemfile:

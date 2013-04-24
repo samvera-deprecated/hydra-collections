@@ -40,20 +40,20 @@ describe Collection do
     @collection.depositor.should == @user.user_key
   end
   it "should be empty by default" do
-    @collection.generic_files.should be_empty
+    @collection.members.should be_empty
   end
   it "should have many files" do
-    @collection.generic_files = [@gf1, @gf2]
+    @collection.members = [@gf1, @gf2]
     @collection.save
-    Collection.find(@collection.pid).generic_files.should == [@gf1, @gf2]
+    Collection.find(@collection.pid).members.should == [@gf1, @gf2]
   end
   it "should allow new files to be added" do
-    @collection.generic_files = [@gf1]
+    @collection.members = [@gf1]
     @collection.save
     @collection = Collection.find(@collection.pid)
-    @collection.generic_files << @gf2
+    @collection.members << @gf2
     @collection.save
-    Collection.find(@collection.pid).generic_files.should == [@gf1, @gf2]
+    Collection.find(@collection.pid).members.should == [@gf1, @gf2]
   end
   it "should set the date uploaded on create" do
     @collection.save
@@ -65,7 +65,7 @@ describe Collection do
     Date.stub(:today).and_return(uploaded_date, modified_date)
     @collection.save
     @collection.date_modified.should == uploaded_date
-    @collection.generic_files = [@gf1]
+    @collection.members = [@gf1]
     @collection.save
     @collection.date_modified.should == modified_date
   end
@@ -86,7 +86,7 @@ describe Collection do
     @collection.terms_for_editing.should == [:title,:description]
   end
   it "should not delete member files when deleted" do
-    @collection.generic_files = [@gf1, @gf2]
+    @collection.members = [@gf1, @gf2]
     @collection.save
     @collection.destroy
     lambda {GenericFile.find(@gf1.pid)}.should_not raise_error ActiveFedora::ObjectNotFoundError

@@ -35,6 +35,25 @@ Or install it yourself as:
 ### Any time you want to refer to the routes from hydra-collections use collections.
     collections.new_collections_path
 
+### Make your Models Collectible
+
+Add `include Hydra::Collections::Collectible` to the models for anything that you want to be able to add to collections (ie. GenericFile, Book, Article, etc.), then add `index_collection_pids` to the solrization logic (ie. put it in to_solr)
+
+Example:
+```ruby
+class GenericFile < ActiveFedora::Base
+  include Hydra::Collections::Collectible
+  ...
+  def to_solr(solr_doc={}, opts={})
+    super(solr_doc, opts)
+    index_collection_pids(solr_doc)
+    return solr_doc
+  end
+end
+```
+
+Any items that include the `Hydra::Collections::Collectible` module can look up which collections they belong to via `.collections`.  The `index_collection_pids` puts the pids of all associated collections into the `collection` facet.
+
 ## Contributing
 
 1. Fork it

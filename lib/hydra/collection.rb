@@ -12,7 +12,7 @@ module Hydra
       has_metadata :name => "descMetadata", :type => CollectionRdfDatastream
       has_metadata :name => "properties", :type => Hydra::Datastream::Properties
 
-      has_and_belongs_to_many :generic_files, :property => :has_collection_member
+      has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base"
 
       delegate_to :properties, [:depositor], :unique => true
       delegate_to :descMetadata, [:date_uploaded, :date_modified, :related_url,

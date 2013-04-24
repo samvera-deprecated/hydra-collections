@@ -15,13 +15,9 @@ task :ci => ['jetty:config'] do
 end
 
 desc "Run specs"
-RSpec::Core::RakeTask.new(:spec => [:generate]) do |t|
-  puts 'running specs'
-  # if ENV['COVERAGE'] and RUBY_VERSION =~ /^1.8/
-  #   t.rcov = true
-  #   t.rcov_opts = %w{--exclude spec\/*,gems\/*,ruby\/* --aggregate coverage.data}
-  # end
-  t.rspec_opts = "--colour"
+# Note: this is _not_ an RSpec::Core::RakeTask.  
+# It's a regular rake task that calls the RSpec RakeTask that's defined in spec/support/lib/tasks/rspec.rake
+task :spec => [:generate] do |t|
   focused_spec = ENV['SPEC'] ? " SPEC=#{File.join(GEM_ROOT, ENV['SPEC'])}" : ''
   within_test_app do
     system "rake myspec#{focused_spec}"

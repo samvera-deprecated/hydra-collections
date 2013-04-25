@@ -52,6 +52,11 @@ describe AcceptsBatchesController do
       subject.batch.should
       flash[:notice].should == "You do not have permission to edit the documents: #{@disallowed.join(', ')}"
     end
+    it "and be sassy if you didn't select anything" do
+      subject.batch = []
+      subject.send(:filter_docs_with_read_access!)
+      flash[:notice].should == "Select something first"
+    end
     
   end
     

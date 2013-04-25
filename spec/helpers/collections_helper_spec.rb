@@ -17,13 +17,13 @@ require 'spec_helper'
 include Hydra::Collections::Engine.routes.url_helpers
 
 describe CollectionsHelper do
-  it "button_create_collection should create a button to the collections new path" do
-    html = button_create_collection 
+  it "button_for_create_collection should create a button to the collections new path" do
+    html = button_for_create_collection 
     html.should have_selector("form[action='#{collections.new_collection_path}']")
     html.should have_selector("input[type='submit']")
   end
-  it "button_create_collection should create a button with my text" do
-    html = button_create_collection "Create My Button"
+  it "button_for_create_collection should create a button with my text" do
+    html = button_for_create_collection "Create My Button"
     html.should have_selector("input[value='Create My Button']")
   end
 end

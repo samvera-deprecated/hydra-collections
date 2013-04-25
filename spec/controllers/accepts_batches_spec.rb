@@ -25,7 +25,35 @@ describe AcceptsBatchesController do
     end
   end
   
-  it "should filter_for_access" 
+  describe "should allow filtering for access" do
+    before do
+      @allowed = [1,2,3]
+      @disallowed = [5,6,7]
+      subject.batch = @allowed + @disallowed
+    end
+    it "using filter_docs_with_access!" do
+      @allowed.each {|doc_id| subject.should_receive(:can?).with(:foo, doc_id).and_return(true)}
+      @disallowed.each {|doc_id| subject.should_receive(:can?).with(:foo, doc_id).and_return(false)}
+      subject.send(:filter_docs_with_access!, :foo)
+      subject.batch.should
+      flash[:notice].should == "You do not have permission to edit the documents: #{@disallowed.join(', ')}"
+    end
+    it "using filter_docs_with_edit_access!" do
+      @allowed.each {|doc_id| subject.should_receive(:can?).with(:edit, doc_id).and_return(true)}
+      @disallowed.each {|doc_id| subject.should_receive(:can?).with(:edit, doc_id).and_return(false)}
+      subject.send(:filter_docs_with_edit_access!)
+      subject.batch.should
+      flash[:notice].should == "You do not have permission to edit the documents: #{@disallowed.join(', ')}"
+    end
+    it "using filter_docs_with_read_access!" do
+      @allowed.each {|doc_id| subject.should_receive(:can?).with(:read, doc_id).and_return(true)}
+      @disallowed.each {|doc_id| subject.should_receive(:can?).with(:read, doc_id).and_return(false)}
+      subject.send(:filter_docs_with_read_access!)
+      subject.batch.should
+      flash[:notice].should == "You do not have permission to edit the documents: #{@disallowed.join(', ')}"
+    end
+    
+  end
     
   it "should check for empty" do
     controller.batch = ["77826928", "94120425"]

@@ -35,8 +35,9 @@ class TestAppGenerator < Rails::Generators::Base
     copy_file "config/initializers/hydra_config.rb"
   end
   
-  def delete_static_index
+  def delete_generated_noise
     remove_file("public/index.html")
+    remove_file("spec/models/user_spec.rb")
   end
   
   def copy_view_overrides

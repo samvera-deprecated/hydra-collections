@@ -1,0 +1,28 @@
+<div data-behavior="batch-add-button">
+  <% if can? :edit, document.id %>
+
+    <%-   
+      # pass in local :document with a SolrDocument
+      if item_in_batch?(document.id)
+        method = :delete
+        label = 'remove from batch'
+        cssClass = "deleteBatch"
+        action = "destroy"
+      else
+        method = :put
+        label = 'add to batch'
+        cssClass = "addBatch"
+        action = "add"
+      end
+    -%>
+
+    <%= form_tag({:controller => "batch_edits", :action => action, :id => document.id}, :method => method, :class=> "batch_toggle #{cssClass}", "data-doc-id" => document.id, "data-behavior" => 'batch-add-form', :title=>h(document[document_show_link_field])) do -%>  
+      <%= hidden_field(:bookmark, :title, :value => document[document_show_link_field]) %>
+      <%= submit_tag(label, :class=>"batch_submit", :id => "batch_submit_#{document.id}") %>
+    <% end %>
+
+  <% else %>
+    <br><span class="label label-warning">You don't have edit access</label>
+  <% end %>
+</div>
+

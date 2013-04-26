@@ -52,7 +52,7 @@ module Hydra
       @collection.apply_depositor_metadata(current_user.user_key)
       respond_to do |format|
         if @collection.save
-          format.html { redirect_to catalog_index_path("f[collection][]"=>@collection.id), notice: 'Collection was successfully created.' }
+          format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully created.' }
           format.json { render json: @collection, status: :created, location: @collection }
         else
           format.html { render action: "new" }
@@ -62,7 +62,42 @@ module Hydra
     end
     
     def update
+      @collection = ::Collection.find(params[:id])
+      process_member_changes
+      @collection.update_attributes(params[:collection].except(:members))
+      respond_to do |format|
+        if @collection.save
+          format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully created.' }
+          format.json { render json: @collection, status: :updated, location: @collection }
+        else
+          format.html { render action: collections.edit_collection_path(@collection) }
+          format.json { render json: @collection.errors, status: :unprocessable_entity }
+        end
+      end
     end
     
-  end
-end
+    protected
+    
+    def process_member_changes
+      unless params[:collection].nil?
+        case params[:collection][:members]
+        when "add"
+          batch.each do |pid|
+            @collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
+          end
+        when "remove"
+          batch.each do |pid|
+            @collection.remove_relationship(:has_collection_member, "info:fedora/#{pid}")
+          end
+        when Array
+          @collection.clear_relationship(:has_collection_member)
+          params[:collection][:members].each do |pid|
+            @collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
+          end
+        end
+      end
+    end  
+    
+      
+  end # module CollectionsControllerBehavior
+end # module Hydra

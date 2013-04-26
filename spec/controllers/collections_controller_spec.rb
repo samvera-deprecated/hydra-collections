@@ -29,6 +29,7 @@ describe CollectionsController do
       get :new
       expect(assigns(:collection)).to be_kind_of(Collection)
     end
+    it "should pass through batch ids if provided and stick them in the form"
   end
   
   describe '#create' do
@@ -39,7 +40,45 @@ describe CollectionsController do
       assigns[:collection].title.should == "My First Collection "
       assigns[:collection].description.should == "The Description\r\n\r\nand more"
       assigns[:collection].depositor.should == @user.user_key
-      response.should redirect_to(Rails.application.routes.url_helpers.catalog_index_path("f[collection][]"=>assigns[:collection].id))
+      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(assigns[:collection].id)
+    end
+    it "should add docs to collection if batch ids provided"
+  end
+  
+  describe "#update" do
+    before do
+      @collection = Collection.new
+      @collection.apply_depositor_metadata(@user.user_key)
+      @collection.save
+      @asset1 = ActiveFedora::Base.create!
+      @asset2 = ActiveFedora::Base.create!
+      @asset3 = ActiveFedora::Base.create!
+      controller.should_receive(:authorize!).and_return(true)
+    end
+    it "should update collection metadata" do
+      put :update, id: @collection.id, collection: {title: "New Title", description: "New Description"}
+      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
+      assigns[:collection].title.should == "New Title"
+      assigns[:collection].description.should == "New Description"
+    end
+    it "should support adding batches of members" do
+      @collection.members << @asset1
+      @collection.save
+      put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3]
+      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
+      assigns[:collection].members.should == [@asset2, @asset3, @asset1]
+    end
+    it "should support removing batches of members" do
+      @collection.members = [@asset1, @asset2, @asset3]
+      @collection.save
+      put :update, id: @collection.id, collection: {members:"remove"}, batch_document_ids:[@asset1, @asset3]
+      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
+      assigns[:collection].members.should == [@asset2]
+    end
+    it "should support setting members array" do
+      put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3, @asset1]
+      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
+      assigns[:collection].members.should == [@asset1,@asset2, @asset3]
     end
   end
 end

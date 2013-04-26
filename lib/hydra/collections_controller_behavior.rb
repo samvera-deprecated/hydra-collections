@@ -50,6 +50,10 @@ module Hydra
     
     def create
       @collection.apply_depositor_metadata(current_user.user_key)
+      unless batch.empty?
+        params[:collection][:members]="add"
+        process_member_changes
+      end
       respond_to do |format|
         if @collection.save
           format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully created.' }

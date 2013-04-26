@@ -29,7 +29,11 @@ describe CollectionsController do
       get :new
       expect(assigns(:collection)).to be_kind_of(Collection)
     end
-    it "should pass through batch ids if provided and stick them in the form"
+    it "should pass through batch ids if provided and stick them in the form" do
+      pending "Couldn't get have_selector working before I had to move on.  - MZ"
+      get :new, batch_document_ids: ["test2", "test88"]
+      response.should have_selector("p[class='foo']")
+    end
   end
   
   describe '#create' do
@@ -42,7 +46,12 @@ describe CollectionsController do
       assigns[:collection].depositor.should == @user.user_key
       response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(assigns[:collection].id)
     end
-    it "should add docs to collection if batch ids provided"
+    it "should add docs to collection if batch ids provided" do
+      @asset1 = ActiveFedora::Base.create!
+      @asset2 = ActiveFedora::Base.create!
+      post :create, batch_document_ids: [@asset1, @asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
+      assigns[:collection].members.should == [@asset1, @asset2]
+    end
   end
   
   describe "#update" do

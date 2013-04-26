@@ -7,4 +7,8 @@ module CollectionsHelper
     render :partial=>'/collections/button_create_collection', :locals=>{:label=>label}
   end
   
+  def button_for_add_batch_to_collection(label = 'Add Selected to a Collection')
+    render :partial=>'/collections/button_add_batch_to_collection', :locals=>{:label=>label}
+  end
+  
 end

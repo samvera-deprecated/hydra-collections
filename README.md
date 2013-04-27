@@ -1,4 +1,4 @@
-# Hydra::Collections [![Version](https://badge.fury.io/rb/hydra-collections.png)](http://badge.fury.io/rb/hydra-collections) [![Build Status](https://travis-ci.org/psu-stewardship/hydra-collections.png?branch=master)](https://travis-ci.org/psu-stewardship/hydra-collections) [![Dependency Status](https://gemnasium.com/psu-stewardship/hydra-collections.png)](https://gemnasium.com/psu-stewardship/hydra-collections) [![Coverage Status](https://coveralls.io/repos/psu-stewardship/badge.png?branch=master)](https://coveralls.io/r/psu-stewardship/hydra-collections)
+# Hydra::Collections [![Version](https://badge.fury.io/rb/hydra-collections.png)](http://badge.fury.io/rb/hydra-collections) [![Build Status](https://travis-ci.org/psu-stewardship/hydra-collections.png?branch=master)](https://travis-ci.org/psu-stewardship/hydra-collections) [![Dependency Status](https://gemnasium.com/psu-stewardship/hydra-collections.png)](https://gemnasium.com/psu-stewardship/hydra-collections)
 
 Add collections to your Hydra application
 

@@ -20,6 +20,7 @@ module Hydra
     included do
       include Hydra::Controller::ControllerBehavior
       include Blacklight::Configurable # comply with BL 3.7
+      include Hydra::Collections::AcceptsBatches
 
       # This is needed as of BL 3.7
       self.copy_blacklight_config_from(CatalogController)

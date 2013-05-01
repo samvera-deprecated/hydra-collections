@@ -1,0 +1,11 @@
+Please Select your colection to add you files to:
+<% thing = Collection.new %>
+<%= form_tag(collections.collection_path('collection_replace_id'), :method => "put") do %>
+<%#= form_for thing, :url => , :html => {:multipart => true, :class => 'form-horizontal'}, :method => :put do |f| %>
+  <ul>
+  <% user_collections.each do |collection| %>
+    <li> <%= radio_button_tag(:id, collection.id, false, :class => "collection-selector") %><%= label_tag(:collection, collection.title) %> </li>
+  <% end %>
+  </ul>
+  <%= button_to "Update Collection", collections.collections_path, :method=>:put, :class=>"btn btn-primary collection-update submits-batches", 'data-behavior'=>'hydra-collections', :id=>'hydra-collection-add' %>
+<% end %>

@@ -11,6 +11,7 @@ module Hydra
     included do
       has_metadata :name => "descMetadata", :type => CollectionRdfDatastream
       has_metadata :name => "properties", :type => Hydra::Datastream::Properties
+      has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
       has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base"
 

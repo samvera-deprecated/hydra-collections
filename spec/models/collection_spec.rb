@@ -39,6 +39,11 @@ describe Collection do
   it "should have a depositor" do
     @collection.depositor.should == @user.user_key
   end
+  it "should allow the depositor to edit and read" do
+    ability = Ability.new(@user)
+    ability.can?(:read, @collection).should  == true
+    ability.can?(:edit, @collection).should  == true
+  end
   it "should be empty by default" do
     @collection.members.should be_empty
   end

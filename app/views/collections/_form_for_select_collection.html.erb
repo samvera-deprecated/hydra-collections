@@ -2,6 +2,8 @@ Please Select your colection to add you files to:
 <% thing = Collection.new %>
 <%= form_tag(collections.collection_path('collection_replace_id'), :method => "put") do %>
 <%#= form_for thing, :url => , :html => {:multipart => true, :class => 'form-horizontal'}, :method => :put do |f| %>
+  <input type="hidden" name="test" value="val" />
+  <%= hash_as_hidden_fields({:collection =>{members:"add"}}) %>
   <ul>
   <% user_collections.each do |collection| %>
     <li> <%= radio_button_tag(:id, collection.id, false, :class => "collection-selector") %><%= label_tag(:collection, collection.title) %> </li>

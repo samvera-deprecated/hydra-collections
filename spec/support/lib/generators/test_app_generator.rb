@@ -43,4 +43,12 @@ class TestAppGenerator < Rails::Generators::Base
   def copy_view_overrides
     directory("app/views/catalog")
   end
+  
+  # Inject call to Hydra::Collections.add_routes in config/routes.rb
+  def inject_javascript
+    insert_into_file "app/assets/javascripts/application.js", :after => '/= require_tree .' do
+      "\n  #include javascript for batches and collections\n//= require hydra/batch_select\n//=  require hydra_collections"
+    end
+  end
+
 end

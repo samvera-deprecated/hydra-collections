@@ -49,6 +49,65 @@ end
 
 Any items that include the `Hydra::Collections::Collectible` module can look up which collections they belong to via `.collections`.  The `index_collection_pids` puts the pids of all associated collections into the `collection` facet.
 
+### Make your Controller Accept a Batch
+
+Add `include Hydra::Collections::AcceptsBatches` to the collections you would like to process batches of models
+
+You can access the batch in your update.
+
+Example:
+```ruby
+class BatchEditsController < ApplicationController
+    include Hydra::Collections::AcceptsBatches
+  ...
+  
+    def update
+      batch.each do |doc_id|
+        obj = ActiveFedora::Base.find(doc_id, :cast=>true)
+        update_document(obj)
+        obj.save
+      end
+      flash[:notice] = "Batch update complete"
+      after_update 
+    end
+
+end
+```
+### Include the javascript to discover checked batch items
+
+include `//= require hydra/batch_select` in your application.js
+
+### Display a selection checkbox in each document partial
+
+include `<%= button_for_add_to_batch document %>'
+
+Example: views/catalog/_document_header.html.erb
+```ruby
+    <% # header bar for doc items in index view -%>
+    <div class="documentHeader clearfix">
+      <%= button_for_add_to_batch(document) %>
+      
+      ...
+     </div>
+
+```
+
+
+### Update your view to submit a Batch
+
+include 
+Add `submits-batches` class to your view input to initialize batch processing
+
+Example: 
+```ruby
+<%= button_to label, edit_batch_edits_path, :method=>:get, :class=>"btn submits-batches", 'data-behavior'=>'batch-edit', :id=>'batch-edit' %>
+```
+
+### Update you action view to submit changes to the batch
+
+Add `updates-batches` class to your 
+
+
 ## Contributing
 
 1. Fork it
@@ -70,3 +129,5 @@ In order to make modifications to the gem code and run the tests, clone the repo
     $ rake clean 
     $ rake spec
 ```
+
+

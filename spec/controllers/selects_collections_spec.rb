@@ -1,0 +1,102 @@
+require "spec_helper"
+
+class SelectsCollectionsController < ApplicationController
+  include Blacklight::Catalog
+  include Hydra::Controller::ControllerBehavior
+  include Hydra::Collections::SelectsCollections
+
+  SelectsCollectionsController.solr_search_params_logic += [:add_access_controls_to_solr_params]
+  # This filters out objects that you want to exclude from search results, like FileAssets
+  SelectsCollectionsController.solr_search_params_logic += [:exclude_unwanted_models]
+
+end
+
+
+describe SelectsCollectionsController do
+
+  describe "Select Collections" do
+    before (:all) do
+      @user = FactoryGirl.find_or_create(:user)
+      @collection = Collection.new title:"Test Public"
+      @collection.apply_depositor_metadata(@user.user_key)
+      @collection.read_groups = ["public"]
+      @collection.save
+      @collection2 = Collection.new title:"Test Read"
+      @collection2.apply_depositor_metadata('abc123@test.com')
+      @collection2.read_users = [@user.user_key]
+      @collection2.save
+      @collection3 = Collection.new title:"Test Edit"
+      @collection3.apply_depositor_metadata('abc123@test.com')
+      @collection3.edit_users = [@user.user_key]
+      @collection3.save 
+      @collection4 = Collection.new title:"Test No Access"
+      @collection4.apply_depositor_metadata('abc123@test.com')
+      @collection4.save 
+    end
+    after (:all) do
+      Collection.find(:all).map(&:delete)
+    end
+    describe "Public Access" do
+      before (:each) do
+        subject.find_collections
+        @user_collections =  subject.instance_variable_get (:@user_collections)
+        expect(@user_collections).to be_kind_of(Array)
+      end
+      it "should return public collections" do
+        @user_collections.index{|d| d.id == @collection.id}.should_not be_nil
+      end 
+      it "should not return non public collections" do
+        @user_collections.index{|d| d.id == @collection2.id}.should be_nil
+        @user_collections.index{|d| d.id == @collection3.id}.should be_nil
+        @user_collections.index{|d| d.id == @collection4.id}.should be_nil
+       end
+    end
+    describe "Read Access" do
+      describe "not signed in" do
+        it "should error if the user is not signed in" do
+          expect { subject.find_collections_with_read_access }.to raise_error
+        end
+      end
+      describe "signed in" do
+        before (:each) do
+          sign_in @user
+          subject.find_collections_with_read_access
+          @user_collections =  subject.instance_variable_get (:@user_collections)
+          expect(@user_collections).to be_kind_of(Array)
+        end
+        it "should return public and read access (edit access implies read) collections" do
+          @user_collections.index{|d| d.id == @collection.id}.should_not be_nil
+          @user_collections.index{|d| d.id == @collection2.id}.should_not be_nil
+          @user_collections.index{|d| d.id == @collection3.id}.should_not be_nil
+        end 
+        it "should not return non public collections" do
+          @user_collections.index{|d| d.id == @collection4.id}.should be_nil
+        end
+      end
+    end
+    describe "Edit Access" do
+      describe "not signed in" do
+        it "should error if the user is not signed in" do
+          expect { subject.find_collections_with_edit_access }.to raise_error
+        end
+      end
+      describe "signed in" do
+        before (:each) do
+          sign_in @user
+          subject.find_collections_with_edit_access
+           @user_collections =  subject.instance_variable_get (:@user_collections)
+           expect(@user_collections).to be_kind_of(Array)
+         end
+        it "should return public or editable collections" do
+          @user_collections.index{|d| d.id == @collection.id}.should_not be_nil
+          @user_collections.index{|d| d.id == @collection3.id}.should_not be_nil
+        end 
+        it "should not return non public or editable collections" do
+          @user_collections.index{|d| d.id == @collection2.id}.should be_nil
+          @user_collections.index{|d| d.id == @collection4.id}.should be_nil
+        end
+      end
+    end
+  end
+  
+end

@@ -44,10 +44,31 @@ class TestAppGenerator < Rails::Generators::Base
     directory("app/views/catalog")
   end
   
-  # Inject call to Hydra::Collections.add_routes in config/routes.rb
+  # Inject javascript into application.js
   def inject_javascript
     insert_into_file "app/assets/javascripts/application.js", :after => '/= require_tree .' do
       "\n  #include javascript for batches and collections\n//= require hydra/batch_select\n//=  require hydra_collections"
+    end
+  end
+
+  # Inject javascript into application.js
+  def inject_css
+    insert_into_file "app/assets/stylesheets/application.css", :after => '*= require_tree .' do
+      "\n  *= require hydra_collections"
+    end
+  end
+  
+  # Inject collections call into balacklight catalog
+  def inject_collections
+    insert_into_file "app/controllers/catalog_controller.rb", :after => 'Hydra::Controller::ControllerBehavior' do
+      "\n  include Hydra::Collections::SelectsCollections\n  before_filter :find_collections, :only=>:index"
+    end
+  end
+
+  # Inject collections SolrDocumentBehavior into balacklight SolrDocument
+  def inject_solr_doc
+    insert_into_file "app/models/solr_document.rb", :after => 'include Blacklight::Solr::Document' do
+      "\n      # Adds Collection behaviors to the SolrDocument.\n      include Hydra::Collections::SolrDocumentBehavior"
     end
   end
 

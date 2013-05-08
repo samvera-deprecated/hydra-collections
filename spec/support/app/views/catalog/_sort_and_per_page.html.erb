@@ -8,13 +8,6 @@
 
     <%= button_for_create_collection %>
 
-
-    <% c1 = Collection.new(title:"title1") %>
-    <% c1.apply_depositor_metadata("cam156@psu.edu") %>
-    <% c1.save %>
-    <% c2  = Collection.new(title:"title2") %>
-    <% c2.apply_depositor_metadata("cam156@psu.edu") %>
-    <% c2.save %>
-    <%= render partial: 'collections/form_for_select_collection', locals: {user_collections: [c1,c2]}  %>
+    <%= render partial: 'collections/form_for_select_collection', locals: {user_collections: @user_collections}  %>
 
 </div>

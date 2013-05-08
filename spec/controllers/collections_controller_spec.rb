@@ -75,7 +75,7 @@ describe CollectionsController do
       @collection.save
       put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3]
       response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
-      assigns[:collection].members.should == [@asset2, @asset3, @asset1]
+      assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3, @asset1].sort! { |a,b| a.pid <=> b.pid }
     end
     it "should support removing batches of members" do
       @collection.members = [@asset1, @asset2, @asset3]

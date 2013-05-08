@@ -6,9 +6,10 @@ module Hydra
     extend ActiveSupport::Concern
     extend ActiveSupport::Autoload
     autoload :Permissions
-    include Hydra::ModelMethods # for access to apply_depositor_metadata
-
-    included do
+   include Hydra::ModelMethods # for access to apply_depositor_metadata
+   include Hydra::ModelMixins::RightsMetadata
+    
+   included do
       has_metadata :name => "descMetadata", :type => CollectionRdfDatastream
       has_metadata :name => "properties", :type => Hydra::Datastream::Properties
       has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
@@ -16,7 +17,7 @@ module Hydra
       has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base"
 
       delegate_to :properties, [:depositor], :unique => true
-      delegate_to :descMetadata, [:date_uploaded, :date_modified, :related_url,
+      delegate_to :descMetadata, [:date_uploaded, :date_modified,
                                   :title, :description], :unique => true
 
       before_create :set_date_uploaded

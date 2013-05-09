@@ -1,3 +1,5 @@
+require 'blacklight'
+
 # -*- coding: utf-8 -*-
 # Copyright © 2012 The Pennsylvania State University
 #
@@ -12,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+include Blacklight::SolrHelper
 
 module Hydra
   module CollectionsControllerBehavior
@@ -45,7 +48,22 @@ module Hydra
     def new
       #@collection = ::Collection.new
     end
-    
+
+    def show
+      logger.warn "Got to show"
+
+      if @collection.member_ids.length > 0
+        query = @collection.member_ids.join " OR "
+        
+        # run the solr query to find the collections
+        (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
+      else
+        @member_docs = []
+        @response =  {}
+      end
+
+    end
+        
     def edit
     end
     
@@ -72,7 +90,7 @@ module Hydra
       @collection.update_attributes(params[:collection].except(:members))
       respond_to do |format|
         if @collection.save
-          format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully created.' }
+          format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully updated.' }
           format.json { render json: @collection, status: :updated, location: @collection }
         else
           format.html { render action: collections.edit_collection_path(@collection) }
@@ -103,6 +121,10 @@ module Hydra
       end
     end  
     
-      
+    # this is only needed until the version of balcklight that we are using this include it in it's solr helper  
+    def blacklight_solr
+        Blacklight.solr
+    end
+    
   end # module CollectionsControllerBehavior
 end # module Hydra

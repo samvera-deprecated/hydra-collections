@@ -1,9 +1,4 @@
 <h1><%=@collection.title%><h1>
 <h3><%=@collection.description%> </h3>
 <h3> <u>Contained Files </u></h3>
-<table>
-  <tr> <th> File id </th> </tr>
-  <% @collection.members.each_with_index do |document,counter| %>
-     <tr><td><%=document.pid%></tr>
-  <% end %>
-</table>
+<%= render partial:'document_list', locals:{documents: @member_docs} %>

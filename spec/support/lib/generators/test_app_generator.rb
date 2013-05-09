@@ -47,7 +47,7 @@ class TestAppGenerator < Rails::Generators::Base
   # Inject javascript into application.js
   def inject_javascript
     insert_into_file "app/assets/javascripts/application.js", :after => '/= require_tree .' do
-      "\n  #include javascript for batches and collections\n//= require hydra/batch_select\n//=  require hydra_collections"
+      "\n  \\\\include javascript for batches and collections\n//= require hydra/batch_select\n//=  require hydra_collections"
     end
   end
 

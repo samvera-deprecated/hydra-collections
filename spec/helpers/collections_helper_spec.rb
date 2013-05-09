@@ -17,13 +17,32 @@ require 'spec_helper'
 include Hydra::Collections::Engine.routes.url_helpers
 
 describe CollectionsHelper do
-  it "button_for_create_collection should create a button to the collections new path" do
-    html = button_for_create_collection 
-    html.should have_selector("form[action='#{collections.new_collection_path}']")
+  describe "button_for_create_collection" do
+    it " should create a button to the collections new path" do
+      html = button_for_create_collection 
+      html.should have_selector("form[action='#{collections.new_collection_path}']")
+      html.should have_selector("input[type='submit']")
+    end
+    it "should create a button with my text" do
+      html = button_for_create_collection "Create My Button"
+      html.should have_selector("input[value='Create My Button']")
+    end
+  end
+describe "button_for_delete_collection" do
+  before (:all) do
+    @collection = Collection.create title:"Test Public"
+  end
+  after (:all) do
+    @collection.delete
+  end
+  it " should create a button to the collections delete path" do
+    html = button_for_delete_collection @collection
+    html.should have_selector("form[action='#{collections.collection_path(@collection.pid)}']")
     html.should have_selector("input[type='submit']")
   end
-  it "button_for_create_collection should create a button with my text" do
-    html = button_for_create_collection "Create My Button"
-    html.should have_selector("input[value='Create My Button']")
+  it "should create a button with my text" do
+    html = button_for_delete_collection @collection,  "Delete My Button"
+    html.should have_selector("input[value='Delete My Button']")
   end
+end
 end

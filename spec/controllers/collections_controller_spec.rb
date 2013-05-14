@@ -52,6 +52,10 @@ describe CollectionsController do
       post :create, batch_document_ids: [@asset1, @asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       assigns[:collection].members.should == [@asset1, @asset2]
     end
+    it "should call after_create" do
+       controller.should_receive(:after_create).and_call_original
+       post :create, collection: {title: "My First Collection ", description: "The Description\r\n\r\nand more"}
+    end
   end
   
   describe "#update" do
@@ -69,6 +73,11 @@ describe CollectionsController do
       response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
       assigns[:collection].title.should == "New Title"
       assigns[:collection].description.should == "New Description"
+    end
+
+    it "should call after_update" do
+       controller.should_receive(:after_update).and_call_original
+       put :update, id: @collection.id, collection: {title: "New Title", description: "New Description"}
     end
     it "should support adding batches of members" do
       @collection.members << @asset1
@@ -90,4 +99,28 @@ describe CollectionsController do
       assigns[:collection].members.should == [@asset1,@asset2, @asset3]
     end
   end
+
+  describe "#destroy" do
+    describe "valid collection" do
+      before do
+        @collection = Collection.new
+        @collection.apply_depositor_metadata(@user.user_key)
+        @collection.save
+        controller.should_receive(:authorize!).and_return(true)
+      end
+      it "should delete collection" do
+        delete :destroy, id: @collection.id
+        response.should redirect_to Rails.application.routes.url_helpers.catalog_index_path
+        flash[:notice].should == "Collection was successfully deleted."
+      end
+      it "should call after_destroy" do
+         controller.should_receive(:after_destroy).and_call_original
+        delete :destroy, id: @collection.id
+      end
+    end
+    it "should not delete an invalid collection" do
+       expect {delete :destroy, id: 'zz:-1'}.to raise_error
+    end
+  end
+
 end

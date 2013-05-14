@@ -31,7 +31,7 @@ module Hydra
       # Catch permission errors
       rescue_from Hydra::AccessDenied, CanCan::AccessDenied do |exception|
         if (exception.action == :edit)
-          redirect_to(sufia.url_for({:action=>'show'}), :alert => "You do not have sufficient privileges to edit this document")
+          redirect_to(collections.url_for({:action=>'show'}), :alert => "You do not have sufficient privileges to edit this document")
         elsif current_user and current_user.persisted?
           redirect_to root_url, :alert => exception.message
         else
@@ -66,21 +66,45 @@ module Hydra
         
     def edit
     end
+
+    def after_create
+      respond_to do |format|
+        format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully created.' }
+        format.json { render json: @collection, status: :created, location: @collection }
+      end
+    end
     
+    def after_create_error
+      respond_to do |format|
+        format.html { render action: "new" }
+        format.json { render json: @collection.errors, status: :unprocessable_entity }
+      end
+    end
+        
     def create
       @collection.apply_depositor_metadata(current_user.user_key)
       unless batch.empty?
         params[:collection][:members]="add"
         process_member_changes
       end
+      if @collection.save
+        after_create
+      else
+        after_create_error
+      end
+    end
+    
+    def after_update 
       respond_to do |format|
-        if @collection.save
-          format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully created.' }
-          format.json { render json: @collection, status: :created, location: @collection }
-        else
-          format.html { render action: "new" }
-          format.json { render json: @collection.errors, status: :unprocessable_entity }
-        end
+        format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully updated.' }
+        format.json { render json: @collection, status: :updated, location: @collection }
+      end
+    end
+    
+    def after_update_error
+      respond_to do |format|
+        format.html { render action: collections.edit_collection_path(@collection) }
+        format.json { render json: @collection.errors, status: :unprocessable_entity }
       end
     end
     
@@ -88,16 +112,36 @@ module Hydra
       @collection = ::Collection.find(params[:id])
       process_member_changes
       @collection.update_attributes(params[:collection].except(:members))
-      respond_to do |format|
-        if @collection.save
-          format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully updated.' }
-          format.json { render json: @collection, status: :updated, location: @collection }
-        else
-          format.html { render action: collections.edit_collection_path(@collection) }
-          format.json { render json: @collection.errors, status: :unprocessable_entity }
-        end
+      if @collection.save
+        after_update
+      else
+        after_update_error
       end
     end
+    
+    
+    def after_destroy (id)
+      respond_to do |format|
+        format.html { redirect_to catalog_index_path, notice: 'Collection was successfully deleted.' }
+        format.json { render json: {id:id}, status: :destroyed, location: @collection }
+      end      
+    end
+
+    def after_destroy_error (id)
+      respond_to do |format|
+        format.html { redirect_to catalog_index_path, notice: 'Collection could not be deleted.' }
+        format.json { render json: {id:id}, status: :destroy_error, location: @collection }
+      end      
+    end
+    
+    def destroy
+      @collection = ::Collection.find(params[:id])     
+       if @collection.destroy
+          after_destroy(params[:id])
+       else
+         after_destroy_error(params[:id])
+       end
+     end
     
     protected
     

@@ -23,6 +23,7 @@ module Hydra
     included do
       include Hydra::Controller::ControllerBehavior
       include Blacklight::Configurable # comply with BL 3.7
+      include Blacklight::Controller
       include Hydra::Collections::AcceptsBatches
 
       # This is needed as of BL 3.7
@@ -58,8 +59,9 @@ module Hydra
         # run the solr query to find the collections
         (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
       else
+        #pretend we ran a solr query to get the colelctions since we do not need to really do it since there should be no results
         @member_docs = []
-        @response =  {}
+        @response =  Blacklight::SolrResponse.new({'responseHeader'=>{'status'=>0,'QTime'=>5,'params'=>{'wt'=>'ruby','q'=>'xxzxas'}},'response'=>{'numFound'=>0,'start'=>0,'maxScore'=>0.0,'docs'=>[]},'facet_counts'=>{'facet_queries'=>{},'facet_fields'=>{'active_fedora_model_ssi'=>[],'object_type_si'=>[]},'facet_dates'=>{},'facet_ranges'=>{}},'spellcheck'=>{'suggestions'=>['correctlySpelled',false]}},"")
       end
 
     end

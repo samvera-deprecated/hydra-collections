@@ -27,15 +27,15 @@ module Hydra::Collections::SelectsCollections
     self.class.send(:define_method, "discovery_permissions")  { access_levels[access_level] } unless access_level.blank?
  
     # add the collection filter to the solr logic for this query
-    orig_solr_search_params_logic = CatalogController.solr_search_params_logic
-    CatalogController.solr_search_params_logic += [:add_collection_filter]
+    orig_solr_search_params_logic = self.class.solr_search_params_logic
+    self.class.solr_search_params_logic += [:add_collection_filter]
     
     # run the solr query to find the collections
     (resp, doc_list) = get_search_results(:q => '', :rows=>100)
 
     #reset to original solr logic
     self.class.send(:define_method, "discovery_permissions")  { original_permissions } unless access_level.blank?
-    CatalogController.solr_search_params_logic = orig_solr_search_params_logic
+    self.class.solr_search_params_logic = orig_solr_search_params_logic
 
     # return the user's collections (or public collections if no access_level is applied)
     @user_collections = doc_list

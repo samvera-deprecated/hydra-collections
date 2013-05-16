@@ -6,6 +6,11 @@ module CollectionsHelper
   def button_for_create_collection(label = 'Create Collection')
     render partial:'/collections/button_create_collection', locals:{label:label}
   end
+
+  # Displays the Collections update collection button.  Put this in your search result page template.  We recommend putting it in catalog/_sort_and_per_page.html.erb
+  def button_for_update_collection(label = 'Update Collection', collection_id = 'collection_replace_id' )
+    render partial:'/collections/button_for_update_collection', locals:{label:label, collection_id:collection_id}
+  end
   
   # Displays the Collections delete collection button.  Put this in your search result page for each collection found.
   def button_for_delete_collection(collection, label = 'Delete Collection' )

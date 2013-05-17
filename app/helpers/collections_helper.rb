@@ -13,8 +13,8 @@ module CollectionsHelper
   end
   
   # Displays the Collections delete collection button.  Put this in your search result page for each collection found.
-  def button_for_delete_collection(collection, label = 'Delete Collection' )
-    render partial:'/collections/button_for_delete_collection', locals:{collection:collection,label:label}
+  def button_for_delete_collection(collection, label = 'Delete Collection', confirm = 'Are you sure?') 
+    render partial:'/collections/button_for_delete_collection', locals:{collection:collection,label:label, confirm:confirm}
   end
 
   def button_for_remove_from_collection(document, label = 'Remove From Collection')

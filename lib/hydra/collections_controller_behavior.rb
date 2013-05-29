@@ -54,8 +54,10 @@ module Hydra
       logger.warn "Got to show"
 
       if @collection.member_ids.length > 0
+        col_query = params[:cq]
         query = @collection.member_ids.join " OR "
-        
+        query = col_query + " AND ("+ query+")" unless col_query.blank?
+        logger.warn "query = #{query}"
         # run the solr query to find the collections
         (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
       else

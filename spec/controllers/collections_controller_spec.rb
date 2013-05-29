@@ -123,4 +123,35 @@ describe CollectionsController do
     end
   end
 
+  describe "#show" do
+    before do
+      @asset1 = ActiveFedora::Base.create!
+      @asset2 = ActiveFedora::Base.create!
+      @asset3 = ActiveFedora::Base.create!
+      @collection = Collection.new
+      @collection.title = "My collection"
+      @collection.apply_depositor_metadata(@user.user_key)
+      @collection.members = [@asset1,@asset2,@asset3]
+      @collection.save
+      controller.should_receive(:authorize!).and_return(true)
+      controller.stub(:apply_gated_search)
+    end
+    it "should show the collections" do
+      get :show, id: @collection.id
+      assigns[:collection].title.should == @collection.title
+      ids = assigns[:member_docs].map {|d| d.id}
+      ids.should include @asset1.pid
+      ids.should include @asset2.pid
+      ids.should include @asset3.pid
+    end
+    it "should query the collections" do
+      get :show, id: @collection.id, cq:@asset1.id
+      assigns[:collection].title.should == @collection.title
+      ids = assigns[:member_docs].map {|d| d.id}
+      ids.should include @asset1.pid
+      ids.should_not include @asset2.pid
+      ids.should_not include @asset3.pid
+    end
+  end
+
 end

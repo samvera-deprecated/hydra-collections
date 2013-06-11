@@ -1,7 +1,7 @@
 $(function () {
 
   // change the action based which collection is selected
-  $('input.submits-batches').on('click', function() {  
+  $('input.updates-collection').on('click', function() {
  
       var form = $(this).closest("form"); 
       var collection_id = $(".collection-selector:checked")[0].value;      

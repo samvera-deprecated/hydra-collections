@@ -1,4 +1,4 @@
-# View Helpers for Hydra Batch Edit functionality
+# View Helpers for Hydra Collections functionality
 module CollectionsHelper 
   
  

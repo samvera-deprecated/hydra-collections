@@ -17,8 +17,12 @@ module Hydra
       has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base"
 
       delegate_to :properties, [:depositor], :unique => true
-      delegate_to :descMetadata, [:date_uploaded, :date_modified,
-                                  :title, :description], :unique => true
+      
+      delegate_to :descMetadata, [:title, :date_uploaded, :date_modified,
+                                  :description], :unique => true         
+      delegate_to :descMetadata, [:creator, :contributor, :based_near, :part_of, 
+                                :publisher, :date_created, :subject,:resource_type, :rights, :identifier,
+                                :language, :tag, :related_url]                            
 
       before_create :set_date_uploaded
       before_save :set_date_modified

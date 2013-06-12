@@ -85,10 +85,10 @@ describe Collection do
     Collection.find(@collection.pid).description.should == @collection.description
   end
   it "should have the expected display terms" do
-    @collection.terms_for_display.should == [:title, :description, :date_uploaded, :date_modified]
+    @collection.terms_for_display.should == [:part_of, :contributor, :creator, :title, :description, :publisher, :date_created, :date_uploaded, :date_modified, :subject, :language, :rights, :resource_type, :identifier, :based_near, :tag, :related_url]
   end
   it "should have the expected edit terms" do
-    @collection.terms_for_editing.should == [:title,:description]
+    @collection.terms_for_editing.should == [:part_of, :contributor, :creator, :title, :description, :publisher, :date_created, :subject, :language, :rights, :resource_type, :identifier, :based_near, :tag, :related_url]
   end
   it "should not delete member files when deleted" do
     @collection.members = [@gf1, @gf2]

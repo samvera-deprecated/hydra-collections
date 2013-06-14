@@ -44,6 +44,7 @@ module Hydra
       # actions: audit, index, create, new, edit, show, update, destroy, permissions, citation
       before_filter :authenticate_user!, :except => [:show]
       load_and_authorize_resource :except=>[:index]
+      before_filter :query_collection_members, only:[:show, :edit]
     end
 
     def new
@@ -51,22 +52,6 @@ module Hydra
     end
 
     def show
-      logger.warn "Got to show"
-
-      if @collection.member_ids.length > 0
-        col_query = params[:cq]
-        query = @collection.member_ids.map{|id| '"'+id+'"'}.join " OR "
-        query = col_query + " AND ("+ query+")" unless col_query.blank?
-        logger.warn "query = #{query}"
-        
-        # run the solr query to find the collections
-        (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
-      else
-        #pretend we ran a solr query to get the colelctions since we do not need to really do it since there should be no results
-        @member_docs = []
-        @response =  Blacklight::SolrResponse.new({'responseHeader'=>{'status'=>0,'QTime'=>5,'params'=>{'wt'=>'ruby','q'=>'xxzxas'}},'response'=>{'numFound'=>0,'start'=>0,'maxScore'=>0.0,'docs'=>[]},'facet_counts'=>{'facet_queries'=>{},'facet_fields'=>{'active_fedora_model_ssi'=>[],'object_type_si'=>[]},'facet_dates'=>{},'facet_ranges'=>{}},'spellcheck'=>{'suggestions'=>['correctlySpelled',false]}},"")
-      end
-
     end
         
     def edit
@@ -149,6 +134,28 @@ module Hydra
      end
     
     protected
+    
+    # Queries Solr for members of the collection.  
+    # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
+    def query_collection_members
+      #
+      # This code should be refactored to use solr_search_params_logic and filter results using :fq parameters
+      #  - MZ June 2013
+      #
+      if @collection.member_ids.length > 0
+        col_query = params[:cq]
+        query = @collection.member_ids.map{|id| '"'+id+'"'}.join " OR "
+        query = col_query + " AND ("+ query+")" unless col_query.blank?
+        logger.warn "query = #{query}"
+        
+        # run the solr query to find the collections
+        (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
+      else
+        #pretend we ran a solr query to get the colelctions since we do not need to really do it since there should be no results
+        @member_docs = []
+        @response =  Blacklight::SolrResponse.new({'responseHeader'=>{'status'=>0,'QTime'=>5,'params'=>{'wt'=>'ruby','q'=>'xxzxas'}},'response'=>{'numFound'=>0,'start'=>0,'maxScore'=>0.0,'docs'=>[]},'facet_counts'=>{'facet_queries'=>{},'facet_fields'=>{'active_fedora_model_ssi'=>[],'object_type_si'=>[]},'facet_dates'=>{},'facet_ranges'=>{}},'spellcheck'=>{'suggestions'=>['correctlySpelled',false]}},"")
+      end
+    end
     
     def process_member_changes
       unless params[:collection].nil?

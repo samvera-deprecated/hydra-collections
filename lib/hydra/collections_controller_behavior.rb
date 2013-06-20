@@ -45,6 +45,9 @@ module Hydra
       before_filter :authenticate_user!, :except => [:show]
       load_and_authorize_resource :except=>[:index]
       before_filter :query_collection_members, only:[:show, :edit]
+
+      #This includes only the collection members in the search
+      self.solr_search_params_logic += [:include_collection_ids]
     end
 
     def new
@@ -138,17 +141,9 @@ module Hydra
     # Queries Solr for members of the collection.  
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
-      #
-      # This code should be refactored to use solr_search_params_logic and filter results using :fq parameters
-      #  - MZ June 2013
-      #
       if @collection.member_ids.length > 0
-        col_query = params[:cq]
-        query = @collection.member_ids.map{|id| '"'+id+'"'}.join " OR "
-        query = col_query + " AND ("+ query+")" unless col_query.blank?
-        logger.warn "query = #{query}"
-        
         # run the solr query to find the collections
+        query = params[:cq]
         (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
       else
         #pretend we ran a solr query to get the colelctions since we do not need to really do it since there should be no results
@@ -181,6 +176,14 @@ module Hydra
     def blacklight_solr
         Blacklight.solr
     end
-    
+
+    # include filters into the query to only include the collection memebers
+    def include_collection_ids(solr_parameters, user_parameters)
+      solr_parameters[:fq] ||= []
+      if @collection.member_ids.length > 0
+        query = @collection.member_ids.map{|id| 'id:"'+id+'"'}.join " OR "
+        solr_parameters[:fq] << query
+      end
+    end
   end # module CollectionsControllerBehavior
 end # module Hydra

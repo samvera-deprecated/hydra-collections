@@ -28,6 +28,8 @@ describe CollectionsController do
   end
   after(:all) do
     @user.destroy
+    GenericFile.destroy_all
+    Collection.destroy_all
     Object.send(:remove_const, :GenericFile)
   end
   
@@ -160,14 +162,35 @@ describe CollectionsController do
       ids.should include @asset2.pid
       ids.should include @asset3.pid
     end
+    it "should show only the collections assets" do
+      @asset4 = GenericFile.create!(title: "#{@asset1.id}")
+      get :show, id: @collection.id
+      assigns[:collection].title.should == @collection.title
+      ids = assigns[:member_docs].map {|d| d.id}
+      ids.should include @asset1.pid
+      ids.should include @asset2.pid
+      ids.should include @asset3.pid
+      ids.should_not include @asset4.pid
+    end
     it "should query the collections" do
-      get :show, id: @collection.id, cq:@asset1.title
-      pending "Can't figure out how to test fielded query within context of the gem"
+      get :show, id: @collection.id, cq:"\"#{@asset1.title}\""
       assigns[:collection].title.should == @collection.title
       ids = assigns[:member_docs].map {|d| d.id}
       ids.should include @asset1.pid
       ids.should_not include @asset2.pid
       ids.should_not include @asset3.pid
+    end
+    it "should query the collections and show only the collection assets" do
+      @asset4 = GenericFile.create!(title: "#{@asset1.id} #{@asset1.title}")
+      @asset5 = GenericFile.create!(title: "#{@asset1.title}")
+      get :show, id: @collection.id, cq:"\"#{@asset1.title}\""
+      assigns[:collection].title.should == @collection.title
+      ids = assigns[:member_docs].map {|d| d.id}
+      ids.should include @asset1.pid
+      ids.should_not include @asset2.pid
+      ids.should_not include @asset3.pid
+      ids.should_not include @asset4.pid
+      ids.should_not include @asset5.pid
     end
   end
 

@@ -31,10 +31,6 @@ class TestAppGenerator < Rails::Generators::Base
     copy_file "lib/tasks/rspec.rake"
   end
 
-  def copy_hydra_config
-    copy_file "config/initializers/hydra_config.rb"
-  end
-  
   def delete_generated_noise
     remove_file("public/index.html")
     remove_file("spec/models/user_spec.rb")

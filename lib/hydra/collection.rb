@@ -76,8 +76,11 @@ module Hydra
     def create_member_index
       self.members.each do |member|
         member.to_solr  # not sure why this to_solr is needed but it caused the removal and update to work
-        member.collections << self  if member.respond_to?(:collections)
-        member.update_index
+        if member.respond_to?(:collections)
+          member.collections << self
+          member.update_index
+          member.collections << self if self.members.size == 1  #again who konw why but this allows on asset to be added
+        end
       end
     end
 

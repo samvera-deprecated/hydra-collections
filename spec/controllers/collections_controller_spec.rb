@@ -78,8 +78,34 @@ describe CollectionsController do
        controller.should_receive(:after_create).and_call_original
        post :create, collection: {title: "My First Collection ", description: "The Description\r\n\r\nand more"}
     end
+
+    it "should add one doc to collection if batch ids provided and add the collection id to the document in the colledction" do
+      @asset1 = GenericFile.create!
+      post :create, batch_document_ids: [@asset1], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
+      assigns[:collection].members.should == [@asset1]
+      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results["response"]["numFound"].should == 1
+      doc = asset_results["response"]["docs"].first
+      doc["id"].should == @asset1.pid
+      afterupdate = GenericFile.find(@asset1.pid)
+      puts doc
+      doc[Solrizer.solr_name(:collection)].should == afterupdate.to_solr[Solrizer.solr_name(:collection)]
+    end
+    it "should add docs to collection if batch ids provided and add the collection id to the documents int he colledction" do
+      @asset1 = GenericFile.create!
+      @asset2 = GenericFile.create!
+      post :create, batch_document_ids: [@asset1,@asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
+      assigns[:collection].members.should == [@asset1,@asset2]
+      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results["response"]["numFound"].should == 1
+      doc = asset_results["response"]["docs"].first
+      doc["id"].should == @asset1.pid
+      afterupdate = GenericFile.find(@asset1.pid)
+      puts doc
+      doc[Solrizer.solr_name(:collection)].should == afterupdate.to_solr[Solrizer.solr_name(:collection)]
+    end
   end
-  
+
   describe "#update" do
     before do
       @collection = Collection.new

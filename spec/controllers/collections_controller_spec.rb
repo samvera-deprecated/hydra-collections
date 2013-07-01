@@ -129,7 +129,6 @@ describe CollectionsController do
     it "should set collection on members" do
       @collection.members << @asset1
       @collection.save
-      puts "pids = #{[@asset2, @asset3, @asset1].map { |a| a.pid }}"
       put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3]
       response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
       assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3, @asset1].sort! { |a,b| a.pid <=> b.pid }
@@ -138,7 +137,6 @@ describe CollectionsController do
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset2.pid
       afterupdate = GenericFile.find(@asset2.pid)
-      puts afterupdate.to_solr
       doc[Solrizer.solr_name(:collection)].should == afterupdate.to_solr[Solrizer.solr_name(:collection)]
       put :update, id: @collection.id, collection: {members:"remove"}, batch_document_ids:[@asset2]
       asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
@@ -164,9 +162,29 @@ describe CollectionsController do
         response.should redirect_to Rails.application.routes.url_helpers.catalog_index_path
         flash[:notice].should == "Collection was successfully deleted."
       end
-      it "should call after_destroy" do
-         controller.should_receive(:after_destroy).and_call_original
+      it "should after_destroy" do
+        controller.should_receive(:after_destroy).and_call_original
         delete :destroy, id: @collection.id
+      end
+      it "should call update members" do
+        @asset1 = GenericFile.create!
+        @collection.members << @asset1
+        @collection.save
+        @asset1 = @asset1.reload
+        @asset1.update_index
+        @asset1.collections.should == [@collection]
+        asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        asset_results["response"]["numFound"].should == 1
+        doc = asset_results["response"]["docs"].first
+        doc[Solrizer.solr_name(:collection)].should == [@collection.pid]
+
+        delete :destroy, id: @collection.id
+        @asset1.reload.collections.should == []
+        asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        asset_results["response"]["numFound"].should == 1
+        doc = asset_results["response"]["docs"].first
+        doc[Solrizer.solr_name(:collection)].should be_nil
+        @asset1.destroy
       end
     end
     it "should not delete an invalid collection" do

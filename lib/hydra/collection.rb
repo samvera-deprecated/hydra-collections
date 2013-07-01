@@ -29,8 +29,9 @@ module Hydra
       before_save :set_date_modified
 
       after_save :local_update_members
-      #after_create :create_member_index
+      after_create :create_member_index
 
+      before_destroy :remove_all_members
     end
 
     # TODO: Move this override into ScholarSphere
@@ -73,11 +74,18 @@ module Hydra
     end
 
     def create_member_index
-      self.reload
       self.members.each do |member|
-        member.collections << self
-        logger.warn "\n\n Creating Member: #{member.id} self: #{self.id} collections: #{member.collections.map {|c|c.pid}} \n\n"
-        member.save
+        member.to_solr  # not sure why this to_solr is needed but it caused the removal and update to work
+        member.collections << self  if member.respond_to?(:collections)
+        member.update_index
+      end
+    end
+
+    def remove_all_members
+      self.members.each do |member|
+        member.to_solr  # not sure why this to_solr is needed but it caused the removal and update to work
+        member.collections.delete(self) if member.respond_to?(:collections)
+        member.update_index
       end
     end
 

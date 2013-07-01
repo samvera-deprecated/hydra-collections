@@ -18,9 +18,13 @@ describe CollectionsController do
   before(:all) do
     @user = FactoryGirl.find_or_create(:user)
     class GenericFile < ActiveFedora::Base
+      include Hydra::Collections::Collectible
+
+
       attr_accessor :title
       def to_solr(solr_doc={})
         super
+        solr_doc = index_collection_pids(solr_doc)
         solr_doc["label_tesim"] = self.title
         solr_doc
       end
@@ -81,10 +85,11 @@ describe CollectionsController do
       @collection = Collection.new
       @collection.apply_depositor_metadata(@user.user_key)
       @collection.save
-      @asset1 = ActiveFedora::Base.create!
-      @asset2 = ActiveFedora::Base.create!
-      @asset3 = ActiveFedora::Base.create!
-      controller.should_receive(:authorize!).and_return(true)
+      @asset1 = GenericFile.create!
+      @asset2 = GenericFile.create!
+      @asset3 = GenericFile.create!
+      controller.stub(:authorize!).and_return(true)
+      controller.should_receive(:authorize!).at_least(:once)
     end
     it "should update collection metadata" do
       put :update, id: @collection.id, collection: {title: "New Title", description: "New Description"}
@@ -114,8 +119,36 @@ describe CollectionsController do
     it "should support setting members array" do
       put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3, @asset1]
       response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
-      assigns[:collection].members.should == [@asset1,@asset2, @asset3]
+      assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3, @asset1].sort! { |a,b| a.pid <=> b.pid }
     end
+    it "should support setting members array" do
+      put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3, @asset1]
+      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
+      assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3, @asset1].sort! { |a,b| a.pid <=> b.pid }
+    end
+    it "should set collection on members" do
+      @collection.members << @asset1
+      @collection.save
+      puts "pids = #{[@asset2, @asset3, @asset1].map { |a| a.pid }}"
+      put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3]
+      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
+      assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3, @asset1].sort! { |a,b| a.pid <=> b.pid }
+      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results["response"]["numFound"].should == 1
+      doc = asset_results["response"]["docs"].first
+      doc["id"].should == @asset2.pid
+      afterupdate = GenericFile.find(@asset2.pid)
+      puts afterupdate.to_solr
+      doc[Solrizer.solr_name(:collection)].should == afterupdate.to_solr[Solrizer.solr_name(:collection)]
+      put :update, id: @collection.id, collection: {members:"remove"}, batch_document_ids:[@asset2]
+      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results["response"]["numFound"].should == 1
+      doc = asset_results["response"]["docs"].first
+      doc["id"].should == @asset2.pid
+      afterupdate = GenericFile.find(@asset2.pid)
+      doc[Solrizer.solr_name(:collection)].should be_nil
+    end
+
   end
 
   describe "#destroy" do

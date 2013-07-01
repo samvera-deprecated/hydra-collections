@@ -19,6 +19,7 @@ module Hydra::Collections::Collectible
   #   end
   def index_collection_pids(solr_doc={})
     solr_doc[Solrizer.solr_name(:collection, :facetable)] = self.collection_ids
+    solr_doc[Solrizer.solr_name(:collection)] = self.collection_ids
     solr_doc
   end
 end

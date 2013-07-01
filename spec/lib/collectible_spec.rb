@@ -16,7 +16,7 @@ describe Hydra::Collections::Collectible do
       @collection1.save
       @collectible.collections << @collection2
       reloaded = CollectibleThing.find(@collectible.pid)
-      @collection2.members.should == [@collectible]
+      @collection2.reload.members.should == [@collectible]
       reloaded.collections.should == [@collection1, @collection2]
     end
   end

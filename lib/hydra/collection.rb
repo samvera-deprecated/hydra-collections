@@ -6,15 +6,16 @@ module Hydra
     extend ActiveSupport::Concern
     extend ActiveSupport::Autoload
     autoload :Permissions
-   include Hydra::ModelMethods # for access to apply_depositor_metadata
-   include Hydra::ModelMixins::RightsMetadata
-    
-   included do
+    include Hydra::ModelMethods # for access to apply_depositor_metadata
+    include Hydra::ModelMixins::RightsMetadata
+    include Hydra::Collections::Collectible
+
+    included do
       has_metadata :name => "descMetadata", :type => CollectionRdfDatastream
       has_metadata :name => "properties", :type => Hydra::Datastream::Properties
       has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
-      has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base"
+      has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base" , :after_remove => :remove_member
 
       delegate_to :properties, [:depositor], :unique => true
       
@@ -26,6 +27,10 @@ module Hydra
 
       before_create :set_date_uploaded
       before_save :set_date_modified
+
+      after_save :local_update_members
+      #after_create :create_member_index
+
     end
 
     # TODO: Move this override into ScholarSphere
@@ -43,6 +48,11 @@ module Hydra
       self.descMetadata.class.config.keys
     end
 
+    def remove_member(member)
+      #member.collections.delete self if member.respond_to?(:collections)
+      member.reload.update_index
+    end
+
     private
 
     def set_date_uploaded
@@ -53,5 +63,24 @@ module Hydra
       self.date_modified = Date.today
     end
 
-  end
+    # cause the members to index the relationship
+    def local_update_members
+      if self.respond_to?(:members)
+        self.members.each do |member|
+          member.reload.update_index
+        end
+      end
+    end
+
+    def create_member_index
+      self.reload
+      self.members.each do |member|
+        member.collections << self
+        logger.warn "\n\n Creating Member: #{member.id} self: #{self.id} collections: #{member.collections.map {|c|c.pid}} \n\n"
+        member.save
+      end
+    end
+
+ end
+
 end

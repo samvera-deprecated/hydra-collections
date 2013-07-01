@@ -154,23 +154,32 @@ module Hydra
     
     def process_member_changes
       unless params[:collection].nil?
+        change_members = []
+        batch.each do |pid|
+          change_members << ActiveFedora::Base.find(pid, :cast=>true)
+        end
+
         case params[:collection][:members]
-        when "add"
-          batch.each do |pid|
-            @collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
-          end
-        when "remove"
-          batch.each do |pid|
-            @collection.remove_relationship(:has_collection_member, "info:fedora/#{pid}")
-          end
-        when Array
-          @collection.clear_relationship(:has_collection_member)
-          params[:collection][:members].each do |pid|
-            @collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
-          end
+          when "add"
+            change_members.each do |member|
+              @collection.members << member
+              #@collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
+            end
+          when "remove"
+            change_members.each do |member|
+              @collection.members.delete(member)
+              #puts "removing pid"
+              #@collection.remove_relationship(:has_collection_member, "info:fedora/#{pid}")
+            end
+          when Array
+            @collection.members.replace(change_members)
+          #@collection.clear_relationship(:has_collection_member)
+          #params[:collection][:members].each do |pid|
+          #  @collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
+          #end
         end
       end
-    end  
+    end
     
     # this is only needed until the version of balcklight that we are using this include it in it's solr helper  
     def blacklight_solr

@@ -132,7 +132,7 @@ In order to make modifications to the gem code and run the tests, clone the repo
 ## License
 
 The hydra-collections source code is freely available under the Apache 2.0 license.
-[Read the copyright statement and license](/projecthydra/hydra-collections/blob/master/LICENSE.txt).
+[Read the copyright statement and license](/LICENSE.txt).
 
 ## Acknowledgements
 

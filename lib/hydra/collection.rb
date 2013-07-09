@@ -46,7 +46,7 @@ module Hydra
     end
 
     def terms_for_display
-      self.descMetadata.class.config.keys
+      self.descMetadata.class.config.keys.map{|v| v.to_sym}
     end
 
     def remove_member(member)

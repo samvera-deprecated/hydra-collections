@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ### Mount the engine to get the routes in config/routes.rb
 
-    mount Hydra::Collections::Engine => '/' 
+    mount Hydra::Collections::Engine => '/'
 
 ### Call button_create_collection view helper in your search result page template.
   We recommend putting it in catalog/_sort_and_per_page.html.erb which you will manually override in you app.
@@ -60,7 +60,7 @@ Example:
 class BatchEditsController < ApplicationController
     include Hydra::Collections::AcceptsBatches
   ...
-  
+
     def update
       batch.each do |doc_id|
         obj = ActiveFedora::Base.find(doc_id, :cast=>true)
@@ -68,7 +68,7 @@ class BatchEditsController < ApplicationController
         obj.save
       end
       flash[:notice] = "Batch update complete"
-      after_update 
+      after_update
     end
 
 end
@@ -86,7 +86,6 @@ Example: views/catalog/_document_header.html.erb
     <% # header bar for doc items in index view -%>
     <div class="documentHeader clearfix">
       <%= button_for_add_to_batch(document) %>
-      
       ...
      </div>
 
@@ -95,17 +94,17 @@ Example: views/catalog/_document_header.html.erb
 
 ### Update your view to submit a Batch
 
-include 
+include
 Add `submits-batches` class to your view input to initialize batch processing
 
-Example: 
+Example:
 ```ruby
 <%= button_to label, edit_batch_edits_path, :method=>:get, :class=>"btn submits-batches", 'data-behavior'=>'batch-edit', :id=>'batch-edit' %>
 ```
 
 ### Update you action view to submit changes to the batch
 
-Add `updates-batches` class to your 
+Add `updates-batches` class to your
 
 
 ## Contributing
@@ -126,8 +125,12 @@ In order to make modifications to the gem code and run the tests, clone the repo
     $ git submodule update
     $ rake jetty:config
     $ rake jetty:start
-    $ rake clean 
+    $ rake clean
     $ rake spec
 ```
 
+## Acknowledgements
 
+This software has been developed by and is brought to you by the Hydra community.  Learn more at the [Project Hydra website](http://projecthydra.org)
+
+![Project Hydra Logo](https://github.com/uvalib/libra-oa/blob/a6564a9e5c13b7873dc883367f5e307bf715d6cf/public/images/powered_by_hydra.png?raw=true)

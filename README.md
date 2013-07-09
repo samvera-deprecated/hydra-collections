@@ -1,4 +1,4 @@
-# Hydra::Collections [![Version](https://badge.fury.io/rb/hydra-collections.png)](http://badge.fury.io/rb/hydra-collections) [![Build Status](https://travis-ci.org/psu-stewardship/hydra-collections.png?branch=master)](https://travis-ci.org/psu-stewardship/hydra-collections) [![Dependency Status](https://gemnasium.com/psu-stewardship/hydra-collections.png)](https://gemnasium.com/psu-stewardship/hydra-collections)
+# Hydra::Collections [![Version](https://badge.fury.io/rb/hydra-collections.png)](http://badge.fury.io/rb/hydra-collections) [![Build Status](https://travis-ci.org/projecthydra/hydra-collections.png?branch=master)](https://travis-ci.org/projecthydra/hydra-collections) [![Dependency Status](https://gemnasium.com/projecthydra/hydra-collections.png)](https://gemnasium.com/projecthydra/hydra-collections)
 
 Add collections to your Hydra application
 
@@ -128,6 +128,11 @@ In order to make modifications to the gem code and run the tests, clone the repo
     $ rake clean
     $ rake spec
 ```
+
+## License
+
+The hydra-collections source code is freely available under the Apache 2.0 license.
+[Read the copyright statement and license](/projecthydra/hydra-collections/blob/master/LICENSE.txt).
 
 ## Acknowledgements
 

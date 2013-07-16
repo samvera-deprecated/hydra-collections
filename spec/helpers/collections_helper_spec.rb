@@ -19,13 +19,20 @@ include Hydra::Collections::Engine.routes.url_helpers
 describe CollectionsHelper do
   describe "button_for_create_collection" do
     it " should create a button to the collections new path" do
-      html = button_for_create_collection 
-      html.should have_selector("form[action='#{collections.new_collection_path}']")
-      html.should have_selector("input[type='submit']")
+      str = String.new(helper.button_for_create_collection)
+      doc = Nokogiri::HTML(str)
+      form = doc.xpath('//form').first
+      form.attr('action').should == "#{collections.new_collection_path}"
+      i = form.children.first.children.first
+      i.attr('type').should == 'submit'
     end
     it "should create a button with my text" do
-      html = button_for_create_collection "Create My Button"
-      html.should have_selector("input[value='Create My Button']")
+      str = String.new(helper.button_for_create_collection "Create My Button")
+      doc = Nokogiri::HTML(str)
+      form = doc.xpath('//form').first
+      form.attr('action').should == "#{collections.new_collection_path}"
+      i = form.children.first.children.first
+      i.attr('value').should == 'Create My Button'
     end
   end
 describe "button_for_delete_collection" do
@@ -36,13 +43,20 @@ describe "button_for_delete_collection" do
     @collection.delete
   end
   it " should create a button to the collections delete path" do
-    html = button_for_delete_collection @collection
-    html.should have_selector("form[action='#{collections.collection_path(@collection.pid)}']")
-    html.should have_selector("input[type='submit']")
+    str = button_for_delete_collection @collection
+    doc = Nokogiri::HTML(str)
+    form = doc.xpath('//form').first
+    form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+    i = form.children.first.children[1]
+    i.attr('type').should == 'submit'
   end
   it "should create a button with my text" do
-    html = button_for_delete_collection @collection,  "Delete My Button"
-    html.should have_selector("input[value='Delete My Button']")
+    str = button_for_delete_collection @collection, "Delete My Button"
+    doc = Nokogiri::HTML(str)
+    form = doc.xpath('//form').first
+    form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+    i = form.children.first.children[1]
+    i.attr('value').should == "Delete My Button"
   end
 end
   describe "button_for_remove_selected_from_collection" do
@@ -53,13 +67,21 @@ end
       @collection.delete
     end
     it " should create a button to the collections delete path" do
-      html = button_for_remove_selected_from_collection @collection
-      html.should have_selector("form[action='#{collections.collection_path(@collection.pid)}']")
-      html.should have_selector("input[type='submit']")
+      str = button_for_remove_selected_from_collection @collection
+      doc = Nokogiri::HTML(str)
+      form = doc.xpath('//form').first
+      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+      i = form.children[2]
+      i.attr('value').should == "remove"
+      i.attr('name').should == "collection[members]"
     end
     it "should create a button with my text" do
-      html = button_for_remove_selected_from_collection @collection, "Remove My Button"
-      html.should have_selector("input[value='Remove My Button']")
+      str = button_for_remove_selected_from_collection @collection, "Remove My Button"
+      doc = Nokogiri::HTML(str)
+      form = doc.xpath('//form').first
+      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+      i = form.children[3]
+      i.attr('value').should == "Remove My Button"
     end
   end
 

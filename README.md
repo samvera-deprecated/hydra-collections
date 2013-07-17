@@ -49,6 +49,19 @@ end
 
 Any items that include the `Hydra::Collections::Collectible` module can look up which collections they belong to via `.collections`.  The `index_collection_pids` puts the pids of all associated collections into the `collection` facet.
 
+### Make the Collection show as a facet in your CatalogController
+
+```ruby
+class CatalogController < ApplicationController
+    include Blacklight::Catalog
+  ...
+    configure_blacklight do |config|
+  ...     
+        config.add_facet_field solr_name("collection", :facetable), label: "Collection", helper_method: :collection_name
+    end
+end
+```
+
 ### Make your Controller Accept a Batch
 
 Add `include Hydra::Collections::AcceptsBatches` to the collections you would like to process batches of models

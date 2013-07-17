@@ -1,17 +1,3 @@
-# Copyright © 2012 The Pennsylvania State University
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 require 'spec_helper'
 
 describe CollectionsController do
@@ -249,6 +235,7 @@ describe CollectionsController do
       ids.should include @asset3.pid
       ids.should_not include @asset4.pid
     end
+    # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
     it "should query the collections" do
       get :show, id: @collection.id, cq:"\"#{@asset1.title}\""
       assigns[:collection].title.should == @collection.title
@@ -257,6 +244,8 @@ describe CollectionsController do
       ids.should_not include @asset2.pid
       ids.should_not include @asset3.pid
     end
+
+    # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
     it "should query the collections and show only the collection assets" do
       @asset4 = GenericFile.create!(title: "#{@asset1.id} #{@asset1.title}")
       @asset5 = GenericFile.create!(title: "#{@asset1.title}")

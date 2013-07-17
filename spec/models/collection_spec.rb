@@ -94,7 +94,7 @@ describe Collection do
     @collection.members = [@gf1, @gf2]
     @collection.save
     @collection.destroy
-    lambda {GenericFile.find(@gf1.pid)}.should_not raise_error ActiveFedora::ObjectNotFoundError
-    lambda {GenericFile.find(@gf2.pid)}.should_not raise_error ActiveFedora::ObjectNotFoundError
+    GenericFile.exists?(@gf1.pid).should be_true
+    GenericFile.exists?(@gf2.pid).should be_true
   end
 end

@@ -23,9 +23,12 @@ Or install it yourself as:
     mount Hydra::Collections::Engine => '/'
 
 ### Call button_create_collection view helper in your search result page template.
-  We recommend putting it in catalog/_sort_and_per_page.html.erb which you will manually override in you app.
-
-    <%= button_create_collection %>
+  First add `helper :collections` to your `catalog_controller.rb`
+  
+  Next, we recommend putting the view helper in catalog/[_sort_and_per_page.html.erb](https://github.com/projectblacklight/blacklight/blob/master/app/views/catalog/_sort_and_per_page.html.erb) which you will manually override in you app.
+```erb
+<%= button_for_create_collection %>
+```    
 
 ### Any time you want to refer to the routes from hydra-collections use collections.
     collections.new_collections_path

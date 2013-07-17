@@ -13,10 +13,10 @@ describe AcceptsBatchesController do
     end
     describe ":all" do
       before do
-        doc1 = stub(:id=>123)
-        doc2 = stub(:id=>456)
+        doc1 = double(:id=>123)
+        doc2 = double(:id=>456)
         Hydra::Collections::SearchService.any_instance.should_receive(:last_search_documents).and_return([doc1, doc2])
-        controller.stub(:current_user=>stub(:user_key=>'vanessa'))
+        controller.stub(current_user: double(user_key: 'vanessa'))
       end
       it "should add every document in the current resultset to the batch" do
         controller.params["batch_document_ids"] = "all"

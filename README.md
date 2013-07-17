@@ -115,7 +115,7 @@ Example:
 <%= button_to label, edit_batch_edits_path, :method=>:get, :class=>"btn submits-batches", 'data-behavior'=>'batch-edit', :id=>'batch-edit' %>
 ```
 
-### Update you action view to submit changes to the batch
+### Update your action view to submit changes to the batch
 
 Add `updates-batches` class to your
 

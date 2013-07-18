@@ -40,5 +40,15 @@ module CollectionsHelper
   def single_item_action_form_fields(form, document, action)
     render partial:'/collections/single_item_action_fields', locals:{form:form, document:document, action: action}
   end
+
+  def hidden_collection_members
+    _erbout = ''
+    if params[:batch_document_ids].present?
+      params[:batch_document_ids].each do |batch_item|
+        _erbout.concat hidden_field_tag("batch_document_ids[]", batch_item)
+      end
+    end
+    _erbout.html_safe
+  end
   
 end

@@ -74,7 +74,6 @@ describe CollectionsController do
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset1.pid
       afterupdate = GenericFile.find(@asset1.pid)
-      puts doc
       doc[Solrizer.solr_name(:collection)].should == afterupdate.to_solr[Solrizer.solr_name(:collection)]
     end
     it "should add docs to collection if batch ids provided and add the collection id to the documents int he colledction" do
@@ -87,7 +86,6 @@ describe CollectionsController do
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset1.pid
       afterupdate = GenericFile.find(@asset1.pid)
-      puts doc
       doc[Solrizer.solr_name(:collection)].should == afterupdate.to_solr[Solrizer.solr_name(:collection)]
     end
   end

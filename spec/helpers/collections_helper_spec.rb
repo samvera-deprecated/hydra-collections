@@ -45,6 +45,21 @@ describe CollectionsHelper do
       i.attr('value').should == "Delete My Button"
     end
   end
+  describe "button_for_remove_from_collection" do
+    let(:item) { double(id: 'changeme:123') } 
+    before do
+      @collection = Collection.create
+    end
+
+    it "should generate a form that can remove the item" do
+      str = button_for_remove_from_collection item
+      doc = Nokogiri::HTML(str)
+      form = doc.xpath('//form').first
+      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+      form.css('input#collection_members[type="hidden"][value="remove"]').should_not be_empty
+      form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]').should_not be_empty
+    end
+  end 
   describe "button_for_remove_selected_from_collection" do
     before (:all) do
       @collection = Collection.create title:"Test Public"

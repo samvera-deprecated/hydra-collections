@@ -6,7 +6,7 @@ module Hydra::Collections::Collectible
   
   included do
     #after_solrize << :index_collection_pids
-    has_many :collections, property: :has_collection_member
+    has_many :collections, property: :has_collection_member, :class_name => "ActiveFedora::Base"
   end
 
   # Add this method to your solrization logic (ie. in to_solr) in order to populate the 'collection' facet 

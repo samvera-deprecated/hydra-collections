@@ -19,9 +19,11 @@ desc "Run specs"
 # It's a regular rake task that calls the RSpec RakeTask that's defined in spec/support/lib/tasks/rspec.rake
 task :spec => [:generate] do |t|
   focused_spec = ENV['SPEC'] ? " SPEC=#{File.join(GEM_ROOT, ENV['SPEC'])}" : ''
-  within_test_app do
-    system "rake myspec#{focused_spec}"
-    abort "Error running hydra-collections" unless $?.success?
+  Bundler.with_clean_env do
+    within_test_app do
+      system "rake myspec#{focused_spec}"
+      abort "Error running hydra-collections" unless $?.success?
+    end
   end
 end
 

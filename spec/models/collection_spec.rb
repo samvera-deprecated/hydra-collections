@@ -97,4 +97,32 @@ describe Collection do
     GenericFile.exists?(@gf1.pid).should be_true
     GenericFile.exists?(@gf2.pid).should be_true
   end
+
+  describe "Collection by another name" do
+    before (:all) do
+      class OtherCollection < ActiveFedora::Base
+        include Hydra::Collection
+        include Hydra::Collections::Collectible
+      end
+      class Member < ActiveFedora::Base
+        include Hydra::Collections::Collectible
+      end
+    end
+    after(:all) do
+      Object.send(:remove_const, :OtherCollection)
+      Object.send(:remove_const, :Member)
+    end
+
+    it "have members that know about the collection" do
+      collection = OtherCollection.new
+      member = Member.create
+      collection.members << member
+      collection.save
+      member.reload
+      member.collections.should == [collection]
+      collection.destroy
+      member.destroy
+    end
+  end
+
 end

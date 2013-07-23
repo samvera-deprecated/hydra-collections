@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+# Please see hydra-batch-edit.gemspec for dependency information.
+gemspec :path=>"../"
+
+gem 'rails', "~> 3.2"

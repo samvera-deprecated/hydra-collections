@@ -102,7 +102,6 @@ module Hydra
     end
     
     def update
-      @collection = ::Collection.find(params[:id])
       process_member_changes
       @collection.update_attributes(params[:collection].except(:members))
       if @collection.save
@@ -128,7 +127,6 @@ module Hydra
     end
     
     def destroy
-      @collection = ::Collection.find(params[:id])     
        if @collection.destroy
           after_destroy(params[:id])
        else

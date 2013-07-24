@@ -43,7 +43,7 @@ module Hydra
 
       # actions: audit, index, create, new, edit, show, update, destroy, permissions, citation
       before_filter :authenticate_user!, :except => [:show]
-      load_and_authorize_resource :except=>[:index]
+      load_and_authorize_resource :except=>[:index], instance_name: :collection
       before_filter :query_collection_members, only:[:show, :edit]
 
       #This includes only the collection members in the search
@@ -56,7 +56,7 @@ module Hydra
 
     def show
     end
-        
+
     def edit
     end
 
@@ -102,7 +102,6 @@ module Hydra
     end
     
     def update
-      @collection = ::Collection.find(params[:id])
       process_member_changes
       @collection.update_attributes(params[:collection].except(:members))
       if @collection.save
@@ -128,7 +127,6 @@ module Hydra
     end
     
     def destroy
-      @collection = ::Collection.find(params[:id])     
        if @collection.destroy
           after_destroy(params[:id])
        else

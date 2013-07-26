@@ -136,24 +136,29 @@ describe CollectionsController do
       response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
       assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3, @asset1].sort! { |a,b| a.pid <=> b.pid }
     end
-    it "should set collection on members" do
-      @collection.members << @asset1
-      @collection.save
+    it "should set/un-set collection on members" do
+      # Add to collection (sets collection on members)
       put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3]
-      response.should redirect_to Hydra::Collections::Engine.routes.url_helpers.collection_path(@collection.id)
-      assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3, @asset1].sort! { |a,b| a.pid <=> b.pid }
+      assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3].sort! { |a,b| a.pid <=> b.pid }
+      ## Check that member lists collection in its solr doc
+      @asset2.reload
+      @asset2.to_solr[Solrizer.solr_name(:collection)].should == [@collection.pid]
+      ## Check that member was re-indexed with collection info
       asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
-      asset_results["response"]["numFound"].should == 1
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset2.pid
-      afterupdate = GenericFile.find(@asset2.pid)
-      doc[Solrizer.solr_name(:collection)].should == afterupdate.to_solr[Solrizer.solr_name(:collection)]
+      doc[Solrizer.solr_name(:collection)].should == [@collection.pid]
+  
+      # Remove from collection (un-sets collection on members)
       put :update, id: @collection.id, collection: {members:"remove"}, batch_document_ids:[@asset2]
+      assigns[:collection].members.should_not include(@asset2)
+      ## Check that member no longer lists collection in its solr doc
+      @asset2.reload
+      @asset2.to_solr[Solrizer.solr_name(:collection)].should == []
+      ## Check that member was re-indexed without collection info
       asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
-      asset_results["response"]["numFound"].should == 1
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset2.pid
-      afterupdate = GenericFile.find(@asset2.pid)
       doc[Solrizer.solr_name(:collection)].should be_nil
     end
 

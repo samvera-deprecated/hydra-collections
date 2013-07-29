@@ -14,6 +14,17 @@ end
 
 describe SelectsCollectionsController do
 
+  describe "#find_collections" do
+    it "should override solr_search_params_logic to use collection_search_params_logic, then switch it back" do
+      # Looks like we can only test this indirectly b/c blacklight doesn't let you explicitly pass solr_search_params_logic when running searches -- you have to set the controller's solr_search_params_logic class attribute
+      original_solr_logic = subject.solr_search_params_logic
+      subject.collection_search_params_logic.should == [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter]
+      subject.class.should_receive(:solr_search_params_logic=).with(subject.collection_search_params_logic)
+      subject.class.should_receive(:solr_search_params_logic=).with(original_solr_logic)
+      subject.find_collections
+    end
+  end
+  
   describe "Select Collections" do
     before (:all) do
       @user = FactoryGirl.find_or_create(:user)

@@ -1,19 +1,3 @@
-require 'blacklight'
-
-# -*- coding: utf-8 -*-
-# Copyright © 2012 The Pennsylvania State University
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 include Blacklight::SolrHelper
 
 module Hydra
@@ -25,6 +9,7 @@ module Hydra
       include Blacklight::Configurable # comply with BL 3.7
       include Blacklight::Controller
       include Hydra::Collections::AcceptsBatches
+      include Hydra::Collections::SelectsCollections
 
       # This is needed as of BL 3.7
       self.copy_blacklight_config_from(CatalogController)
@@ -45,6 +30,7 @@ module Hydra
       before_filter :authenticate_user!, :except => [:show]
       load_and_authorize_resource :except=>[:index], instance_name: :collection
       before_filter :query_collection_members, only:[:show, :edit]
+      before_filter :find_collections, only: [:edit]
 
       #This includes only the collection members in the search
       self.solr_search_params_logic += [:include_collection_ids]
@@ -88,8 +74,11 @@ module Hydra
     end
     
     def after_update 
+      if flash[:notice].nil?
+        flash[:notice] = 'Collection was successfully updated.'
+      end
       respond_to do |format|
-        format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully updated.' }
+        format.html { redirect_to collections.collection_path(@collection) }
         format.json { render json: @collection, status: :updated, location: @collection }
       end
     end
@@ -166,9 +155,15 @@ module Hydra
           when "remove"
             change_members.each do |member|
               @collection.members.delete(member)
-              #puts "removing pid"
-              #@collection.remove_relationship(:has_collection_member, "info:fedora/#{pid}")
             end
+          when "move"
+            @destination_collection = ::Collection.find(params[:destination_collection_id])
+            change_members.each do |member|
+              @collection.members.delete(member)
+              @destination_collection.members << member
+            end
+            @destination_collection.save
+            flash[:notice] = "Successfully moved #{change_members.count} files to #{@destination_collection.title} Collection."
           when Array
             @collection.members.replace(change_members)
           #@collection.clear_relationship(:has_collection_member)

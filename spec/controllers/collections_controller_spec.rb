@@ -3,6 +3,7 @@ require 'spec_helper'
 describe CollectionsController do
   before(:all) do
     @user = FactoryGirl.find_or_create(:user)
+#    CollectionsController.config.default_solr_params = {:qf => 'title_tesim'}
     class GenericFile < ActiveFedora::Base
       include Hydra::Collections::Collectible
 
@@ -218,7 +219,7 @@ describe CollectionsController do
     end
   end
 
-  describe "#show" do
+  describe "with a number of assets #show" do
     before do
       @asset1 = GenericFile.create!(title: "First of the Assets")
       @asset2 = GenericFile.create!(title: "Second of the Assets")
@@ -249,6 +250,13 @@ describe CollectionsController do
       ids.should include @asset3.pid
       ids.should_not include @asset4.pid
     end
+
+    it "when the collection is empty it should show no assets" do
+      get :show, id: Collection.create(title: "Empty collection").id
+      assigns[:collection].title.should ==  "Empty collection"
+      assigns[:member_docs].should be_empty
+    end
+
     # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
     it "should query the collections" do
       get :show, id: @collection.id, cq:"\"#{@asset1.title}\""

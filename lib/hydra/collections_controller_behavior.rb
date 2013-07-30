@@ -29,21 +29,21 @@ module Hydra
       # actions: audit, index, create, new, edit, show, update, destroy, permissions, citation
       before_filter :authenticate_user!, :except => [:show]
       load_and_authorize_resource :except=>[:index], instance_name: :collection
-      before_filter :query_collection_members, only:[:show, :edit]
-      before_filter :find_collections, only: [:edit]
 
       #This includes only the collection members in the search
       self.solr_search_params_logic += [:include_collection_ids]
     end
 
     def new
-      #@collection = ::Collection.new
     end
 
     def show
+      query_collection_members
     end
 
     def edit
+      query_collection_members
+      find_collections
     end
 
     def after_create
@@ -128,15 +128,9 @@ module Hydra
     # Queries Solr for members of the collection.  
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
-      if @collection.member_ids.length > 0
-        # run the solr query to find the collections
-        query = params[:cq]
-        (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
-      else
-        #pretend we ran a solr query to get the colelctions since we do not need to really do it since there should be no results
-        @member_docs = []
-        @response =  Blacklight::SolrResponse.new({'responseHeader'=>{'status'=>0,'QTime'=>5,'params'=>{'wt'=>'ruby','q'=>'xxzxas'}},'response'=>{'numFound'=>0,'start'=>0,'maxScore'=>0.0,'docs'=>[]},'facet_counts'=>{'facet_queries'=>{},'facet_fields'=>{'active_fedora_model_ssi'=>[],'object_type_si'=>[]},'facet_dates'=>{},'facet_ranges'=>{}},'spellcheck'=>{'suggestions'=>['correctlySpelled',false]}},"")
-      end
+      # run the solr query to find the collections
+      query = params[:cq]
+      (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
     end
     
     def process_member_changes
@@ -182,7 +176,9 @@ module Hydra
     # include filters into the query to only include the collection memebers
     def include_collection_ids(solr_parameters, user_parameters)
       solr_parameters[:fq] ||= []
-      if @collection.member_ids.length > 0
+      if @collection.member_ids.empty?
+        solr_parameters[:fq] << '{!lucene}-id:[* TO *]' # Don't match anything
+      else
         query = @collection.member_ids.map{|id| 'id:"'+id+'"'}.join " OR "
         solr_parameters[:fq] << query
       end

@@ -59,6 +59,30 @@ describe CollectionsHelper do
       form.css('input#collection_members[type="hidden"][value="remove"]').should_not be_empty
       form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]').should_not be_empty
     end
+
+    describe "for a collection of another name" do
+      before(:all) do
+        class OtherCollection < ActiveFedora::Base
+          include Hydra::Collection
+          include Hydra::Collections::Collectible
+        end
+
+        @collection = OtherCollection.create
+      end
+      after(:all) do
+        Object.send(:remove_const, :OtherCollection)
+      end
+
+      it "should generate a form that can remove the item" do
+        str = button_for_remove_from_collection item
+        doc = Nokogiri::HTML(str)
+        form = doc.xpath('//form').first
+        form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+        form.css('input#collection_members[type="hidden"][value="remove"]').should_not be_empty
+        form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]').should_not be_empty
+      end
+
+    end
   end 
   describe "button_for_remove_selected_from_collection" do
     before (:all) do

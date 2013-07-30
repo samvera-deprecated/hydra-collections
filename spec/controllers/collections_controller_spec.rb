@@ -161,6 +161,17 @@ describe CollectionsController do
       doc["id"].should == @asset2.pid
       doc[Solrizer.solr_name(:collection)].should be_nil
     end
+    
+    it "should allow moving members between collections" do
+      @collection.members = [@asset1, @asset2, @asset3]
+      @collection.save
+      @collection2 = Collection.new
+      @collection2.apply_depositor_metadata(@user.user_key)
+      @collection2.save
+      put :update, id: @collection.id, collection: {members:"move"}, destination_collection_id:@collection2.pid, batch_document_ids:[@asset2, @asset3]
+      ::Collection.find(@collection.pid).members.should == [@asset1]
+      ::Collection.find(@collection2.pid).members.should == [@asset2, @asset3]
+    end
 
   end
 

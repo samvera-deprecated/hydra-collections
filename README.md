@@ -91,7 +91,14 @@ end
 ```
 ### Include the javascript to discover checked batch items
 
-include `//= require hydra/batch_select` in your application.js
+add to your application.js
+```ruby
+  //= require hydra/batch_select
+  //= require hydra_collections
+```
+
+### Take a look at the helpers located in app/helpers/collections_helper.rb, app/helpers/batch_select_helper.rb and app/helpers/collections_search_helper for helpers to allow you to display Hydra-collections in you views.
+### The following instructions show a few simple examples of adding these helpers to your views.
 
 ### Display a selection checkbox in each document partial
 
@@ -120,7 +127,12 @@ Example:
 
 ### Update your action view to submit changes to the batch
 
-Add `updates-batches` class to your
+Add `updates-batches` class to your button for submitting the batch
+
+Example:
+```ruby
+<%= button_to label, collections.collection_path(collection_id), :method=>:put, :class=>"btn btn-primary updates-collection submits-batches collection-update", 'data-behavior'=>'hydra-collections', :id=>'hydra-collection-update' %>
+```
 
 
 ## Contributing

@@ -107,7 +107,7 @@ Take a look at the helpers located in:
 
 ##### Display a selection checkbox in each document partial
 
-include `<%= button_for_add_to_batch document %>'
+include ```<%= button_for_add_to_batch document %>```
 
 Example: views/catalog/_document_header.html.erb
 ```ruby

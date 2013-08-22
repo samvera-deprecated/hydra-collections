@@ -97,10 +97,15 @@ add to your application.js
   //= require hydra_collections
 ```
 
-### Take a look at the helpers located in app/helpers/collections_helper.rb, app/helpers/batch_select_helper.rb and app/helpers/collections_search_helper for helpers to allow you to display Hydra-collections in you views.
-### The following instructions show a few simple examples of adding these helpers to your views.
+### Display Hydra-collections in you views
+Take a look at the helpers located in:
+* [app/helpers/collections_helper.rb](/app/helpers/collections_helper.rb) 
+* [app/helpers/batch_select_helper.rb](/app/helpers/batch_select_helper.rb) 
+* [app/helpers/collections_search_helper.rb](/app/helpers/collections_search_helper.rb) 
+ 
+#### Examples
 
-### Display a selection checkbox in each document partial
+##### Display a selection checkbox in each document partial
 
 include `<%= button_for_add_to_batch document %>'
 
@@ -115,7 +120,7 @@ Example: views/catalog/_document_header.html.erb
 ```
 
 
-### Update your view to submit a Batch
+##### Update your view to submit a Batch
 
 include
 Add `submits-batches` class to your view input to initialize batch processing
@@ -125,7 +130,7 @@ Example:
 <%= button_to label, edit_batch_edits_path, :method=>:get, :class=>"btn submits-batches", 'data-behavior'=>'batch-edit', :id=>'batch-edit' %>
 ```
 
-### Update your action view to submit changes to the batch
+##### Update your action view to submit changes to the batch
 
 Add `updates-batches` class to your button for submitting the batch
 

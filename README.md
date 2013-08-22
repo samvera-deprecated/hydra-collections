@@ -124,12 +124,12 @@ Example:
 
 ##### Update your view to submit a Batch
 
-include
 Add `submits-batches` class to your view input to initialize batch processing
 
 Example:
 ```erb
-<%= button_to label, edit_batch_edits_path, :method=>:get, :class=>"btn submits-batches", 'data-behavior'=>'batch-edit', :id=>'batch-edit' %>
+<%= button_to label, edit_batch_edits_path, method: :get, class: "btn submits-batches", 
+      'data-behavior'=>'batch-edit', id: 'batch-edit' %>
 ```
 
 ##### Update your action view to submit changes to the batch
@@ -138,7 +138,9 @@ Add `updates-batches` class to your button for submitting the batch
 
 Example:
 ```erb
-<%= button_to label, collections.collection_path(collection_id), :method=>:put, :class=>"btn btn-primary updates-collection submits-batches collection-update", 'data-behavior'=>'hydra-collections', :id=>'hydra-collection-update' %>
+<%= button_to label, collections.collection_path(collection_id), method: :put,
+      class: "btn btn-primary updates-collection submits-batches collection-update", 
+      'data-behavior'=>'hydra-collections', id: 'hydra-collection-update' %>
 ```
 
 

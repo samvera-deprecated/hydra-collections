@@ -92,7 +92,7 @@ end
 ### Include the javascript to discover checked batch items
 
 add to your application.js
-```ruby
+```js
   //= require hydra/batch_select
   //= require hydra_collections
 ```
@@ -109,8 +109,10 @@ Take a look at the helpers located in:
 
 include ```<%= button_for_add_to_batch document %>```
 
-Example: views/catalog/_document_header.html.erb
-```ruby
+Example:
+```erb
+    <% # views/catalog/_document_header.html.erb -%>
+    
     <% # header bar for doc items in index view -%>
     <div class="documentHeader clearfix">
       <%= button_for_add_to_batch(document) %>
@@ -126,7 +128,7 @@ include
 Add `submits-batches` class to your view input to initialize batch processing
 
 Example:
-```ruby
+```erb
 <%= button_to label, edit_batch_edits_path, :method=>:get, :class=>"btn submits-batches", 'data-behavior'=>'batch-edit', :id=>'batch-edit' %>
 ```
 
@@ -135,7 +137,7 @@ Example:
 Add `updates-batches` class to your button for submitting the batch
 
 Example:
-```ruby
+```erb
 <%= button_to label, collections.collection_path(collection_id), :method=>:put, :class=>"btn btn-primary updates-collection submits-batches collection-update", 'data-behavior'=>'hydra-collections', :id=>'hydra-collection-update' %>
 ```
 

@@ -5,9 +5,7 @@ module Hydra
     extend ActiveSupport::Concern
 
     included do
-      include Hydra::Controller::ControllerBehavior
-      include Blacklight::Configurable # comply with BL 3.7
-      include Blacklight::Controller
+      include Blacklight::Configurable
       include Hydra::Collections::AcceptsBatches
       include Hydra::Collections::SelectsCollections
 

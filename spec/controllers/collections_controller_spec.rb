@@ -280,6 +280,14 @@ describe CollectionsController do
       ids.should_not include @asset4.pid
       ids.should_not include @asset5.pid
     end
+
+    it "should query the collections with rows" do
+      get :show, id: @collection.id, rows:"2"
+      assigns[:collection].title.should == @collection.title
+      ids = assigns[:member_docs].map {|d| d.id}
+      ids.count.should == 2
+    end
+
   end
 
 end

@@ -126,9 +126,13 @@ module Hydra
     # Queries Solr for members of the collection.  
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
-      # run the solr query to find the collections
       query = params[:cq]
-      (@response, @member_docs) = get_search_results(:q => query, :rows=>100)
+
+      #default the rows to 100 if not specified then merge in the user parameters and the attach the collection query
+      solr_params =  {rows:100}.merge(params.symbolize_keys).merge({:q => query})
+
+      # run the solr query to find the collections
+      (@response, @member_docs) = get_search_results(solr_params)
     end
     
     def process_member_changes

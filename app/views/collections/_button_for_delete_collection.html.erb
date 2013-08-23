@@ -1,4 +1,4 @@
 <%# button for deleting a collections %>
 <%# collection -- collection to be deleted %>
-<%= button_to label, collections.collection_path(collection.id), :confirm => confirm, :method=>:delete, :class=>"btn btn-primary collection-delete", 'data-behavior'=>'hydra-collections', :id=>'hydra-collection-add' %>
+<%= button_to label, collections.collection_path(collection.id), data:{confirm: confirm, behavior: 'hydra-collections'}, method: :delete, class: "btn btn-primary collection-delete", id: 'hydra-collection-add' %>
 

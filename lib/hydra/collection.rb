@@ -5,7 +5,6 @@ module Hydra
   module Collection
     extend ActiveSupport::Concern
     extend ActiveSupport::Autoload
-    autoload :Permissions
     include Hydra::ModelMethods # for access to apply_depositor_metadata
     include Hydra::ModelMixins::RightsMetadata
     include Hydra::Collections::Collectible
@@ -33,13 +32,6 @@ module Hydra
 
       before_destroy :remove_all_members
     end
-
-    # TODO: Move this override into ScholarSphere
-    #def to_solr(solr_doc={}, opts={})
-    #  super(solr_doc, opts)
-    #  solr_doc[Solrizer.solr_name("noid", :sortable, :type => :text)] = noid
-    #  return solr_doc
-    #end
 
     def terms_for_editing
       terms_for_display - [:date_modified, :date_uploaded]

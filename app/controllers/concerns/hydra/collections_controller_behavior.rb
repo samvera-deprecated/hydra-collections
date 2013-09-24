@@ -178,12 +178,7 @@ module Hydra
     # include filters into the query to only include the collection memebers
     def include_collection_ids(solr_parameters, user_parameters)
       solr_parameters[:fq] ||= []
-      if @collection.member_ids.empty?
-        solr_parameters[:fq] << '{!lucene}-id:[* TO *]' # Don't match anything
-      else
-        query = @collection.member_ids.map{|id| 'id:"'+id+'"'}.join " OR "
-        solr_parameters[:fq] << query
-      end
+      solr_parameters[:fq] << Solrizer.solr_name(:collection)+':"'+@collection.id+'"'
     end
   end # module CollectionsControllerBehavior
 end # module Hydra

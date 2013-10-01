@@ -1,7 +1,21 @@
-#require "bundler/setup"
 require "hydra/head"
-# require "active_fedora"
-# require "blacklight"
-require "hydra/collections"
-require "hydra/collections_controller_behavior"
-require "hydra/collection"
+
+module Hydra
+  module Collections
+    extend ActiveSupport::Autoload
+    autoload :Version
+    autoload :Collectible
+    autoload :SearchService
+    autoload :AcceptsBatches
+    autoload :SelectsCollections
+    autoload :SolrDocumentBehavior
+    class Engine < ::Rails::Engine
+      engine_name "collections"
+      config.autoload_paths += %W(
+        #{config.root}/app/controllers/concerns
+        #{config.root}/app/models/concerns
+      )
+    end
+  end
+end
+

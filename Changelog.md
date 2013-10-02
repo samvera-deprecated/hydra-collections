@@ -1,3 +1,7 @@
+# 1.2.0.rc1
+
+* Made compatible with hydra-head 6.4.0
+
 # 1.1.0 
 
 * 2013-09-30: Refactor to load modules after engine is initialized (concerns)

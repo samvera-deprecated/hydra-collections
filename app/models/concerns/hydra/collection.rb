@@ -1,4 +1,3 @@
-require 'hydra/head'
 require 'hydra/datastreams/collection_rdf_datastream'
 
 module Hydra
@@ -6,23 +5,22 @@ module Hydra
     extend ActiveSupport::Concern
     extend ActiveSupport::Autoload
     include Hydra::ModelMethods # for access to apply_depositor_metadata
-    include Hydra::ModelMixins::RightsMetadata
+    include Hydra::AccessControls::Permissions
     include Hydra::Collections::Collectible
 
     included do
-      has_metadata :name => "descMetadata", :type => CollectionRdfDatastream
-      has_metadata :name => "properties", :type => Hydra::Datastream::Properties
-      has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
+      has_metadata "descMetadata", type: CollectionRdfDatastream
+      has_metadata "properties", type: Hydra::Datastream::Properties
 
       has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base" , :after_remove => :remove_member
 
-      delegate_to :properties, [:depositor], :unique => true
+      delegate_to :properties, [:depositor], multiple: false
       
       delegate_to :descMetadata, [:title, :date_uploaded, :date_modified,
-                                  :description], :unique => true         
+                                  :description], multiple: false
       delegate_to :descMetadata, [:creator, :contributor, :based_near, :part_of, 
                                 :publisher, :date_created, :subject,:resource_type, :rights, :identifier,
-                                :language, :tag, :related_url]                            
+                                :language, :tag, :related_url], multiple: true                            
 
       before_create :set_date_uploaded
       before_save :set_date_modified

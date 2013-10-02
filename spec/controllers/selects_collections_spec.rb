@@ -45,7 +45,7 @@ describe SelectsCollectionsController do
       @collection4.save 
     end
     after (:all) do
-      Collection.find(:all).map(&:delete)
+      Collection.delete_all
     end
     describe "Public Access" do
       before (:each) do

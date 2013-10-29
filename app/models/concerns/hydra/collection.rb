@@ -14,13 +14,14 @@ module Hydra
 
       has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base" , :after_remove => :remove_member
 
-      delegate_to :properties, [:depositor], multiple: false
+      has_attributes :depositor, datastream: :properties, multiple: false
       
-      delegate_to :descMetadata, [:title, :date_uploaded, :date_modified,
-                                  :description], multiple: false
-      delegate_to :descMetadata, [:creator, :contributor, :based_near, :part_of, 
-                                :publisher, :date_created, :subject,:resource_type, :rights, :identifier,
-                                :language, :tag, :related_url], multiple: true                            
+      has_attributes :title, :date_uploaded, :date_modified, :description, 
+                     datastream: :descMetadata, multiple: false
+      has_attributes :creator, :contributor, :based_near, :part_of, :publisher,
+                     :date_created, :subject,:resource_type, :rights,
+                     :identifier, :language, :tag, :related_url,
+                     datastream: :descMetadata, multiple: true
 
       before_create :set_date_uploaded
       before_save :set_date_modified

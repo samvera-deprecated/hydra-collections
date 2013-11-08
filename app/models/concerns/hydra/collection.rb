@@ -1,4 +1,3 @@
-require 'hydra/datastreams/collection_rdf_datastream'
 
 module Hydra
   module Collection
@@ -9,7 +8,7 @@ module Hydra
     include Hydra::Collections::Collectible
 
     included do
-      has_metadata "descMetadata", type: CollectionRdfDatastream
+      has_metadata "descMetadata", type: Hydra::CollectionRdfDatastream
       has_metadata "properties", type: Hydra::Datastream::Properties
 
       has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base" , :after_remove => :remove_member

@@ -18,6 +18,14 @@ describe Collection do
   before(:all) do
     @user = FactoryGirl.find_or_create(:user)
     class GenericFile < ActiveFedora::Base
+      include Hydra::Collections::Collectible
+
+      def to_solr(solr_doc={}, opts={})
+        super(solr_doc, opts)
+        solr_doc = index_collection_pids(solr_doc)
+        return solr_doc
+      end
+
     end
   end
   after(:all) do
@@ -73,6 +81,9 @@ describe Collection do
     @collection.members = [@gf1]
     @collection.save
     @collection.date_modified.should == modified_date
+    @gf1 = @gf1.reload
+    @gf1.collections.should include(@collection)
+    @gf1.to_solr[Solrizer.solr_name(:collection)].should == [@collection.id]
   end
   it "should have a title" do
     @collection.title = "title"

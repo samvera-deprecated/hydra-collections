@@ -13,10 +13,23 @@ end
 class OtherCollection < ActiveFedora::Base
   include Hydra::Collection
   include Hydra::Collections::Collectible
+
+  def to_solr(solr_doc={}, opts={})
+    super(solr_doc, opts)
+    solr_doc = index_collection_pids(solr_doc)
+    return solr_doc
+  end
+
 end
 class Member < ActiveFedora::Base
   include Hydra::Collections::Collectible
   attr_accessor :title
+
+  def to_solr(solr_doc={}, opts={})
+    super(solr_doc, opts)
+    solr_doc = index_collection_pids(solr_doc)
+    return solr_doc
+  end
 
 end
 

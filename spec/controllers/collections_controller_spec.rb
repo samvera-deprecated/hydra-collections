@@ -224,7 +224,7 @@ describe CollectionsController do
       @asset1 = GenericFile.create!(title: "First of the Assets")
       @asset2 = GenericFile.create!(title: "Second of the Assets")
       @asset3 = GenericFile.create!(title: "Third of the Assets")
-      @collection = Collection.new
+      @collection = Collection.new(pid:"abc:123")
       @collection.title = "My collection"
       @collection.apply_depositor_metadata(@user.user_key)
       @collection.members = [@asset1,@asset2,@asset3]
@@ -240,15 +240,39 @@ describe CollectionsController do
       ids.should include @asset2.pid
       ids.should include @asset3.pid
     end
-    it "should show only the collections assets" do
-      @asset4 = GenericFile.create!(title: "#{@asset1.id}")
-      get :show, id: @collection.id
-      assigns[:collection].title.should == @collection.title
-      ids = assigns[:member_docs].map {|d| d.id}
-      ids.should include @asset1.pid
-      ids.should include @asset2.pid
-      ids.should include @asset3.pid
-      ids.should_not include @asset4.pid
+    describe "additional collections" do
+      before do
+        @asset4 = GenericFile.create!(title: "#{@asset1.id}")
+        @collection2 = Collection.new(pid:"abc:1234")
+        @collection2.title = "Other collection"
+        @collection2.apply_depositor_metadata(@user.user_key)
+        @collection2.members = [@asset4]
+        @collection2.save
+        @asset4 = @asset4.reload
+        @asset4.collections.should == [@collection2]
+      end
+
+      it "should show only the collections assets" do
+        get :show, id: @collection.pid
+        assigns[:collection].title.should == @collection.title
+        ids = assigns[:member_docs].map {|d| d.id}
+        ids.should include @asset1.pid
+        ids.should include @asset2.pid
+        ids.should include @asset3.pid
+        ids.should_not include @asset4.pid
+
+      end
+      it "should show only the other collections assets" do
+
+        get :show, id: @collection2.pid
+        assigns[:collection].title.should == @collection2.title
+        ids = assigns[:member_docs].map {|d| d.id}
+        ids.should_not include @asset1.pid
+        ids.should_not include @asset2.pid
+        ids.should_not include @asset3.pid
+        ids.should include @asset4.pid
+
+      end
     end
 
     it "when the collection is empty it should show no assets" do

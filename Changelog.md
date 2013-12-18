@@ -1,8 +1,12 @@
+# 1.3.2
+
+Fixes delete button behavior
+
 # 1.2.0.rc1
 
 * Made compatible with hydra-head 6.4.0
 
-# 1.1.0 
+# 1.1.0
 
 * 2013-09-30: Refactor to load modules after engine is initialized (concerns)
 [Justin Coyne]
@@ -106,4 +110,3 @@ point at the new code location [Michael J. Giarlo]
 
 * 2013-07-09: Updates license and README per new community conventions [Michael
 J. Giarlo]
-

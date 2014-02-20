@@ -122,7 +122,7 @@ module Hydra
      end
     
     protected
-    
+
     # Queries Solr for members of the collection.  
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
@@ -134,7 +134,7 @@ module Hydra
       # run the solr query to find the collections
       (@response, @member_docs) = get_search_results(solr_params)
     end
-    
+
     def process_member_changes
       unless params[:collection].nil?
         change_members = []
@@ -170,11 +170,6 @@ module Hydra
       end
     end
     
-    # this is only needed until the version of balcklight that we are using this include it in it's solr helper  
-    def blacklight_solr
-        Blacklight.solr
-    end
-
     # include filters into the query to only include the collection memebers
     def include_collection_ids(solr_parameters, user_parameters)
       solr_parameters[:fq] ||= []

@@ -70,7 +70,7 @@ describe CollectionsController do
       @asset1 = GenericFile.create!
       post :create, batch_document_ids: [@asset1], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       assigns[:collection].members.should == [@asset1]
-      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
       asset_results["response"]["numFound"].should == 1
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset1.pid
@@ -82,7 +82,7 @@ describe CollectionsController do
       @asset2 = GenericFile.create!
       post :create, batch_document_ids: [@asset1,@asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       assigns[:collection].members.should == [@asset1,@asset2]
-      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
       asset_results["response"]["numFound"].should == 1
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset1.pid
@@ -145,7 +145,7 @@ describe CollectionsController do
       @asset2.reload
       @asset2.to_solr[Solrizer.solr_name(:collection)].should == [@collection.pid]
       ## Check that member was re-indexed with collection info
-      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset2.pid
       doc[Solrizer.solr_name(:collection)].should == [@collection.pid]
@@ -157,7 +157,7 @@ describe CollectionsController do
       @asset2.reload
       @asset2.to_solr[Solrizer.solr_name(:collection)].should == []
       ## Check that member was re-indexed without collection info
-      asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset2.pid
       doc[Solrizer.solr_name(:collection)].should be_nil
@@ -200,14 +200,14 @@ describe CollectionsController do
         @asset1 = @asset1.reload
         @asset1.update_index
         @asset1.collections.should == [@collection]
-        asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
         asset_results["response"]["numFound"].should == 1
         doc = asset_results["response"]["docs"].first
         doc[Solrizer.solr_name(:collection)].should == [@collection.pid]
 
         delete :destroy, id: @collection.id
         @asset1.reload.collections.should == []
-        asset_results = Blacklight.solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
         asset_results["response"]["numFound"].should == 1
         doc = asset_results["response"]["docs"].first
         doc[Solrizer.solr_name(:collection)].should be_nil

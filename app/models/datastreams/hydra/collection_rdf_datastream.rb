@@ -67,5 +67,9 @@ module Hydra
       end
       map.related_url(:to => "seeAlso", :in => RDF::RDFS)
     end
+
+    def prefix
+      ""
+    end
   end
 end

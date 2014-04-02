@@ -6,8 +6,6 @@ class SelectsCollectionsController < ApplicationController
   include Hydra::Collections::SelectsCollections
 
   SelectsCollectionsController.solr_search_params_logic += [:add_access_controls_to_solr_params]
-  # This filters out objects that you want to exclude from search results, like FileAssets
-  SelectsCollectionsController.solr_search_params_logic += [:exclude_unwanted_models]
 
 end
 

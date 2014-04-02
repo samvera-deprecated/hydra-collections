@@ -6,7 +6,7 @@ class TestAppGenerator < Rails::Generators::Base
   def run_blacklight_generator
     say_status("warning", "GENERATING BL", :yellow)       
 
-    generate 'blacklight', '--devise'
+    generate "blacklight:install", '--devise'
   end
 
   def run_hydra_head_generator
@@ -68,4 +68,9 @@ class TestAppGenerator < Rails::Generators::Base
     end
   end
 
+  def add_create_permissions
+    insert_into_file 'app/models/ability.rb', after: 'custom_permissions' do
+          "\n    can :create, :all if user_groups.include? 'registered'\n"
+    end
+  end
 end

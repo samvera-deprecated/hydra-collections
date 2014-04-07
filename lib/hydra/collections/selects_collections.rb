@@ -36,7 +36,7 @@ module Hydra::Collections::SelectsCollections
     self.class.solr_search_params_logic = collection_search_params_logic
     logger.debug "Collection Search logic: "+ self.class.solr_search_params_logic.inspect
     # run the solr query to find the collections
-    (resp, doc_list) = get_search_results(:q => '', :rows=>100)
+    (resp, doc_list) = get_search_results({:q => ''}, {:rows=>100})
     
     #reset to original solr logic
     self.class.send(:define_method, "discovery_permissions")  { original_permissions } unless access_level.blank?

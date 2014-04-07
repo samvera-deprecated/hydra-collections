@@ -40,7 +40,15 @@ describe SelectsCollectionsController do
       @collection3.save 
       @collection4 = Collection.new title:"Test No Access"
       @collection4.apply_depositor_metadata('abc123@test.com')
-      @collection4.save 
+      @collection4.save
+      @collections = []
+      (1..11).each do |i|
+        collection = Collection.new title:"Test Public #{i}"
+        collection.apply_depositor_metadata(@user.user_key)
+        collection.read_groups = ["public"]
+        collection.save
+        @collections << collection
+      end
     end
     after (:all) do
       Collection.delete_all
@@ -53,7 +61,10 @@ describe SelectsCollectionsController do
       end
       it "should return public collections" do
         @user_collections.index{|d| d.id == @collection.id}.should_not be_nil
-      end 
+      end
+      it "should return all public collections" do
+        @user_collections.count.should == 12
+      end
       it "should not return non public collections" do
         @user_collections.index{|d| d.id == @collection2.id}.should be_nil
         @user_collections.index{|d| d.id == @collection3.id}.should be_nil

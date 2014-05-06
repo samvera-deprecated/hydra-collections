@@ -1,4 +1,4 @@
-# Hydra::Collections [![Version](https://badge.fury.io/rb/hydra-collections.png)](http://badge.fury.io/rb/hydra-collections) [![Build Status](https://travis-ci.org/projecthydra-labs/hydra-collections.png?branch=master)](https://travis-ci.org/projecthydra/hydra-collections) [![Dependency Status](https://gemnasium.com/projecthydra/hydra-collections.png)](https://gemnasium.com/projecthydra/hydra-collections)
+# Hydra::Collections [![Version](https://badge.fury.io/rb/hydra-collections.png)](http://badge.fury.io/rb/hydra-collections) [![Build Status](https://travis-ci.org/projecthydra-labs/hydra-collections.png?branch=master)](https://travis-ci.org/projecthydra-labs/hydra-collections) [![Dependency Status](https://gemnasium.com/projecthydra/hydra-collections.png)](https://gemnasium.com/projecthydra/hydra-collections)
 
 Add collections to your Hydra application.  These collections are typically created by depositors (instead of librarians or curators).  Any collectible item can belong to many different collections.  The collection does not confer access rights onto any of the members of the collections.
 

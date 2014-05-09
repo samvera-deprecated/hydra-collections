@@ -1,4 +1,4 @@
-$(function () {
+Blacklight.onLoad(function () {
 
   // change the action based which collection is selected
   $('input.updates-collection').on('click', function() {

@@ -1,4 +1,4 @@
-$(function () {
+Blacklight.onLoad(function () {
 
   // add the batch ids to any submit of a batch update
   var batch_ids = null;

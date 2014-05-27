@@ -68,6 +68,17 @@ describe Collection do
     @collection.save
     Collection.find(@collection.pid).members.should == [@gf1, @gf2]
   end
+  it "should allow files to be removed" do
+    @collection.members = [@gf1, @gf2]
+    @collection.save
+    solr_doc_before_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, @gf1.pid).send(:solr_doc)
+    solr_doc_before_remove["collection_tesim"].should == [@collection.pid]
+    @collection.reload.members.delete(@gf1)
+    @collection.save
+    Collection.find(@collection.pid).members.should == [@gf2]
+    solr_doc_after_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, @gf1.pid).send(:solr_doc)
+    solr_doc_after_remove["collection_tesim"].should be_nil
+  end
   it "should set the date uploaded on create" do
     @collection.save
     @collection.date_uploaded.should be_kind_of(Date)

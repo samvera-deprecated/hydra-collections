@@ -139,6 +139,8 @@ describe CollectionsController do
     end
     it "should set/un-set collection on members" do
       # Add to collection (sets collection on members)
+      solr_doc_before_add = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, @asset2.pid).send(:solr_doc)
+      solr_doc_before_add[Solrizer.solr_name(:collection)].should be_nil
       put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[@asset2, @asset3]
       assigns[:collection].members.sort! { |a,b| a.pid <=> b.pid }.should == [@asset2, @asset3].sort! { |a,b| a.pid <=> b.pid }
       ## Check that member lists collection in its solr doc
@@ -149,8 +151,12 @@ describe CollectionsController do
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset2.pid
       doc[Solrizer.solr_name(:collection)].should == [@collection.pid]
-  
+      solr_doc_after_add = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, @asset2.pid).send(:solr_doc)
+      solr_doc_after_add[Solrizer.solr_name(:collection)].should == [@collection.pid]
+
       # Remove from collection (un-sets collection on members)
+      solr_doc_before_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, @asset2.pid).send(:solr_doc)
+      solr_doc_before_remove[Solrizer.solr_name(:collection)].should == [@collection.pid]
       put :update, id: @collection.id, collection: {members:"remove"}, batch_document_ids:[@asset2]
       assigns[:collection].members.should_not include(@asset2)
       ## Check that member no longer lists collection in its solr doc
@@ -161,6 +167,8 @@ describe CollectionsController do
       doc = asset_results["response"]["docs"].first
       doc["id"].should == @asset2.pid
       doc[Solrizer.solr_name(:collection)].should be_nil
+      solr_doc_after_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, @asset2.pid).send(:solr_doc)
+      solr_doc_after_remove[Solrizer.solr_name(:collection)].should be_nil
     end
     
     it "should allow moving members between collections" do
@@ -229,7 +237,7 @@ describe CollectionsController do
       @collection.apply_depositor_metadata(@user.user_key)
       @collection.members = [@asset1,@asset2,@asset3]
       @collection.save
-      controller.should_receive(:authorize!).and_return(true)
+      controller.stub(:authorize!).and_return(true)
       controller.stub(:apply_gated_search)
     end
     it "should show the collections" do
@@ -239,6 +247,18 @@ describe CollectionsController do
       ids.should include @asset1.pid
       ids.should include @asset2.pid
       ids.should include @asset3.pid
+    end
+    context "when items have been added and removed" do
+      it "should return the items that are in the collection and not return items that have been removed" do
+        asset4 = GenericFile.create!(title: "Fourth of the Assets")
+        put :update, id: @collection.id, collection: {members:"remove"}, batch_document_ids:[@asset2.pid]
+        controller.batch = nil
+        put :update, id: @collection.id, collection: {members:"add"}, batch_document_ids:[asset4.pid]
+        get :show, id: @collection.id
+        ids = assigns[:member_docs].map(&:id)
+        expect(ids).to include @asset1.pid, @asset3.pid, asset4.pid
+        expect(ids).to_not include @asset2.pid
+      end
     end
     describe "additional collections" do
       before do

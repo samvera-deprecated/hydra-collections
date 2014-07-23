@@ -5,6 +5,7 @@ ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("config/environment", ENV['RAILS_ROOT'] || File.expand_path("../internal", __FILE__))
 require 'rspec/rails'
 require 'hydra-collections'
+require 'byebug' unless ENV['TRAVIS']
 
 FactoryGirl.definition_file_paths = [File.expand_path("../factories", __FILE__)]
 FactoryGirl.find_definitions

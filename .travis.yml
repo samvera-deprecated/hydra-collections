@@ -1,18 +1,14 @@
 language: ruby
 rvm:
   - 2.1
-gemfile:
-  - gemfiles/rails3.gemfile
-  - gemfiles/rails4.gemfile
+  - 2.0
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 notifications:
   email:
     recipients:
-      - "michael@psu.edu"
-      - "cam156@psu.edu"
-      - "dmc186@psu.edu"
+      - "ul-dlt-hydra@lists.psu.edu"
     on_success: "change"
     on_failure: "always"
   irc:

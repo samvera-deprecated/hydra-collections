@@ -5,9 +5,9 @@ gemspec
 
 group :development, :test do
   gem 'sqlite3'
-  gem "factory_girl_rails", "~> 4.1.0"
+  gem "factory_girl_rails"
   gem 'devise'
-  gem 'capybara', '~>1.1.3'
+  gem 'capybara'
   gem 'jettywrapper'
   gem 'byebug' unless ENV['CI']
 end

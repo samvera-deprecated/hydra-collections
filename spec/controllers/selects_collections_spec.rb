@@ -10,21 +10,21 @@ class SelectsCollectionsController < ApplicationController
 end
 
 
-describe SelectsCollectionsController, :type => :controller do
+describe SelectsCollectionsController do
 
   describe "#find_collections" do
     it "should override solr_search_params_logic to use collection_search_params_logic, then switch it back" do
       # Looks like we can only test this indirectly b/c blacklight doesn't let you explicitly pass solr_search_params_logic when running searches -- you have to set the controller's solr_search_params_logic class attribute
       original_solr_logic = subject.solr_search_params_logic
-      expect(subject.collection_search_params_logic).to eq([:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter])
-      expect(subject.class).to receive(:solr_search_params_logic=).with(subject.collection_search_params_logic)
-      expect(subject.class).to receive(:solr_search_params_logic=).with(original_solr_logic)
+      subject.collection_search_params_logic.should == [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter]
+      subject.class.should_receive(:solr_search_params_logic=).with(subject.collection_search_params_logic)
+      subject.class.should_receive(:solr_search_params_logic=).with(original_solr_logic)
       subject.find_collections
     end
   end
   
   describe "Select Collections" do
-    before (:all) do
+    before do
       @user = FactoryGirl.find_or_create(:user)
       @collection = Collection.new title:"Test Public"
       @collection.apply_depositor_metadata(@user.user_key)
@@ -41,36 +41,34 @@ describe SelectsCollectionsController, :type => :controller do
       @collection4 = Collection.new title:"Test No Access"
       @collection4.apply_depositor_metadata('abc123@test.com')
       @collection4.save
-      @collections = []
-      (1..11).each do |i|
-        collection = Collection.new title:"Test Public #{i}"
-        collection.apply_depositor_metadata(@user.user_key)
-        collection.read_groups = ["public"]
-        collection.save
-        @collections << collection
-      end
     end
-    after (:all) do
-      Collection.delete_all
-    end
+
     describe "Public Access" do
-      before (:each) do
+      let(:user_collections) do
         subject.find_collections
-        @user_collections =  subject.instance_variable_get (:@user_collections)
-        expect(@user_collections).to be_kind_of(Array)
+        subject.instance_variable_get(:@user_collections)
       end
-      it "should return public collections" do
-        expect(@user_collections.index{|d| d.id == @collection.id}).not_to be_nil
+
+      it "should only return public collections" do
+        expect(user_collections.map(&:id)).to match_array [@collection.id]
       end
-      it "should return all public collections" do
-        expect(@user_collections.count).to eq(12)
+
+      context "when there are more than 10" do
+        before do
+          11.times do |i|
+            Collection.new(title:"Test Public #{i}").tap do |col|
+              col.apply_depositor_metadata(@user.user_key)
+              col.read_groups = ["public"]
+              col.save!
+            end
+          end
+        end
+        it "should return all public collections" do
+          user_collections.count.should == 12
+        end
       end
-      it "should not return non public collections" do
-        expect(@user_collections.index{|d| d.id == @collection2.id}).to be_nil
-        expect(@user_collections.index{|d| d.id == @collection3.id}).to be_nil
-        expect(@user_collections.index{|d| d.id == @collection4.id}).to be_nil
-       end
     end
+
     describe "Read Access" do
       describe "not signed in" do
         it "should error if the user is not signed in" do
@@ -78,45 +76,38 @@ describe SelectsCollectionsController, :type => :controller do
         end
       end
       describe "signed in" do
-        before (:each) do
-          sign_in @user
+        before { sign_in @user }
+
+        let(:user_collections) do
           subject.find_collections_with_read_access
-          @user_collections =  subject.instance_variable_get (:@user_collections)
-          expect(@user_collections).to be_kind_of(Array)
+          subject.instance_variable_get(:@user_collections)
         end
-        it "should return public and read access (edit access implies read) collections" do
-          expect(@user_collections.index{|d| d.id == @collection.id}).not_to be_nil
-          expect(@user_collections.index{|d| d.id == @collection2.id}).not_to be_nil
-          expect(@user_collections.index{|d| d.id == @collection3.id}).not_to be_nil
+
+        it "should return only public and read access (edit access implies read) collections" do
+          expect(user_collections.map(&:id)).to match_array [@collection.id, @collection2.id, @collection3.id]
         end 
-        it "should not return non public collections" do
-          expect(@user_collections.index{|d| d.id == @collection4.id}).to be_nil
-        end
       end
     end
+
     describe "Edit Access" do
       describe "not signed in" do
         it "should error if the user is not signed in" do
           expect { subject.find_collections_with_edit_access }.to raise_error
         end
       end
+
       describe "signed in" do
-        before (:each) do
-          sign_in @user
+        before { sign_in @user }
+
+        let(:user_collections) do
           subject.find_collections_with_edit_access
-           @user_collections =  subject.instance_variable_get (:@user_collections)
-           expect(@user_collections).to be_kind_of(Array)
-         end
-        it "should return public or editable collections" do
-          expect(@user_collections.index{|d| d.id == @collection.id}).not_to be_nil
-          expect(@user_collections.index{|d| d.id == @collection3.id}).not_to be_nil
-        end 
-        it "should not return non public or editable collections" do
-          expect(@user_collections.index{|d| d.id == @collection2.id}).to be_nil
-          expect(@user_collections.index{|d| d.id == @collection4.id}).to be_nil
+          subject.instance_variable_get(:@user_collections)
         end
+
+        it "should return only public or editable collections" do
+          expect(user_collections.map(&:id)).to match_array [@collection.id, @collection3.id]
+        end 
       end
     end
   end
-  
 end

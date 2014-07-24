@@ -1,12 +1,8 @@
-require 'blacklight/catalog'
-
 module Hydra::Collections::SelectsCollections
-
-  extend ActiveSupport::Autoload
   extend ActiveSupport::Concern
  
   def access_levels
-    {read:[:read,:edit],edit:[:edit]}
+    { read: [:read, :edit], edit: [:edit] }
   end 
 
   # add one of the following methods as a before filter on any page that shows the form_for_select_collection
@@ -32,11 +28,10 @@ module Hydra::Collections::SelectsCollections
     
     # temporarily set solr_search_params_logic to collection_search_params_logic
     orig_solr_search_params_logic = self.class.solr_search_params_logic
-    # self.class.solr_search_params_logic += [:add_collection_filter]
     self.class.solr_search_params_logic = collection_search_params_logic
     logger.debug "Collection Search logic: "+ self.class.solr_search_params_logic.inspect
     # run the solr query to find the collections
-    (resp, doc_list) = get_search_results({:q => ''}, {:rows=>100})
+    (resp, doc_list) = get_search_results({q: ''}, {rows: 100})
     
     #reset to original solr logic
     self.class.send(:define_method, "discovery_permissions")  { original_permissions } unless access_level.blank?
@@ -48,7 +43,7 @@ module Hydra::Collections::SelectsCollections
       
   def add_collection_filter(solr_parameters, user_parameters)
     solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << "#{Solrizer.solr_name("has_model", :symbol)}:\"info:fedora/afmodel:Collection\""
+    solr_parameters[:fq] << "#{Solrizer.solr_name("has_model", :symbol)}:Collection"
   end
   
   # Defines which solr_search_params_logic should be used when searching for Collections

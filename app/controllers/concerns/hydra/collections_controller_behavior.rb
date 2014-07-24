@@ -14,7 +14,7 @@ module Hydra
 
       # Catch permission errors
       rescue_from Hydra::AccessDenied, CanCan::AccessDenied do |exception|
-        if (exception.action == :edit)
+        if exception.action == :edit
           redirect_to(collections.url_for({:action=>'show'}), :alert => "You do not have sufficient privileges to edit this document")
         elsif current_user and current_user.persisted?
           redirect_to root_url, :alert => exception.message
@@ -46,6 +46,7 @@ module Hydra
 
     def after_create
       respond_to do |format|
+        ActiveFedora::SolrService.instance.conn.commit
         format.html { redirect_to collections.collection_path(@collection), notice: 'Collection was successfully created.' }
         format.json { render json: @collection, status: :created, location: @collection }
       end
@@ -125,7 +126,7 @@ module Hydra
       query = params[:cq]
 
       #default the rows to 100 if not specified then merge in the user parameters and the attach the collection query
-      solr_params =  {rows:100}.merge(params.symbolize_keys).merge({:q => query})
+      solr_params =  { rows: 100 }.merge(params.symbolize_keys).merge(q: query)
 
       # run the solr query to find the collections
       (@response, @member_docs) = get_search_results(solr_params)
@@ -142,17 +143,15 @@ module Hydra
 
     def add_members_to_collection collection = nil
       collection ||= @collection
-      collection.members(true)
       collection.member_ids = batch.concat(collection.member_ids)
     end
 
     def remove_members_from_collection
-      @collection.members(true)
       @collection.member_ids = (@collection.member_ids - batch)
     end
 
     def assign_batch_to_collection
-      @collection.members(true)
+      @collection.members(true) #Force the members to get cached before (maybe) removing some of them
       @collection.member_ids = batch
     end
 
@@ -170,7 +169,8 @@ module Hydra
     # include filters into the query to only include the collection memebers
     def include_collection_ids(solr_parameters, user_parameters)
       solr_parameters[:fq] ||= []
-      solr_parameters[:fq] << Solrizer.solr_name(:collection)+':"'+@collection.id+'"'
+      #solr_parameters[:fq] << '(' + ActiveFedora::SolrService.construct_query_for_pids(@collection.member_ids) + ')'
+      solr_parameters[:fq] << Solrizer.solr_name(:collection, :facetable)+':"'+@collection.id+'"'
     end
   end # module CollectionsControllerBehavior
 end # module Hydra

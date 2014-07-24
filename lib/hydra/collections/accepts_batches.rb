@@ -18,12 +18,12 @@ module Hydra
       protected
       
       def batch_ids_from_params
-        if params["batch_document_ids"].nil? || params["batch_document_ids"].empty?
-          return []
+        if params["batch_document_ids"].blank?
+          []
         elsif params["batch_document_ids"] == "all"
-          return Hydra::Collections::SearchService.new(session, current_user.user_key).last_search_documents.map(&:id)
+          Hydra::Collections::SearchService.new(session, current_user.user_key).last_search_documents.map(&:id)
         else
-          return params["batch_document_ids"]
+          params["batch_document_ids"]
         end
       end
       

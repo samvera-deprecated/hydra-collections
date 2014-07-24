@@ -1,12 +1,10 @@
 # This module adds a `has_many :collections` association to any models that you mix it into, using the :has_collection_member property
 # It also provides methods to help you index the information as a facet
 module Hydra::Collections::Collectible
-  extend ActiveSupport::Autoload
   extend ActiveSupport::Concern
   
   included do
-    #after_solrize << :index_collection_pids
-    has_many :collections, property: :has_collection_member, :class_name => "ActiveFedora::Base"
+    has_many :collections, property: :has_collection_member, class_name: "ActiveFedora::Base"
   end
 
   # Add this method to your solrization logic (ie. in to_solr) in order to populate the 'collection' facet 

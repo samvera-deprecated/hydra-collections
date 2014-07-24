@@ -22,12 +22,10 @@ describe CollectionsHelper, :type => :helper do
     end
   end
   describe "button_for_delete_collection" do
-    before (:all) do
+    before do
       @collection = Collection.create(title: "Test Public")
     end
-    after (:all) do
-      @collection.delete
-    end
+
     it " should create a button to the collections delete path" do
       str = button_for_delete_collection @collection
       doc = Nokogiri::HTML(str)
@@ -85,12 +83,10 @@ describe CollectionsHelper, :type => :helper do
     end
   end 
   describe "button_for_remove_selected_from_collection" do
-    before (:all) do
-      @collection = Collection.create title:"Test Public"
+    before do
+      @collection = Collection.create title: "Test Public"
     end
-    after (:all) do
-      @collection.delete
-    end
+
     it " should create a button to the collections delete path" do
       str = button_for_remove_selected_from_collection @collection
       doc = Nokogiri::HTML(str)
@@ -100,6 +96,7 @@ describe CollectionsHelper, :type => :helper do
       expect(i.attr('value')).to eq("remove")
       expect(i.attr('name')).to eq("collection[members]")
     end
+
     it "should create a button with my text" do
       str = button_for_remove_selected_from_collection @collection, "Remove My Button"
       doc = Nokogiri::HTML(str)

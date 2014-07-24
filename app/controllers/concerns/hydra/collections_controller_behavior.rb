@@ -60,10 +60,7 @@ module Hydra
         
     def create
       @collection.apply_depositor_metadata(current_user.user_key)
-      unless batch.empty?
-        params[:collection][:members]="add"
-        process_member_changes
-      end
+      add_members_to_collection unless batch.empty?
       if @collection.save
         after_create
       else
@@ -98,7 +95,6 @@ module Hydra
       end
     end
     
-    
     def after_destroy (id)
       respond_to do |format|
         format.html { redirect_to catalog_index_path, notice: 'Collection was successfully deleted.' }
@@ -114,12 +110,12 @@ module Hydra
     end
     
     def destroy
-       if @collection.destroy
-          after_destroy(params[:id])
-       else
-         after_destroy_error(params[:id])
-       end
-     end
+      if @collection.destroy
+         after_destroy(params[:id])
+      else
+        after_destroy_error(params[:id])
+      end
+    end
     
     protected
 
@@ -136,37 +132,38 @@ module Hydra
     end
 
     def process_member_changes
-      unless params[:collection].nil?
-        change_members = []
-        batch.each do |pid|
-          change_members << ActiveFedora::Base.find(pid, :cast=>true)
-        end
+      case params[:collection][:members]
+        when "add" then add_members_to_collection
+        when "remove" then remove_members_from_collection
+        when "move" then move_members_between_collections
+        when Array then assign_batch_to_collection
+      end
+    end
 
-        case params[:collection][:members]
-          when "add"
-            change_members.each do |member|
-              @collection.members << member
-              #@collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
-            end
-          when "remove"
-            change_members.each do |member|
-              @collection.members.delete(member)
-            end
-          when "move"
-            @destination_collection = ::Collection.find(params[:destination_collection_id])
-            change_members.each do |member|
-              @collection.members.delete(member)
-              @destination_collection.members << member
-            end
-            @destination_collection.save
-            flash[:notice] = "Successfully moved #{change_members.count} files to #{@destination_collection.title} Collection."
-          when Array
-            @collection.members.replace(change_members)
-          #@collection.clear_relationship(:has_collection_member)
-          #params[:collection][:members].each do |pid|
-          #  @collection.add_relationship(:has_collection_member, "info:fedora/#{pid}")
-          #end
-        end
+    def add_members_to_collection collection = nil
+      collection ||= @collection
+      collection.members(true)
+      collection.member_ids = batch.concat(collection.member_ids)
+    end
+
+    def remove_members_from_collection
+      @collection.members(true)
+      @collection.member_ids = (@collection.member_ids - batch)
+    end
+
+    def assign_batch_to_collection
+      @collection.members(true)
+      @collection.member_ids = batch
+    end
+
+    def move_members_between_collections
+      destination_collection = ::Collection.find(params[:destination_collection_id])
+      remove_members_from_collection
+      add_members_to_collection(destination_collection)
+      if destination_collection.save
+        flash[:notice] = "Successfully moved #{batch.count} files to #{destination_collection.title} Collection."
+      else
+        flash[:error] = "An error occured. Files were not moved to #{destination_collection.title} Collection."
       end
     end
     

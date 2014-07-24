@@ -11,7 +11,7 @@ module Hydra
       has_metadata "descMetadata", type: Hydra::CollectionRdfDatastream
       has_metadata "properties", type: Hydra::Datastream::Properties
 
-      has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base" , :after_remove => :remove_member
+      has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base" , :after_remove => :update_member
 
       has_attributes :depositor, datastream: :properties, multiple: false
       
@@ -25,8 +25,7 @@ module Hydra
       before_create :set_date_uploaded
       before_save :set_date_modified
 
-      after_save :local_update_members
-      after_create :create_member_index
+      after_save :update_all_members
 
       before_destroy :remove_all_members
     end
@@ -39,9 +38,16 @@ module Hydra
       self.descMetadata.class.config.keys.map{|v| v.to_sym}
     end
 
-    def remove_member(member)
-      #member.collections.delete self if member.respond_to?(:collections)
-      member.reload.update_index
+    def update_member member
+      member.update_index
+    end
+
+    # Re-index each member of the collection
+    # This can be overridden as a batch job for large collections
+    def update_all_members
+      self.members.each do |member|
+        member.update_index
+      end
     end
 
     private
@@ -54,31 +60,9 @@ module Hydra
       self.date_modified = Date.today
     end
 
-    # cause the members to index the relationship
-    def local_update_members
-      if self.respond_to?(:members)
-        self.members.each do |member|
-          member.reload.update_index
-        end
-      end
-    end
-
-    def create_member_index
-      self.members.each do |member|
-        member.to_solr  # not sure why this to_solr is needed but it caused the removal and update to work
-        if member.respond_to?(:collections)
-          member.collections << self
-          member.update_index
-          member.collections << self if self.members.size == 1  #again who konw why but this allows on asset to be added
-        end
-      end
-    end
-
     def remove_all_members
       self.members.each do |member|
-        member.to_solr  # not sure why this to_solr is needed but it caused the removal and update to work
         member.collections.delete(self) if member.respond_to?(:collections)
-        member.update_index
       end
     end
 

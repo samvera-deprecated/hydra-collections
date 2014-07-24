@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'active-fedora', github: 'projecthydra/active_fedora', branch: 'fedora-4'
-gem 'hydra-head', github: 'psu-stewardship/hydra-head', branch: 'fedora-4'
+gem 'hydra-head', github: 'projecthydra/hydra-head', branch: 'fedora-4'
 
 
 group :development, :test do

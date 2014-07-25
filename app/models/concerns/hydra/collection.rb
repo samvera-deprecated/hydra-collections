@@ -27,7 +27,7 @@ module Hydra
 
       after_save :update_all_members
 
-      before_destroy :remove_all_members
+      before_destroy :update_all_members
     end
 
     def terms_for_editing
@@ -38,16 +38,13 @@ module Hydra
       self.descMetadata.class.config.keys.map{|v| v.to_sym}
     end
 
-    def update_member member
-      member.update_index
+    def update_all_members
+      self.members.collect { |m| update_member(m) }
     end
 
-    # Re-index each member of the collection
-    # This can be overridden as a batch job for large collections
-    def update_all_members
-      self.members.each do |member|
-        member.update_index
-      end
+    # TODO: Use solr atomic updates to accelerate this process
+    def update_member member
+      member.update_index
     end
 
     private
@@ -60,12 +57,6 @@ module Hydra
       self.date_modified = Date.today
     end
 
-    def remove_all_members
-      self.members.each do |member|
-        member.collections.delete(self) if member.respond_to?(:collections)
-      end
-    end
-
- end
+  end
 
 end

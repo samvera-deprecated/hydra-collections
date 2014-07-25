@@ -9,5 +9,5 @@ group :development, :test do
   gem 'devise'
   gem 'capybara'
   gem 'jettywrapper'
-  gem 'byebug' unless ENV['CI']
+  gem 'byebug', require: false
 end

@@ -1,6 +1,28 @@
+# 2.0.4
+
+* Updating dependencies
+* Refactoring collection membership methods
+
+# 2.0.3
+
+* Pin to Rspec 2.99
+* Made compatible with hydra-head 7.1
+
+# 2.0.2
+
+* Javascript is turbolinks-capable
+
+# 2.0.1
+
+* Fixes to searching and RDF datastreams
+
+# 2.0.0
+
+* Made compatible with hydra-head 7
+
 # 1.3.2
 
-Fixes delete button behavior
+* Fixes delete button behavior
 
 # 1.2.0.rc1
 

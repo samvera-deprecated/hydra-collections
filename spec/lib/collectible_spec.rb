@@ -16,8 +16,8 @@ describe Hydra::Collections::Collectible do
       @collection1.save
       @collectible.collections << @collection2
       reloaded = CollectibleThing.find(@collectible.pid)
-      @collection2.reload.members.should == [@collectible]
-      reloaded.collections.should == [@collection1, @collection2]
+      expect(@collection2.reload.members).to eq([@collectible])
+      expect(reloaded.collections).to eq([@collection1, @collection2])
     end
   end
   describe "index_collection_pids" do
@@ -25,7 +25,7 @@ describe Hydra::Collections::Collectible do
       @collectible.save
       @collectible.collections << @collection1
       @collectible.collections << @collection2
-      @collectible.index_collection_pids["collection_sim"].should == [@collection1.pid, @collection2.pid]
+      expect(@collectible.index_collection_pids["collection_sim"]).to eq([@collection1.pid, @collection2.pid])
     end
   end
 end

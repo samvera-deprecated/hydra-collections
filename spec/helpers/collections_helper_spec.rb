@@ -2,23 +2,23 @@ require 'spec_helper'
 
 include Hydra::Collections::Engine.routes.url_helpers
 
-describe CollectionsHelper do
+describe CollectionsHelper, :type => :helper do
   describe "button_for_create_collection" do
     it " should create a button to the collections new path" do
       str = String.new(helper.button_for_create_collection)
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      form.attr('action').should == "#{collections.new_collection_path}"
+      expect(form.attr('action')).to eq("#{collections.new_collection_path}")
       i = form.children.first.children.first
-      i.attr('type').should == 'submit'
+      expect(i.attr('type')).to eq('submit')
     end
     it "should create a button with my text" do
       str = String.new(helper.button_for_create_collection "Create My Button")
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      form.attr('action').should == "#{collections.new_collection_path}"
+      expect(form.attr('action')).to eq("#{collections.new_collection_path}")
       i = form.children.first.children.first
-      i.attr('value').should == 'Create My Button'
+      expect(i.attr('value')).to eq('Create My Button')
     end
   end
   describe "button_for_delete_collection" do
@@ -32,17 +32,17 @@ describe CollectionsHelper do
       str = button_for_delete_collection @collection
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
       i = form.children.first.children[1]
-      i.attr('type').should == 'submit'
+      expect(i.attr('type')).to eq('submit')
     end
     it "should create a button with my text" do
       str = button_for_delete_collection @collection, "Delete My Button"
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
       i = form.children.first.children[1]
-      i.attr('value').should == "Delete My Button"
+      expect(i.attr('value')).to eq("Delete My Button")
     end
   end
   describe "button_for_remove_from_collection" do
@@ -55,9 +55,9 @@ describe CollectionsHelper do
       str = button_for_remove_from_collection item
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
-      form.css('input#collection_members[type="hidden"][value="remove"]').should_not be_empty
-      form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]').should_not be_empty
+      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
+      expect(form.css('input#collection_members[type="hidden"][value="remove"]')).not_to be_empty
+      expect(form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]')).not_to be_empty
     end
 
     describe "for a collection of another name" do
@@ -77,9 +77,9 @@ describe CollectionsHelper do
         str = button_for_remove_from_collection item
         doc = Nokogiri::HTML(str)
         form = doc.xpath('//form').first
-        form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
-        form.css('input#collection_members[type="hidden"][value="remove"]').should_not be_empty
-        form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]').should_not be_empty
+        expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
+        expect(form.css('input#collection_members[type="hidden"][value="remove"]')).not_to be_empty
+        expect(form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]')).not_to be_empty
       end
 
     end
@@ -95,18 +95,18 @@ describe CollectionsHelper do
       str = button_for_remove_selected_from_collection @collection
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
       i = form.children[2]
-      i.attr('value').should == "remove"
-      i.attr('name').should == "collection[members]"
+      expect(i.attr('value')).to eq("remove")
+      expect(i.attr('name')).to eq("collection[members]")
     end
     it "should create a button with my text" do
       str = button_for_remove_selected_from_collection @collection, "Remove My Button"
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      form.attr('action').should == "#{collections.collection_path(@collection.pid)}"
+      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
       i = form.children[3]
-      i.attr('value').should == "Remove My Button"
+      expect(i.attr('value')).to eq("Remove My Button")
     end
   end
 
@@ -115,9 +115,9 @@ describe CollectionsHelper do
     it "should make hidden fields" do
       doc = Nokogiri::HTML(hidden_collection_members)
       inputs = doc.xpath('//input[@type="hidden"][@name="batch_document_ids[]"]')
-      inputs.length.should == 2
-      inputs[0].attr('value').should == 'foo:12'
-      inputs[1].attr('value').should == 'foo:23'
+      expect(inputs.length).to eq(2)
+      expect(inputs[0].attr('value')).to eq('foo:12')
+      expect(inputs[1].attr('value')).to eq('foo:23')
     end
   end
 

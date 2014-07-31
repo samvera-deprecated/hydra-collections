@@ -10,15 +10,15 @@ class SelectsCollectionsController < ApplicationController
 end
 
 
-describe SelectsCollectionsController do
+describe SelectsCollectionsController, :type => :controller do
 
   describe "#find_collections" do
     it "should override solr_search_params_logic to use collection_search_params_logic, then switch it back" do
       # Looks like we can only test this indirectly b/c blacklight doesn't let you explicitly pass solr_search_params_logic when running searches -- you have to set the controller's solr_search_params_logic class attribute
       original_solr_logic = subject.solr_search_params_logic
-      subject.collection_search_params_logic.should == [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter]
-      subject.class.should_receive(:solr_search_params_logic=).with(subject.collection_search_params_logic)
-      subject.class.should_receive(:solr_search_params_logic=).with(original_solr_logic)
+      expect(subject.collection_search_params_logic).to eq([:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter])
+      expect(subject.class).to receive(:solr_search_params_logic=).with(subject.collection_search_params_logic)
+      expect(subject.class).to receive(:solr_search_params_logic=).with(original_solr_logic)
       subject.find_collections
     end
   end
@@ -60,15 +60,15 @@ describe SelectsCollectionsController do
         expect(@user_collections).to be_kind_of(Array)
       end
       it "should return public collections" do
-        @user_collections.index{|d| d.id == @collection.id}.should_not be_nil
+        expect(@user_collections.index{|d| d.id == @collection.id}).not_to be_nil
       end
       it "should return all public collections" do
-        @user_collections.count.should == 12
+        expect(@user_collections.count).to eq(12)
       end
       it "should not return non public collections" do
-        @user_collections.index{|d| d.id == @collection2.id}.should be_nil
-        @user_collections.index{|d| d.id == @collection3.id}.should be_nil
-        @user_collections.index{|d| d.id == @collection4.id}.should be_nil
+        expect(@user_collections.index{|d| d.id == @collection2.id}).to be_nil
+        expect(@user_collections.index{|d| d.id == @collection3.id}).to be_nil
+        expect(@user_collections.index{|d| d.id == @collection4.id}).to be_nil
        end
     end
     describe "Read Access" do
@@ -85,12 +85,12 @@ describe SelectsCollectionsController do
           expect(@user_collections).to be_kind_of(Array)
         end
         it "should return public and read access (edit access implies read) collections" do
-          @user_collections.index{|d| d.id == @collection.id}.should_not be_nil
-          @user_collections.index{|d| d.id == @collection2.id}.should_not be_nil
-          @user_collections.index{|d| d.id == @collection3.id}.should_not be_nil
+          expect(@user_collections.index{|d| d.id == @collection.id}).not_to be_nil
+          expect(@user_collections.index{|d| d.id == @collection2.id}).not_to be_nil
+          expect(@user_collections.index{|d| d.id == @collection3.id}).not_to be_nil
         end 
         it "should not return non public collections" do
-          @user_collections.index{|d| d.id == @collection4.id}.should be_nil
+          expect(@user_collections.index{|d| d.id == @collection4.id}).to be_nil
         end
       end
     end
@@ -108,12 +108,12 @@ describe SelectsCollectionsController do
            expect(@user_collections).to be_kind_of(Array)
          end
         it "should return public or editable collections" do
-          @user_collections.index{|d| d.id == @collection.id}.should_not be_nil
-          @user_collections.index{|d| d.id == @collection3.id}.should_not be_nil
+          expect(@user_collections.index{|d| d.id == @collection.id}).not_to be_nil
+          expect(@user_collections.index{|d| d.id == @collection3.id}).not_to be_nil
         end 
         it "should not return non public or editable collections" do
-          @user_collections.index{|d| d.id == @collection2.id}.should be_nil
-          @user_collections.index{|d| d.id == @collection4.id}.should be_nil
+          expect(@user_collections.index{|d| d.id == @collection2.id}).to be_nil
+          expect(@user_collections.index{|d| d.id == @collection4.id}).to be_nil
         end
       end
     end

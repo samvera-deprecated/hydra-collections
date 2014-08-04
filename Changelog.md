@@ -2,6 +2,8 @@
 
 * Updating dependencies
 * Refactoring collection membership methods
+* More thorough testing of relationships in Solr
+* Update to Rspec 3
 
 # 2.0.3
 

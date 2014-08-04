@@ -16,9 +16,9 @@ require 'spec_helper'
 
 include Rails.application.routes.url_helpers
 
-describe CatalogController do
+describe CatalogController, :type => :controller do
   before do
-    controller.stub(:has_access?).and_return(true)
+    allow(controller).to receive(:has_access?).and_return(true)
     @user = FactoryGirl.find_or_create(:user)
     @collection = Collection.new title:"Test"
     @collection.apply_depositor_metadata(@user.user_key)
@@ -37,7 +37,7 @@ describe CatalogController do
       @routes = Rails.application.routes
       get :index
       expect(assigns(:user_collections)).to be_kind_of(Array)
-      assigns(:user_collections).index{|d| d.id == @collection.id}.should_not be_nil
+      expect(assigns(:user_collections).index{|d| d.id == @collection.id}).not_to be_nil
     end
   end
   

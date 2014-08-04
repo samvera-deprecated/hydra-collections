@@ -20,7 +20,6 @@ RSpec.configure do |config|
   config.include Devise::TestHelpers, :type => :controller
   config.before(:each, :type=>"controller") { @routes = Hydra::Collections::Engine.routes }
   config.include EngineRoutes, :type => :controller
-  config.infer_spec_type_from_file_location!
 end
 
 module FactoryGirl

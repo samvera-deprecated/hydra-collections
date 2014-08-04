@@ -34,7 +34,7 @@ class Member < ActiveFedora::Base
 end
 
 # make sure a collection by another name still assigns the @collection variable
-describe OtherCollectionsController do
+describe OtherCollectionsController, :type => :controller do
   before(:all) do
     @user = FactoryGirl.find_or_create(:user)
   end
@@ -49,12 +49,12 @@ describe OtherCollectionsController do
   end
   
   before do
-    controller.stub(:has_access?).and_return(true)
+    allow(controller).to receive(:has_access?).and_return(true)
 
     @user = FactoryGirl.find_or_create(:user)
     sign_in @user
-    User.any_instance.stub(:groups).and_return([])
-    controller.stub(:clear_session_user) ## Don't clear out the authenticated session
+    allow_any_instance_of(User).to receive(:groups).and_return([])
+    allow(controller).to receive(:clear_session_user) ## Don't clear out the authenticated session
   end
 
   describe "#show" do
@@ -68,7 +68,7 @@ describe OtherCollectionsController do
       collection.apply_depositor_metadata(@user.user_key)
       collection.members = [asset1,asset2,asset3]
       collection.save
-      controller.stub(:apply_gated_search)
+      allow(controller).to receive(:apply_gated_search)
     end
     after do
       Rails.application.reload_routes!
@@ -76,11 +76,11 @@ describe OtherCollectionsController do
     it "should show the collections" do
       routes.draw { resources :other_collections, except: :index }
       get :show, id: collection.id
-      assigns[:collection].title.should == collection.title
+      expect(assigns[:collection].title).to eq(collection.title)
       ids = assigns[:member_docs].map {|d| d.id}
-      ids.should include asset1.pid
-      ids.should include asset2.pid
-      ids.should include asset3.pid
+      expect(ids).to include asset1.pid
+      expect(ids).to include asset2.pid
+      expect(ids).to include asset3.pid
     end
   end
 

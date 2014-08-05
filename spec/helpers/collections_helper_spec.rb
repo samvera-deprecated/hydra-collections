@@ -103,10 +103,9 @@ describe CollectionsHelper, :type => :helper do
     it "should create a button with my text" do
       str = button_for_remove_selected_from_collection @collection, "Remove My Button"
       doc = Nokogiri::HTML(str)
-      form = doc.xpath('//form').first
-      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
-      i = form.children[3]
-      expect(i.attr('value')).to eq("Remove My Button")
+      form = doc.css('form').first
+      expect(form.attr('action')).to eq collections.collection_path(@collection.id)
+      expect(form.css('input[type="submit"]').attr('value').value).to eq "Remove My Button"
     end
   end
 

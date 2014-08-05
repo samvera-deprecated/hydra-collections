@@ -2,8 +2,12 @@ require 'spec_helper'
 
 describe CollectionsController, :type => :controller do
   before(:all) do
+    CollectionsController.configure_blacklight do |config|
+      config.default_solr_params = {:qf => 'label_tesim'}
+    end
+
     @user = FactoryGirl.find_or_create(:user)
-#    CollectionsController.config.default_solr_params = {:qf => 'title_tesim'}
+
     class GenericFile < ActiveFedora::Base
       include Hydra::Collections::Collectible
 

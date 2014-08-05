@@ -1,17 +1,3 @@
-# Copyright © 2013 The Pennsylvania State University
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 require 'spec_helper'
 
 describe Collection, :type => :model do
@@ -71,6 +57,9 @@ describe Collection, :type => :model do
   it "should allow files to be removed" do
     @collection.members = [@gf1, @gf2]
     @collection.save
+
+    expect(@gf1.collections).to eq [@collection] # This line forces the "collections" to be cached.
+    # We need to ensure that deleting causes the collection to be flushed.
     solr_doc_before_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, @gf1.pid).send(:solr_doc)
     expect(solr_doc_before_remove["collection_tesim"]).to eq([@collection.pid])
     @collection.reload.members.delete(@gf1)

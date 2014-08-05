@@ -1,4 +1,3 @@
-
 module Hydra
   module Collection
     extend ActiveSupport::Concern
@@ -11,7 +10,7 @@ module Hydra
       has_metadata "descMetadata", type: Hydra::CollectionRdfDatastream
       has_metadata "properties", type: Hydra::Datastream::Properties
 
-      has_and_belongs_to_many :members, :property => :has_collection_member, :class_name => "ActiveFedora::Base" , :after_remove => :update_member
+      has_and_belongs_to_many :members, property: :has_collection_member, class_name: "ActiveFedora::Base" , after_remove: :update_member
 
       has_attributes :depositor, datastream: :properties, multiple: false
       
@@ -44,6 +43,8 @@ module Hydra
 
     # TODO: Use solr atomic updates to accelerate this process
     def update_member member
+      # because the member may have its collections cached, reload that cache so that it indexes the correct fields.
+      member.collections(true) if member.respond_to? :collections
       member.update_index
     end
 

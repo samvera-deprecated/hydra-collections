@@ -8,13 +8,16 @@ module Hydra
 
     included do
       has_metadata "descMetadata", type: Hydra::CollectionRdfDatastream
-      has_metadata "properties", type: Hydra::Datastream::Properties
 
       has_and_belongs_to_many :members, property: :has_collection_member, class_name: "ActiveFedora::Base" , after_remove: :update_member
 
-      has_attributes :depositor, datastream: :properties, multiple: false
-      
-      has_attributes :title, :date_uploaded, :date_modified, :description, 
+      attribute :depositor, [
+        RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt"),
+        FedoraLens::Lenses.single,
+        FedoraLens::Lenses.literal_to_string
+      ]
+
+      has_attributes :title, :date_uploaded, :date_modified, :description,
                      datastream: :descMetadata, multiple: false
       has_attributes :creator, :contributor, :based_near, :part_of, :publisher,
                      :date_created, :subject,:resource_type, :rights,

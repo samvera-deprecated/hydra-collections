@@ -3,9 +3,9 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in hydra-collections.gemspec
 gemspec
 
-gem 'active-fedora', github: 'projecthydra/active_fedora', branch: 'fedora-4'
+gem 'active-fedora', github: 'projecthydra/active_fedora', branch: 'activetriples'
 gem 'hydra-head', github: 'projecthydra/hydra-head', branch: 'fedora-4'
-
+gem 'active-triples', github: 'no-reply/ActiveTriples'
 
 group :development, :test do
   gem 'sqlite3'

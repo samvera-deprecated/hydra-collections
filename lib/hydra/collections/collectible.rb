@@ -2,12 +2,12 @@
 # It also provides methods to help you index the information as a facet
 module Hydra::Collections::Collectible
   extend ActiveSupport::Concern
-  
+
   included do
     has_many :collections, property: :has_collection_member, class_name: "ActiveFedora::Base"
   end
 
-  # Add this method to your solrization logic (ie. in to_solr) in order to populate the 'collection' facet 
+  # Add this method to your solrization logic (ie. in to_solr) in order to populate the 'collection' facet
   # with the pids of any collections that contain the current object.
   # @example
   #   def to_solr(solr_doc={}, opts={})

@@ -51,14 +51,14 @@ module Hydra
         format.json { render json: @collection, status: :created, location: @collection }
       end
     end
-    
+
     def after_create_error
       respond_to do |format|
         format.html { render action: "new" }
         format.json { render json: @collection.errors, status: :unprocessable_entity }
       end
     end
-        
+
     def create
       @collection.apply_depositor_metadata(current_user.user_key)
       add_members_to_collection unless batch.empty?
@@ -68,8 +68,8 @@ module Hydra
         after_create_error
       end
     end
-    
-    def after_update 
+
+    def after_update
       if flash[:notice].nil?
         flash[:notice] = 'Collection was successfully updated.'
       end
@@ -78,14 +78,14 @@ module Hydra
         format.json { render json: @collection, status: :updated, location: @collection }
       end
     end
-    
+
     def after_update_error
       respond_to do |format|
         format.html { render action: collections.edit_collection_path(@collection) }
         format.json { render json: @collection.errors, status: :unprocessable_entity }
       end
     end
-    
+
     def update
       process_member_changes
       @collection.update_attributes(params[:collection].except(:members))
@@ -95,21 +95,21 @@ module Hydra
         after_update_error
       end
     end
-    
+
     def after_destroy (id)
       respond_to do |format|
         format.html { redirect_to catalog_index_path, notice: 'Collection was successfully deleted.' }
         format.json { render json: {id:id}, status: :destroyed, location: @collection }
-      end      
+      end
     end
 
     def after_destroy_error (id)
       respond_to do |format|
         format.html { redirect_to catalog_index_path, notice: 'Collection could not be deleted.' }
         format.json { render json: {id:id}, status: :destroy_error, location: @collection }
-      end      
+      end
     end
-    
+
     def destroy
       if @collection.destroy
          after_destroy(params[:id])
@@ -117,10 +117,10 @@ module Hydra
         after_destroy_error(params[:id])
       end
     end
-    
+
     protected
 
-    # Queries Solr for members of the collection.  
+    # Queries Solr for members of the collection.
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
       query = params[:cq]
@@ -165,7 +165,7 @@ module Hydra
         flash[:error] = "An error occured. Files were not moved to #{destination_collection.title} Collection."
       end
     end
-    
+
     # include filters into the query to only include the collection memebers
     def include_collection_ids(solr_parameters, user_parameters)
       solr_parameters[:fq] ||= []

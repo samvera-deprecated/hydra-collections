@@ -11,11 +11,13 @@ module Hydra
 
       has_and_belongs_to_many :members, property: :has_collection_member, class_name: "ActiveFedora::Base" , after_remove: :update_member
 
-      attribute :depositor, [
-        RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt"),
-        FedoraLens::Lenses.single,
-        FedoraLens::Lenses.literal_to_string
-      ]
+      property :depositor, predicate: RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt")
+
+      # Hack until https://github.com/no-reply/ActiveTriples/pull/37 is merged
+      def depositor_with_first
+        depositor_without_first.first
+      end
+      alias_method_chain :depositor, :first
 
       has_attributes :title, :date_uploaded, :date_modified, :description,
                      datastream: :descMetadata, multiple: false

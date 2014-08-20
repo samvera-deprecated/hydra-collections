@@ -27,15 +27,13 @@ RSpec.configure do |config|
   # Stub out test stuff.
   config.before(:each) do
     begin
-      FedoraLens.connection.delete("test")
+      ActiveFedora.fedora.connection.delete(ActiveFedora.fedora.base_path.sub('/', ''))
     rescue StandardError
     end
-    FedoraLens.connection.put("test","")
+    ActiveFedora.fedora.connection.put(ActiveFedora.fedora.base_path.sub('/', ''),"")
     restore_spec_configuration if ActiveFedora::SolrService.instance.nil? || ActiveFedora::SolrService.instance.conn.nil?
     ActiveFedora::SolrService.instance.conn.delete_by_query('*:*', params: {'softCommit' => true})
-    FedoraLens.base_path = "/test"
   end
-  
 end
 
 module FactoryGirl

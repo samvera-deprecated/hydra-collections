@@ -28,11 +28,10 @@ module Hydra
 
       before_create :set_date_uploaded
       before_save :set_date_modified
-
-      # TODO: Not sure if F4 can do this yet
-      after_save :update_all_members
       before_destroy :update_all_members
 
+      after_save :update_all_members
+      
       include Hydra::Collections::DirtyMembers
     end
 
@@ -48,15 +47,11 @@ module Hydra
       self.members.collect { |m| update_member(m) }
     end
 
-    # Re-index each member of the collection
-    # This can be overridden as a batch job for large collections
-    def update_all_members
-      removed_members.each do |member_id|
-        ActiveFedora::Base.find(member_id).update_index
-      end
-      members.each do |member|
-        member.update_index
-      end
+    # TODO: Use solr atomic updates to accelerate this process
+    def update_member member
+      # because the member may have its collections cached, reload that cache so that it indexes the correct fields.
+      member.collections(true) if member.respond_to? :collections
+      member.update_index
     end
 
     private

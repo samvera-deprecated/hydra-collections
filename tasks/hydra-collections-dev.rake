@@ -17,3 +17,18 @@ task ci: ['engine_cart:clean', 'engine_cart:generate', 'jetty:clean'] do
   end
   raise "test failures: #{error}" if error
 end
+
+EXTRA_GEMS =<<EOF
+gem 'active-fedora', github: 'projecthydra/active_fedora', ref: '331a64092daf3c2b5f72e32db750287f1f5bd198'
+gem 'hydra-head', github: 'projecthydra/hydra-head', branch: 'fedora-4'
+
+EOF
+
+namespace :engine_cart do
+  # we're adding some extra stuff into the gemfile beyond what engine_cart gives us by default
+  task :inject_gemfile_extras do
+    open(File.expand_path('Gemfile', EngineCart.destination), 'a') do |f|
+      f.write EXTRA_GEMS
+    end
+  end
+end

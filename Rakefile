@@ -1,12 +1,12 @@
 #!/usr/bin/env rake
-require "bundler/gem_tasks"
+begin
+  require 'bundler/setup'
+rescue LoadError
+  puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
+end
+
+Bundler::GemHelper.install_tasks
 
 Dir.glob('tasks/*.rake').each { |r| import r }
 
-ENV["RAILS_ROOT"] ||= 'spec/internal'
-
-desc 'Run CI tests in e.g. Travis environment'
-task :travis => ['clean', 'ci']
-
-desc 'Default: run CI'
-task :default => [:travis]
+task :default => [:ci]

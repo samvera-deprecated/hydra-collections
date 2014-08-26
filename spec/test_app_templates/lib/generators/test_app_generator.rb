@@ -1,7 +1,13 @@
 require 'rails/generators'
 
 class TestAppGenerator < Rails::Generators::Base
-  source_root File.expand_path("../../../../support", __FILE__)
+  source_root File.expand_path("../../../../test_app_templates", __FILE__)
+
+  def update_gemfile
+    append_to_file "Gemfile" do
+      "\n   gem 'factory_girl_rails'"
+    end
+  end
 
   def run_blacklight_generator
     say_status("warning", "GENERATING BL", :yellow)       
@@ -33,7 +39,7 @@ class TestAppGenerator < Rails::Generators::Base
 
   def delete_generated_noise
     remove_file("public/index.html")
-    remove_file("spec/models/user_spec.rb")
+    remove_file("test/factories/users.rb")
   end
   
   def copy_view_overrides
@@ -74,3 +80,4 @@ class TestAppGenerator < Rails::Generators::Base
     end
   end
 end
+

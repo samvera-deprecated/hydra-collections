@@ -148,7 +148,6 @@ describe CollectionsController, :type => :controller do
     end
 
     it "should set/un-set collection on members" do
-      pending "Solr index is not being updated"
       # Add to collection (sets collection on members)
       put :update, id: @collection.id, collection: { members: "add"}, batch_document_ids: [@asset2, @asset3]
       expect(assigns[:collection].members).to match_array [@asset2, @asset3]

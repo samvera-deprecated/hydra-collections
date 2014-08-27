@@ -94,8 +94,6 @@ module Hydra
       before_destroy :update_all_members
 
       after_save :update_all_members
-      
-      include Hydra::Collections::DirtyMembers
     end
 
     def terms_for_editing

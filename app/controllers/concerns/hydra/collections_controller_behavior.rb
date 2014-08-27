@@ -147,7 +147,7 @@ module Hydra
     end
 
     def remove_members_from_collection
-      @collection.member_ids = (@collection.member_ids - batch)
+      @collection.members.delete(batch.map { |pid| ActiveFedora::Base.find(pid) })
     end
 
     def assign_batch_to_collection
@@ -169,7 +169,6 @@ module Hydra
     # include filters into the query to only include the collection memebers
     def include_collection_ids(solr_parameters, user_parameters)
       solr_parameters[:fq] ||= []
-      #solr_parameters[:fq] << '(' + ActiveFedora::SolrService.construct_query_for_pids(@collection.member_ids) + ')'
       solr_parameters[:fq] << Solrizer.solr_name(:collection, :facetable)+':"'+@collection.id+'"'
     end
   end # module CollectionsControllerBehavior

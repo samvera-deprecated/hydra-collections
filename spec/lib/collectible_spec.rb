@@ -20,12 +20,12 @@ describe Hydra::Collections::Collectible do
       expect(reloaded.collections).to eq([@collection1, @collection2])
     end
   end
-  describe "index_collection_pids" do
+  describe "index_collection_ids" do
     it "should add pids for all associated collections" do
       @collectible.save
       @collectible.collections << @collection1
       @collectible.collections << @collection2
-      expect(@collectible.index_collection_pids["collection_sim"]).to eq([@collection1.pid, @collection2.pid])
+      expect(@collectible.index_collection_ids["collection_sim"]).to eq([@collection1.pid, @collection2.pid])
     end
   end
 end

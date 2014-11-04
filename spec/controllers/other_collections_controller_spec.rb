@@ -16,7 +16,7 @@ class OtherCollection < ActiveFedora::Base
 
   def to_solr(solr_doc={}, opts={})
     super(solr_doc, opts)
-    solr_doc = index_collection_pids(solr_doc)
+    solr_doc = index_collection_ids(solr_doc)
     return solr_doc
   end
 
@@ -27,7 +27,7 @@ class Member < ActiveFedora::Base
 
   def to_solr(solr_doc={}, opts={})
     super(solr_doc, opts)
-    solr_doc = index_collection_pids(solr_doc)
+    solr_doc = index_collection_ids(solr_doc)
     return solr_doc
   end
 

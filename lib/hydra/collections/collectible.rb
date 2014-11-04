@@ -12,10 +12,10 @@ module Hydra::Collections::Collectible
   # @example
   #   def to_solr(solr_doc={}, opts={})
   #    super(solr_doc, opts)
-  #    index_collection_pids(solr_doc)
+  #    index_collection_ids(solr_doc)
   #    return solr_doc
   #   end
-  def index_collection_pids(solr_doc={})
+  def index_collection_ids(solr_doc={})
     solr_doc[Solrizer.solr_name(:collection, :facetable)] = self.collection_ids
     solr_doc[Solrizer.solr_name(:collection)] = self.collection_ids
     solr_doc

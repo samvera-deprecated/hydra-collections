@@ -26,7 +26,7 @@ describe CollectionsController, :type => :controller do
 
       def to_solr(solr_doc={})
         super
-        solr_doc = index_collection_pids(solr_doc)
+        solr_doc = index_collection_ids(solr_doc)
         solr_doc["label_tesim"] = self.title
         solr_doc
       end

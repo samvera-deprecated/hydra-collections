@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "blacklight"
   spec.add_dependency "hydra-head", "~> 8.0.0.alpha"
+  spec.add_dependency 'deprecation'
 
   spec.add_development_dependency "engine_cart"
   spec.add_development_dependency "rspec-rails"

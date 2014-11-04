@@ -1,7 +1,10 @@
 # This module adds a `has_many :collections` association to any models that you mix it into, using the :has_collection_member property
 # It also provides methods to help you index the information as a facet
+require 'deprecation'
 module Hydra::Collections::Collectible
   extend ActiveSupport::Concern
+  extend Deprecation
+  self.deprecation_horizon = "hydra-collections 4.0"
 
   included do
     has_many :collections, property: :has_collection_member, class_name: "ActiveFedora::Base"
@@ -20,4 +23,10 @@ module Hydra::Collections::Collectible
     solr_doc[Solrizer.solr_name(:collection)] = self.collection_ids
     solr_doc
   end
+
+  def index_collection_pids(solr_doc={})
+    index_collection_ids(solr_doc)
+  end
+  deprecation_deprecate :index_collection_pids
+
 end

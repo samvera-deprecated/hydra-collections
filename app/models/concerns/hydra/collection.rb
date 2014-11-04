@@ -63,31 +63,25 @@ module Hydra
       property :related_url, predicate: RDF::RDFS.seeAlso
 
       # Single-valued properties
-      # Hack until https://github.com/no-reply/ActiveTriples/pull/37 is merged
-      def depositor_with_first
-        depositor_without_first.first
+      def depositor
+        super.first
       end
-      alias_method_chain :depositor, :first
 
-      def title_with_first
-        title_without_first.first
+      def title
+        super.first
       end
-      alias_method_chain :title, :first
 
-      def date_uploaded_with_first
-        date_uploaded_without_first.first
+      def date_uploaded
+        super.first
       end
-      alias_method_chain :date_uploaded, :first
 
-      def date_modified_with_first
-        date_modified_without_first.first
+      def date_modified
+        super.first
       end
-      alias_method_chain :date_modified, :first
 
-      def description_with_first
-        description_without_first.first
+      def description
+        super.first
       end
-      alias_method_chain :description, :first      
 
       before_create :set_date_uploaded
       before_save :set_date_modified

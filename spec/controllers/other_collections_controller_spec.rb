@@ -75,12 +75,10 @@ describe OtherCollectionsController, :type => :controller do
     end
     it "should show the collections" do
       routes.draw { resources :other_collections, except: :index }
-      get :show, id: collection.id
-      expect(assigns[:collection].title).to eq(collection.title)
-      ids = assigns[:member_docs].map {|d| d.id}
-      expect(ids).to include asset1.pid
-      expect(ids).to include asset2.pid
-      expect(ids).to include asset3.pid
+      get :show, id: collection
+      expect(assigns[:collection].title).to eq collection.title
+      ids = assigns[:member_docs].map(&:id)
+      expect(ids).to include(asset1.id, asset2.id, asset3.id)
     end
   end
 

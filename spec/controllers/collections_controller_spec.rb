@@ -77,12 +77,12 @@ describe CollectionsController, :type => :controller do
     it "should add one doc to collection if batch ids provided and add the collection id to the document in the colledction" do
       @asset1 = GenericFile.create!
       post :create, batch_document_ids: [@asset1], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
-      expect(assigns[:collection].members).to eq([@asset1])
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      expect(assigns[:collection].members).to eq [@asset1]
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
-      expect(doc["id"]).to eq(@asset1.pid)
-      afterupdate = GenericFile.find(@asset1.pid)
+      expect(doc["id"]).to eq(@asset1.id)
+      afterupdate = GenericFile.find(@asset1.id)
       expect(doc[Solrizer.solr_name(:collection)]).to eq(afterupdate.to_solr[Solrizer.solr_name(:collection)])
     end
     it "should add docs to collection if batch ids provided and add the collection id to the documents int he colledction" do
@@ -90,11 +90,11 @@ describe CollectionsController, :type => :controller do
       @asset2 = GenericFile.create!
       post :create, batch_document_ids: [@asset1,@asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       expect(assigns[:collection].members).to eq([@asset1,@asset2])
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
-      expect(doc["id"]).to eq(@asset1.pid)
-      afterupdate = GenericFile.find(@asset1.pid)
+      expect(doc["id"]).to eq(@asset1.id)
+      afterupdate = GenericFile.find(@asset1.id)
       expect(doc[Solrizer.solr_name(:collection)]).to eq(afterupdate.to_solr[Solrizer.solr_name(:collection)])
     end
   end
@@ -154,13 +154,13 @@ describe CollectionsController, :type => :controller do
 
       ## Check that member lists collection in its solr doc
       @asset2.reload
-      expect(@asset2.to_solr[Solrizer.solr_name(:collection)]).to eq([@collection.pid])
+      expect(@asset2.to_solr[Solrizer.solr_name(:collection)]).to eq [@collection.id]
       ## Check that member was re-indexed with collection info
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       doc = asset_results["response"]["docs"].first
-      expect(doc["id"]).to eq(@asset2.pid)
-      expect(doc[Solrizer.solr_name(:collection)]).to eq([@collection.pid])
-  
+      expect(doc["id"]).to eq(@asset2.id)
+      expect(doc[Solrizer.solr_name(:collection)]).to eq [@collection.id]
+
       # Remove from collection (un-sets collection on members)
       put :update, id: @collection, collection: { members:"remove" }, batch_document_ids: [@asset2]
       expect(assigns[:collection].members).to_not include(@asset2)
@@ -170,12 +170,12 @@ describe CollectionsController, :type => :controller do
       expect(@asset2.to_solr[Solrizer.solr_name(:collection)]).to eq([])
 
       ## Check that member was re-indexed without collection info
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       doc = asset_results["response"]["docs"].first
-      expect(doc["id"]).to eq(@asset2.pid)
+      expect(doc["id"]).to eq(@asset2.id)
       expect(doc[Solrizer.solr_name(:collection)]).to be_nil
     end
-    
+
     context "when moving members between collections" do
       before do
         @collection.members = [@asset1, @asset2, @asset3]
@@ -220,15 +220,15 @@ describe CollectionsController, :type => :controller do
         @collection.save
         @asset1 = @asset1.reload
         @asset1.update_index
-        expect(@asset1.collections).to eq([@collection])
-        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        expect(@asset1.collections).to eq [@collection]
+        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
         expect(asset_results["response"]["numFound"]).to eq(1)
         doc = asset_results["response"]["docs"].first
-        expect(doc[Solrizer.solr_name(:collection)]).to eq([@collection.pid])
+        expect(doc[Solrizer.solr_name(:collection)]).to eq([@collection.id])
 
-        delete :destroy, id: @collection.id
+        delete :destroy, id: @collection
         expect(@asset1.reload.collections).to eq([])
-        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.pid}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
         expect(asset_results["response"]["numFound"]).to eq(1)
         doc = asset_results["response"]["docs"].first
         expect(doc[Solrizer.solr_name(:collection)]).to be_nil
@@ -245,7 +245,7 @@ describe CollectionsController, :type => :controller do
       @asset1 = GenericFile.create!(title: "First of the Assets")
       @asset2 = GenericFile.create!(title: "Second of the Assets")
       @asset3 = GenericFile.create!(title: "Third of the Assets")
-      @collection = Collection.new(pid:"abc123")
+      @collection = Collection.new(id:"abc123")
       @collection.title = "My collection"
       @collection.apply_depositor_metadata(@user.user_key)
       @collection.members = [@asset1, @asset2, @asset3]
@@ -257,7 +257,7 @@ describe CollectionsController, :type => :controller do
     describe "additional collections" do
       before do
         @asset4 = GenericFile.create!(title: "#{@asset1.id}")
-        @collection2 = Collection.new(pid: "abc1234")
+        @collection2 = Collection.new(id: "abc1234")
         @collection2.title = "Other collection"
         @collection2.apply_depositor_metadata(@user.user_key)
         @collection2.members = [@asset4]

@@ -30,7 +30,7 @@ describe CollectionsHelper, :type => :helper do
       str = button_for_delete_collection @collection
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
+      expect(form.attr('action')).to eq collections.collection_path(@collection)
       i = form.children.first.children[1]
       expect(i.attr('type')).to eq('submit')
     end
@@ -38,7 +38,7 @@ describe CollectionsHelper, :type => :helper do
       str = button_for_delete_collection @collection, "Delete My Button"
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
+      expect(form.attr('action')).to eq collections.collection_path(@collection)
       i = form.children.first.children[1]
       expect(i.attr('value')).to eq("Delete My Button")
     end
@@ -53,7 +53,7 @@ describe CollectionsHelper, :type => :helper do
       str = button_for_remove_from_collection item
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
+      expect(form.attr('action')).to eq collections.collection_path(@collection)
       expect(form.css('input#collection_members[type="hidden"][value="remove"]')).not_to be_empty
       expect(form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]')).not_to be_empty
     end
@@ -75,13 +75,14 @@ describe CollectionsHelper, :type => :helper do
         str = button_for_remove_from_collection item
         doc = Nokogiri::HTML(str)
         form = doc.xpath('//form').first
-        expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
+        expect(form.attr('action')).to eq collections.collection_path(@collection)
         expect(form.css('input#collection_members[type="hidden"][value="remove"]')).not_to be_empty
         expect(form.css('input[type="hidden"][name="batch_document_ids[]"][value="changeme:123"]')).not_to be_empty
       end
 
     end
-  end 
+  end
+
   describe "button_for_remove_selected_from_collection" do
     before do
       @collection = Collection.create title: "Test Public"
@@ -91,7 +92,7 @@ describe CollectionsHelper, :type => :helper do
       str = button_for_remove_selected_from_collection @collection
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
-      expect(form.attr('action')).to eq("#{collections.collection_path(@collection.pid)}")
+      expect(form.attr('action')).to eq collections.collection_path(@collection)
       i = form.children[2]
       expect(i.attr('value')).to eq("remove")
       expect(i.attr('name')).to eq("collection[members]")
@@ -101,7 +102,7 @@ describe CollectionsHelper, :type => :helper do
       str = button_for_remove_selected_from_collection @collection, "Remove My Button"
       doc = Nokogiri::HTML(str)
       form = doc.css('form').first
-      expect(form.attr('action')).to eq collections.collection_path(@collection.id)
+      expect(form.attr('action')).to eq collections.collection_path(@collection)
       expect(form.css('input[type="submit"]').attr('value').value).to eq "Remove My Button"
     end
   end

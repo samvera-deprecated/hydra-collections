@@ -77,13 +77,14 @@ describe Collection, :type => :model do
   it "should have a title" do
     @collection.title = "title"
     @collection.save
-    expect(Collection.find(@collection.pid).title).to eq(@collection.title)
+    expect(Collection.find(@collection.id).title).to eq(@collection.title)
   end
   it "should have a description" do
     @collection.description = "description"
     @collection.save
-    expect(Collection.find(@collection.pid).description).to eq(@collection.description)
+    expect(Collection.find(@collection.id).description).to eq(@collection.description)
   end
+
   it "should have the expected display terms" do
     expect(@collection.terms_for_display).to include(
       :part_of, :contributor, :creator, :title, :description, :publisher, 
@@ -101,8 +102,8 @@ describe Collection, :type => :model do
     @collection.members = [@gf1, @gf2]
     @collection.save
     @collection.destroy
-    expect(GenericFile).to exist(@gf1.pid)
-    expect(GenericFile).to exist(@gf2.pid)
+    expect(GenericFile).to exist(@gf1.id)
+    expect(GenericFile).to exist(@gf2.id)
   end
 
   describe "Collection by another name" do

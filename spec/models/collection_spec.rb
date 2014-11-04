@@ -57,14 +57,13 @@ describe Collection, :type => :model do
   end
 
   it "should set the date uploaded on create" do
-    pending "AF needs to return dates"
     @collection.save
     expect(@collection.date_uploaded).to be_kind_of(Date)
   end
   it "should update the date modified on update" do
     uploaded_date = Date.today
     modified_date = Date.tomorrow
-    allow(Date).to receive(:today).and_return(uploaded_date, modified_date)
+    expect(Date).to receive(:today).twice.and_return(uploaded_date, modified_date)
     @collection.save
     expect(@collection.date_modified).to eq(uploaded_date)
     @collection.members = [@gf1]

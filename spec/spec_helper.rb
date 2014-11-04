@@ -18,6 +18,7 @@ module EngineRoutes
   end
 end
 
+require 'active_fedora/cleaner'
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.include Devise::TestHelpers, :type => :controller
@@ -26,13 +27,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   # Stub out test stuff.
   config.before(:each) do
-    begin
-      ActiveFedora.fedora.connection.delete(ActiveFedora.fedora.base_path.sub('/', ''))
-    rescue StandardError
-    end
-    ActiveFedora.fedora.connection.put(ActiveFedora.fedora.base_path.sub('/', ''),"")
-    restore_spec_configuration if ActiveFedora::SolrService.instance.nil? || ActiveFedora::SolrService.instance.conn.nil?
-    ActiveFedora::SolrService.instance.conn.delete_by_query('*:*', params: {'softCommit' => true})
+    ActiveFedora::Cleaner.clean!
   end
 end
 

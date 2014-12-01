@@ -7,7 +7,7 @@ module Hydra::Collections::Collectible
   self.deprecation_horizon = "hydra-collections 4.0"
 
   included do
-    has_many :collections, property: :has_collection_member, class_name: "ActiveFedora::Base"
+    has_many :collections, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasCollectionMember, class_name: "ActiveFedora::Base"
   end
 
   # Add this method to your solrization logic (ie. in to_solr) in order to populate the 'collection' facet

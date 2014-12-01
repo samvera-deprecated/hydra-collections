@@ -11,7 +11,7 @@ describe CollectionsController, :type => :controller do
     class GenericFile < ActiveFedora::Base
       include Hydra::Collections::Collectible
 
-      property :title, predicate: RDF::DC.title
+      property :title, predicate: ::RDF::DC.title
 
       # Hack until https://github.com/no-reply/ActiveTriples/pull/37 is merged
       def title_with_first
@@ -25,10 +25,10 @@ describe CollectionsController, :type => :controller do
       end
 
       def to_solr(solr_doc={})
-        super
-        solr_doc = index_collection_ids(solr_doc)
-        solr_doc["label_tesim"] = self.title
-        solr_doc
+        super.tap do |solr_doc|
+          solr_doc = index_collection_ids(solr_doc)
+          solr_doc["label_tesim"] = self.title
+        end
       end
     end
   end

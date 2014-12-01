@@ -7,9 +7,9 @@ describe Collection, :type => :model do
       include Hydra::Collections::Collectible
 
       def to_solr(solr_doc={}, opts={})
-        super(solr_doc, opts)
-        solr_doc = index_collection_ids(solr_doc)
-        return solr_doc
+        super(solr_doc, opts).tap do |solr_doc|
+          solr_doc = index_collection_ids(solr_doc)
+        end
       end
 
     end
@@ -22,7 +22,7 @@ describe Collection, :type => :model do
   before do
     @collection = Collection.new
     @collection.apply_depositor_metadata(@user.user_key)
-    @collection.save
+    @collection.save!
     @gf1 = GenericFile.create
     @gf2 = GenericFile.create
   end

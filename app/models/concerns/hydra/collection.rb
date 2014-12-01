@@ -7,7 +7,7 @@ module Hydra
     include Hydra::Collections::Collectible
 
     included do
-      has_and_belongs_to_many :members, property: :has_collection_member, class_name: "ActiveFedora::Base" , after_remove: :update_member
+      has_and_belongs_to_many :members, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasCollectionMember, class_name: "ActiveFedora::Base" , after_remove: :update_member
 
       property :depositor, predicate: RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt")
 

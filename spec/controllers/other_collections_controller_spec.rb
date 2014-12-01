@@ -15,8 +15,9 @@ class OtherCollection < ActiveFedora::Base
   include Hydra::Collections::Collectible
 
   def to_solr(solr_doc={})
-    super
-    index_collection_ids(solr_doc)
+    super.tap do |solr_doc|
+      index_collection_ids(solr_doc)
+    end
   end
 end
 
@@ -25,8 +26,9 @@ class Member < ActiveFedora::Base
   attr_accessor :title
 
   def to_solr(solr_doc={})
-    super
-    index_collection_ids(solr_doc)
+    super.tap do |solr_doc|
+      index_collection_ids(solr_doc)
+    end
   end
 
 end

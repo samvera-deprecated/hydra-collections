@@ -3,7 +3,7 @@ require 'rspec/core/rake_task'
 require 'jettywrapper'
 require 'engine_cart/rake_task'
 
-JETTY_ZIP_BASENAME = 'fedora-4/edge'
+JETTY_ZIP_BASENAME = 'fedora-4/master'
 Jettywrapper.url = "https://github.com/projecthydra/hydra-jetty/archive/#{JETTY_ZIP_BASENAME}.zip"
 
 RSpec::Core::RakeTask.new(:spec)

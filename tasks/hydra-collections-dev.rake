@@ -19,7 +19,7 @@ task ci: ['engine_cart:clean', 'engine_cart:generate', 'jetty:clean'] do
 end
 
 EXTRA_GEMS =<<EOF
-gem 'active-fedora', github: 'projecthydra/active_fedora', branch: 'fedora-4'
+gem 'active-fedora', '9.0.0.beta3'
 gem 'hydra-head', github: 'projecthydra/hydra-head', branch: 'fedora-4'
 
 EOF

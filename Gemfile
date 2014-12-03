@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in hydra-collections.gemspec
 gemspec
 
-gem 'active-fedora', github: 'projecthydra/active_fedora', branch: 'fedora-4'
+gem 'active-fedora', '9.0.0.beta3'
 gem 'hydra-head', github: 'projecthydra/hydra-head', branch: 'fedora-4'
 
 group :development, :test do

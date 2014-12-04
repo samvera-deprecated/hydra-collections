@@ -19,94 +19,153 @@ describe Collection, :type => :model do
     Object.send(:remove_const, :GenericFile)
   end
 
-  before do
-    @collection = Collection.new
-    @collection.apply_depositor_metadata(@user.user_key)
-    @collection.save!
-    @gf1 = GenericFile.create
-    @gf2 = GenericFile.create
+  let(:gf1) { GenericFile.create }
+  let(:gf2) { GenericFile.create }
+
+  let(:user) { @user }
+
+  describe "#to_solr" do
+    let(:collection) { Collection.new(title: "A good title") }
+
+    subject { collection.to_solr }
+
+    it "should have title" do
+      expect(subject['desc_metadata__title_tesim']).to eq ['A good title']
+    end
   end
 
-  it "should have a depositor" do
-    expect(@collection.depositor).to eq(@user.user_key)
+  describe "#depositor" do
+    before do
+      subject.apply_depositor_metadata(user)
+    end
+
+    it "should have a depositor" do
+      expect(subject.depositor).to eq(user.user_key)
+    end
   end
 
-  it "should allow the depositor to edit and read" do
-    ability = Ability.new(@user)
-    expect(ability.can?(:read, @collection)).to be true
-    expect(ability.can?(:edit, @collection)).to be true
+  describe "the ability" do
+    let(:collection) do
+      Collection.new.tap do |collection|
+        collection.apply_depositor_metadata(user)
+        collection.save
+      end
+    end
+    subject { Ability.new(user) }
+
+    it "should allow the depositor to edit and read" do
+      expect(subject.can?(:read, collection)).to be true
+      expect(subject.can?(:edit, collection)).to be true
+    end
   end
 
-  it "should be empty by default" do
-    expect(@collection.members).to be_empty
-  end
+  describe "#members" do
+    it "should be empty by default" do
+      expect(subject.members).to be_empty
+    end
 
-  it "should have many files" do
-    @collection.members = [@gf1, @gf2]
-    @collection.save
-    expect(@collection.reload.members).to match_array [@gf1, @gf2]
-  end
+    context "adding members" do
+      context "using assignment" do
+        subject { Collection.create(members: [gf1, gf2]) }
 
-  it "should allow new files to be added" do
-    @collection.members = [@gf1]
-    @collection.save
-    @collection.reload
-    @collection.members << @gf2
-    @collection.save
-    expect(@collection.reload.members).to match_array [@gf1, @gf2]
+        it "should have many files" do
+          expect(subject.reload.members).to eq [gf1, gf2]
+        end
+      end
+
+      context "using append" do
+        before do
+          subject.members = [gf1]
+          subject.save
+        end
+        it "should allow new files to be added" do
+          subject.reload
+          subject.members << gf2
+          subject.save
+          expect(subject.reload.members).to eq [gf1, gf2]
+        end
+      end
+    end
+
+
+    context "removing members" do
+      before do
+        subject.members = [gf1, gf2]
+        subject.save
+      end
+
+      it "should allow files to be removed" do
+        expect(gf1.collections).to eq [subject] # This line forces the "collections" to be cached.
+        # We need to ensure that deleting causes the collection to be flushed.
+        solr_doc_before_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.pid).send(:solr_doc)
+        expect(solr_doc_before_remove["collection_tesim"]).to eq [subject.pid]
+        subject.reload.members.delete(gf1)
+        subject.save
+        expect(subject.reload.members).to eq [gf2]
+        solr_doc_after_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.pid).send(:solr_doc)
+        expect(solr_doc_after_remove["collection_tesim"]).to be_nil
+      end
+    end
   end
 
   it "should set the date uploaded on create" do
-    @collection.save
-    expect(@collection.date_uploaded).to be_kind_of(Date)
+    subject.save
+    expect(subject.date_uploaded).to be_kind_of(Date)
   end
-  it "should update the date modified on update" do
-    uploaded_date = Date.today
-    modified_date = Date.tomorrow
-    expect(Date).to receive(:today).twice.and_return(uploaded_date, modified_date)
-    @collection.save
-    expect(@collection.date_modified).to eq(uploaded_date)
-    @collection.members = [@gf1]
-    @collection.save
-    expect(@collection.date_modified).to eq(modified_date)
-    @gf1 = @gf1.reload
-    expect(@gf1.collections).to include(@collection)
-    expect(@gf1.to_solr[Solrizer.solr_name(:collection)]).to eq([@collection.id])
+
+  describe "when updating" do
+    let(:gf1) { GenericFile.create }
+
+    it "should update the date modified on update" do
+      uploaded_date = Date.today
+      modified_date = Date.tomorrow
+      subject.save
+      allow(Date).to receive(:today).and_return(uploaded_date, modified_date)
+      subject.save
+      expect(subject.date_modified).to eq uploaded_date
+      subject.members = [gf1]
+      subject.save
+      expect(subject.date_modified).to eq modified_date
+      expect(gf1.reload.collections).to include(subject)
+      expect(gf1.to_solr[Solrizer.solr_name(:collection)]).to eq [subject.id]
+    end
   end
+
   it "should have a title" do
-    @collection.title = "title"
-    @collection.save
-    expect(Collection.find(@collection.id).title).to eq(@collection.title)
+    subject.title = "title"
+    subject.save
+    expect(subject.title).to eq "title"
   end
+
   it "should have a description" do
-    @collection.description = "description"
-    @collection.save
-    expect(Collection.find(@collection.id).description).to eq(@collection.description)
+    subject.description = "description"
+    subject.save
+    expect(subject.reload.description).to eq "description"
   end
 
   it "should have the expected display terms" do
-    expect(@collection.terms_for_display).to include(
-      :part_of, :contributor, :creator, :title, :description, :publisher, 
-      :date_created, :date_uploaded, :date_modified, :subject, :language, :rights, 
-      :resource_type, :identifier, :based_near, :tag, :related_url
-    )
+    expect(subject.terms_for_display).to eq([:part_of, :contributor, :creator, :title, :description, :publisher, :date_created, :date_uploaded, :date_modified, :subject, :language, :rights, :resource_type, :identifier, :based_near, :tag, :related_url])
   end
+
   it "should have the expected edit terms" do
-    expect(@collection.terms_for_editing).to include(
-      :part_of, :contributor, :creator, :title, :description, :publisher, :date_created,
-      :subject, :language, :rights, :resource_type, :identifier, :based_near, :tag, :related_url
-     )
+    expect(subject.terms_for_editing).to eq([:part_of, :contributor, :creator, :title, :description, :publisher, :date_created, :subject, :language, :rights, :resource_type, :identifier, :based_near, :tag, :related_url])
   end
-  it "should not delete member files when deleted" do
-    @collection.members = [@gf1, @gf2]
-    @collection.save
-    @collection.destroy
-    expect(GenericFile).to exist(@gf1.id)
-    expect(GenericFile).to exist(@gf2.id)
+
+  describe "#destroy" do
+    before do
+      subject.members = [gf1, gf2]
+      subject.save
+      subject.destroy
+    end
+
+    it "should not delete member files when deleted" do
+      expect(GenericFile.exists?(gf1.pid)).to be true
+      expect(GenericFile.exists?(gf2.pid)).to be true
+    end
   end
 
   describe "Collection by another name" do
-    before (:all) do
+    before do
       class OtherCollection < ActiveFedora::Base
         include Hydra::Collection
       end
@@ -115,7 +174,7 @@ describe Collection, :type => :model do
         include Hydra::Collections::Collectible
       end
     end
-    after(:all) do
+    after do
       Object.send(:remove_const, :OtherCollection)
       Object.send(:remove_const, :Member)
     end
@@ -133,5 +192,4 @@ describe Collection, :type => :model do
       expect(member.collections).to eq [collection]
     end
   end
-
 end

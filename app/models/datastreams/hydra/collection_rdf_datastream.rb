@@ -50,9 +50,5 @@ module Hydra
       index.as :stored_searchable, :facetable
     end
     property :related_url, predicate: RDF::RDFS.seeAlso
-
-    def prefix
-      ""
-    end
   end
 end

@@ -13,8 +13,8 @@ module Hydra
       has_and_belongs_to_many :members, property: :has_collection_member, class_name: "ActiveFedora::Base" , after_remove: :update_member
 
       has_attributes :depositor, datastream: :properties, multiple: false
-      
-      has_attributes :title, :date_uploaded, :date_modified, :description, 
+
+      has_attributes :title, :date_uploaded, :date_modified, :description,
                      datastream: :descMetadata, multiple: false
       has_attributes :creator, :contributor, :based_near, :part_of, :publisher,
                      :date_created, :subject,:resource_type, :rights,
@@ -34,7 +34,7 @@ module Hydra
     end
 
     def terms_for_display
-      self.descMetadata.class.config.keys.map{|v| v.to_sym}
+      self.descMetadata.class.properties.keys.map{|v| v.to_sym}
     end
 
     def update_all_members

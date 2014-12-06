@@ -11,18 +11,7 @@ describe CollectionsController, :type => :controller do
     class GenericFile < ActiveFedora::Base
       include Hydra::Collections::Collectible
 
-      property :title, predicate: ::RDF::DC.title
-
-      # Hack until https://github.com/no-reply/ActiveTriples/pull/37 is merged
-      def title_with_first
-        title_without_first.first
-      end
-      alias_method_chain :title, :first
-
-      # use this until https://github.com/projecthydra/active_fedora/issues/457 is resolved
-      def to_param
-        id
-      end
+      property :title, predicate: ::RDF::DC.title, multiple: false
 
       def to_solr(solr_doc={})
         super.tap do |solr_doc|
@@ -293,7 +282,7 @@ describe CollectionsController, :type => :controller do
     context "When there are search matches that are not in the collection" do
       before do
         GenericFile.create!(title: "#{@asset1.id} #{@asset1.title}")
-        GenericFile.create!(title: @asset1.title)
+        GenericFile.create!(title: @asset1.title.to_s)
       end
       # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
       it "should query the collections and show only the collection assets" do

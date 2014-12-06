@@ -9,7 +9,7 @@ module Hydra
     included do
       has_and_belongs_to_many :members, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasCollectionMember, class_name: "ActiveFedora::Base" , after_remove: :update_member
 
-      property :depositor, predicate: RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt")
+      property :depositor, predicate: RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt"), multiple: false
 
       property :part_of, predicate: RDF::DC.isPartOf
       property :contributor, predicate: RDF::DC.contributor do |index|
@@ -18,10 +18,10 @@ module Hydra
       property :creator, predicate: RDF::DC.creator do |index|
         index.as :stored_searchable, :facetable
       end
-      property :title, predicate: RDF::DC.title do |index|
+      property :title, predicate: RDF::DC.title, multiple: false do |index|
         index.as :stored_searchable
       end
-      property :description, predicate: RDF::DC.description do |index|
+      property :description, predicate: RDF::DC.description, multiple: false do |index|
         index.type :text
         index.as :stored_searchable
       end
@@ -31,11 +31,11 @@ module Hydra
       property :date_created, predicate: RDF::DC.created do |index|
         index.as :stored_searchable
       end
-      property :date_uploaded, predicate: RDF::DC.dateSubmitted do |index|
+      property :date_uploaded, predicate: RDF::DC.dateSubmitted, multiple: false do |index|
         index.type :date
         index.as :stored_sortable
       end
-      property :date_modified, predicate: RDF::DC.modified do |index|
+      property :date_modified, predicate: RDF::DC.modified, multiple: false do |index|
         index.type :date
         index.as :stored_sortable
       end
@@ -62,27 +62,6 @@ module Hydra
       end
       property :related_url, predicate: RDF::RDFS.seeAlso
 
-      # Single-valued properties
-      def depositor
-        super.first
-      end
-
-      def title
-        super.first
-      end
-
-      def date_uploaded
-        super.first
-      end
-
-      def date_modified
-        super.first
-      end
-
-      def description
-        super.first
-      end
-
       before_create :set_date_uploaded
       before_save :set_date_modified
       before_destroy :update_all_members
@@ -96,8 +75,8 @@ module Hydra
 
     def terms_for_display
       [
-        :part_of, :contributor, :creator, :title, :description, :publisher, 
-        :date_created, :date_uploaded, :date_modified, :subject, :language, :rights, 
+        :part_of, :contributor, :creator, :title, :description, :publisher,
+        :date_created, :date_uploaded, :date_modified, :subject, :language, :rights,
         :resource_type, :identifier, :based_near, :tag, :related_url
       ]
     end

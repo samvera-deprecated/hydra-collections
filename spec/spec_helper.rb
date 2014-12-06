@@ -9,11 +9,10 @@ require 'hydra-collections'
 FactoryGirl.definition_file_paths = [File.expand_path("../factories", __FILE__)]
 FactoryGirl.find_definitions
 
+# require 'http_logger'
 # HttpLogger.logger = Logger.new(STDOUT)
 # HttpLogger.ignore = [/localhost:8983\/solr/]
 # HttpLogger.colorize = false
-# # Patch for https://github.com/railsware/http_logger/issues/13
-# HttpLogger::HTTP_METHODS_WITH_BODY = Set.new(%w(POST PUT GET PATCH))
 
 module EngineRoutes
   def self.included(base)

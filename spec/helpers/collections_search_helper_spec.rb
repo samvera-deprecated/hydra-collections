@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe CollectionsSearchHelper, :type => :helper do
   describe "collection_name" do
-    let (:collection_without_title) { Collection.create() }
+    let (:collection_without_title) { Collection.create!() }
     let (:collection_with_title) { Collection.create(title: "Title of Collection 2") }
 
     it "should return the pid if no title available" do

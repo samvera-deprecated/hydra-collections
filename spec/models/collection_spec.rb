@@ -30,7 +30,7 @@ describe Collection, :type => :model do
     subject { collection.to_solr }
 
     it "should have title" do
-      expect(subject['desc_metadata__title_tesim']).to eq ['A good title']
+      expect(subject['title_tesim']).to eq ['A good title']
     end
   end
 
@@ -97,12 +97,12 @@ describe Collection, :type => :model do
       it "should allow files to be removed" do
         expect(gf1.collections).to eq [subject] # This line forces the "collections" to be cached.
         # We need to ensure that deleting causes the collection to be flushed.
-        solr_doc_before_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.pid).send(:solr_doc)
-        expect(solr_doc_before_remove["collection_tesim"]).to eq [subject.pid]
+        solr_doc_before_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.id).send(:solr_doc)
+        expect(solr_doc_before_remove["collection_tesim"]).to eq [subject.id]
         subject.reload.members.delete(gf1)
         subject.save
         expect(subject.reload.members).to eq [gf2]
-        solr_doc_after_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.pid).send(:solr_doc)
+        solr_doc_after_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.id).send(:solr_doc)
         expect(solr_doc_after_remove["collection_tesim"]).to be_nil
       end
     end
@@ -159,8 +159,8 @@ describe Collection, :type => :model do
     end
 
     it "should not delete member files when deleted" do
-      expect(GenericFile.exists?(gf1.pid)).to be true
-      expect(GenericFile.exists?(gf2.pid)).to be true
+      expect(GenericFile.exists?(gf1.id)).to be true
+      expect(GenericFile.exists?(gf2.id)).to be true
     end
   end
 

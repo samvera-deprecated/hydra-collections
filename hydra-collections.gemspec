@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "blacklight"
-  spec.add_dependency "hydra-head", "~> 9.0.0.beta5"
+  spec.add_dependency "hydra-head", "~> 9.0.0.beta1"
   spec.add_dependency 'deprecation'
 
   spec.add_development_dependency "engine_cart"

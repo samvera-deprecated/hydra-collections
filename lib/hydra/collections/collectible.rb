@@ -19,8 +19,11 @@ module Hydra::Collections::Collectible
   #    return solr_doc
   #   end
   def index_collection_ids(solr_doc={})
-    solr_doc[Solrizer.solr_name(:collection, :facetable)] = self.collection_ids
-    solr_doc[Solrizer.solr_name(:collection)] = self.collection_ids
+    # CollectionAssociation#ids_reader loads from solr on each call, so only call it once
+    # see https://github.com/projecthydra/active_fedora/issues/644
+    ids = collection_ids
+    solr_doc[Solrizer.solr_name(:collection, :facetable)] = ids
+    solr_doc[Solrizer.solr_name(:collection)] = ids
     solr_doc
   end
 

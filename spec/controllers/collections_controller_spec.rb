@@ -67,7 +67,7 @@ describe CollectionsController, :type => :controller do
       @asset1 = GenericFile.create!
       post :create, batch_document_ids: [@asset1], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       expect(assigns[:collection].members).to eq [@asset1]
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
       expect(doc["id"]).to eq(@asset1.id)
@@ -79,7 +79,7 @@ describe CollectionsController, :type => :controller do
       @asset2 = GenericFile.create!
       post :create, batch_document_ids: [@asset1,@asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       expect(assigns[:collection].members).to eq([@asset1,@asset2])
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
       expect(doc["id"]).to eq(@asset1.id)
@@ -145,7 +145,7 @@ describe CollectionsController, :type => :controller do
       @asset2.reload
       expect(@asset2.to_solr[Solrizer.solr_name(:collection)]).to eq [@collection.id]
       ## Check that member was re-indexed with collection info
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       doc = asset_results["response"]["docs"].first
       expect(doc["id"]).to eq(@asset2.id)
       expect(doc[Solrizer.solr_name(:collection)]).to eq [@collection.id]
@@ -159,7 +159,7 @@ describe CollectionsController, :type => :controller do
       expect(@asset2.to_solr[Solrizer.solr_name(:collection)]).to eq([])
 
       ## Check that member was re-indexed without collection info
-      asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
+      asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       doc = asset_results["response"]["docs"].first
       expect(doc["id"]).to eq(@asset2.id)
       expect(doc[Solrizer.solr_name(:collection)]).to be_nil
@@ -210,14 +210,14 @@ describe CollectionsController, :type => :controller do
         @asset1 = @asset1.reload
         @asset1.update_index
         expect(@asset1.collections).to eq [@collection]
-        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
         expect(asset_results["response"]["numFound"]).to eq(1)
         doc = asset_results["response"]["docs"].first
         expect(doc[Solrizer.solr_name(:collection)]).to eq([@collection.id])
 
         delete :destroy, id: @collection
         expect(@asset1.reload.collections).to eq([])
-        asset_results = blacklight_solr.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
+        asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
         expect(asset_results["response"]["numFound"]).to eq(1)
         doc = asset_results["response"]["docs"].first
         expect(doc[Solrizer.solr_name(:collection)]).to be_nil

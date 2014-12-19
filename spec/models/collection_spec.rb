@@ -143,14 +143,6 @@ describe Collection, :type => :model do
     expect(subject.reload.description).to eq "description"
   end
 
-  it "should have the expected display terms" do
-    expect(subject.terms_for_display).to eq([:part_of, :contributor, :creator, :title, :description, :publisher, :date_created, :date_uploaded, :date_modified, :subject, :language, :rights, :resource_type, :identifier, :based_near, :tag, :related_url])
-  end
-
-  it "should have the expected edit terms" do
-    expect(subject.terms_for_editing).to eq([:part_of, :contributor, :creator, :title, :description, :publisher, :date_created, :subject, :language, :rights, :resource_type, :identifier, :based_near, :tag, :related_url])
-  end
-
   describe "#destroy" do
     before do
       subject.members = [gf1, gf2]

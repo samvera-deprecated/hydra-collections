@@ -69,18 +69,6 @@ module Hydra
       after_save :update_all_members
     end
 
-    def terms_for_editing
-      terms_for_display - [:date_modified, :date_uploaded]
-    end
-
-    def terms_for_display
-      [
-        :part_of, :contributor, :creator, :title, :description, :publisher,
-        :date_created, :date_uploaded, :date_modified, :subject, :language, :rights,
-        :resource_type, :identifier, :based_near, :tag, :related_url
-      ]
-    end
-
     def update_all_members
       self.members.collect { |m| update_member(m) }
     end

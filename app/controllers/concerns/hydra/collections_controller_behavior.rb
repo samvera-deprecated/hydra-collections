@@ -88,7 +88,7 @@ module Hydra
 
     def update
       process_member_changes
-      @collection.update_attributes(params[:collection].except(:members))
+      @collection.update_attributes(collection_params.except(:members))
       if @collection.save
         after_update
       else
@@ -119,6 +119,12 @@ module Hydra
     end
 
     protected
+
+    def collection_params
+      params.require(:collection).permit(:part_of, :contributor, :creator, :title,
+        :description, :publisher, :date_created, :subject, :language, :rights,
+        :resource_type, :identifier, :based_near, :tag, :related_url, :members)
+    end
 
     # Queries Solr for members of the collection.
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents

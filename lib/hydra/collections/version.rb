@@ -1,5 +1,5 @@
 module Hydra
   module Collections
-    VERSION = "4.0.0.rc1"
+    VERSION = "4.0.0.rc2"
   end
 end

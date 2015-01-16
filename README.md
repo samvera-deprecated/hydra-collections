@@ -158,8 +158,7 @@ In order to make modifications to the gem code and run the tests, clone the repo
 
 ```
     $ bundle install
-    $ git submodule init
-    $ git submodule update
+    $ rake jetty:unzip
     $ rake jetty:config
     $ rake jetty:start
     $ rake clean

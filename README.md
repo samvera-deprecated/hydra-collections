@@ -161,7 +161,8 @@ In order to make modifications to the gem code and run the tests, clone the repo
     $ rake jetty:unzip
     $ rake jetty:config
     $ rake jetty:start
-    $ rake clean
+    $ rake engine_cart:clean
+    $ rake engine_cart:generate
     $ rake spec
 ```
 

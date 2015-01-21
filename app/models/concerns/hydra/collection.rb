@@ -9,7 +9,9 @@ module Hydra
     included do
       has_and_belongs_to_many :members, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasCollectionMember, class_name: "ActiveFedora::Base" , after_remove: :update_member
 
-      property :depositor, predicate: RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt"), multiple: false
+      property :depositor, predicate: ::RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt"), multiple: false do |index|
+        index.as :symbol, :stored_searchable
+      end
 
       property :part_of, predicate: RDF::DC.isPartOf
       property :contributor, predicate: RDF::DC.contributor do |index|

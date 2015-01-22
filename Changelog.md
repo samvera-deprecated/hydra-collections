@@ -4,6 +4,7 @@
 * Refactoring collection membership methods
 * More thorough testing of relationships in Solr
 * Update to Rspec 3
+* Updating collection to index the depositor into solr
 
 # 2.0.3
 

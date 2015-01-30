@@ -18,10 +18,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "blacklight"
-  spec.add_dependency "hydra-head", "~> 9.0.0.rc2"
-  spec.add_dependency 'deprecation'
+  spec.add_dependency 'hydra-head', '~> 9.0.1'
+  spec.add_dependency 'deprecation', '~> 0.1.0'
 
-  spec.add_development_dependency "engine_cart"
-  spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency 'engine_cart', '~> 0.5'
+  spec.add_development_dependency 'rspec-rails', '~> 3.1'
 end

@@ -28,8 +28,14 @@ module Hydra
       before_filter :authenticate_user!, :except => [:show]
       load_and_authorize_resource :except=>[:index], instance_name: :collection
 
-      #This includes only the collection members in the search
-      self.search_params_logic += [:include_collection_ids]
+      layout 'collections'
+    end
+
+    def index
+      # run the solr query to find the collections
+      query = collections_search_builder.with(params).query
+      @response = repository.search(query)
+      @document_list = @response.documents
     end
 
     def new
@@ -123,9 +129,9 @@ module Hydra
 
     protected
 
-    # Defines which search_params_logic should be used when searching for Collections
-    def collection_search_params_logic
-      search_params_logic
+    # Defines which search_params_logic should be used when searching for Collection members
+    def collection_member_search_logic
+      search_params_logic + [:include_collection_ids]
     end
 
     def collection_params
@@ -137,16 +143,24 @@ module Hydra
     # Queries Solr for members of the collection.
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
-      query = params[:cq]
 
       #default the rows to 100 if not specified then merge in the user parameters and the attach the collection query
-      solr_params =  { rows: 100 }.merge(params.symbolize_keys).merge(q: query)
+      solr_params =  { rows: 100 }.merge(params.symbolize_keys).merge(q: params[:cq])
 
-      # run the solr query to find the collections
-      # (@response, @member_docs) = search_results(solr_params, search_params_logic)
-      query = collections_search_builder.with(solr_params).query
+      # run the solr query to find the collection members
+      query = collection_member_search_builder.with(solr_params).query
       @response = repository.search(query)
       @member_docs = @response.documents
+    end
+
+    def collection_member_search_builder_class
+      Hydra::Collections::SearchBuilder
+    end
+
+    def collection_member_search_builder(access_level = nil)
+      @collection_member_search_builder ||= collection_member_search_builder_class.new(collection_member_search_logic, self).tap do |builder|
+        builder.current_ability = current_ability
+      end
     end
 
     def process_member_changes
@@ -181,6 +195,11 @@ module Hydra
       else
         flash[:error] = "An error occured. Files were not moved to #{destination_collection.title} Collection."
       end
+    end
+
+    # Override rails path for the views
+    def _prefixes
+      @_prefixes ||= super + ['catalog']
     end
   end # module CollectionsControllerBehavior
 end # module Hydra

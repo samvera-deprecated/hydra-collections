@@ -27,13 +27,27 @@ describe CollectionsController, :type => :controller do
     Object.send(:remove_const, :GenericFile)
   end
 
+  let(:user) { FactoryGirl.create(:user) }
+
   before do
     allow(controller).to receive(:has_access?).and_return(true)
 
-    @user = FactoryGirl.find_or_create(:user)
-    sign_in @user
+    sign_in user
     allow_any_instance_of(User).to receive(:groups).and_return([])
     allow(controller).to receive(:clear_session_user) ## Don't clear out the authenticated session
+  end
+
+  describe "#index" do
+    let!(:collection1) { Collection.create { |c| c.apply_depositor_metadata(user.user_key) } }
+    let!(:collection2) { Collection.create { |c| c.apply_depositor_metadata(user.user_key) } }
+    let!(:generic_file) { GenericFile.create }
+
+    it "should show a list of collections" do
+      get :index
+      expect(response).to be_successful
+      expect(assigns[:document_list].map(&:id)).not_to include generic_file.id
+      expect(assigns[:document_list].map(&:id)).to eq [collection1.id, collection2.id]
+    end
   end
 
   describe '#new' do
@@ -50,7 +64,7 @@ describe CollectionsController, :type => :controller do
       }.to change { Collection.count }.by(1)
       expect(assigns[:collection].title).to eq("My First Collection ")
       expect(assigns[:collection].description).to eq("The Description\r\n\r\nand more")
-      expect(assigns[:collection].depositor).to eq(@user.user_key)
+      expect(assigns[:collection].depositor).to eq(user.user_key)
       expect(response).to redirect_to collections.collection_path(assigns[:collection])
     end
     it "should add docs to collection if batch ids provided" do
@@ -91,7 +105,7 @@ describe CollectionsController, :type => :controller do
 
   describe "#update" do
     before do
-      @collection = Collection.create { |c| c.apply_depositor_metadata(@user.user_key) }
+      @collection = Collection.create { |c| c.apply_depositor_metadata(user.user_key) }
       @asset1 = GenericFile.create!
       @asset2 = GenericFile.create!
       @asset3 = GenericFile.create!
@@ -152,7 +166,7 @@ describe CollectionsController, :type => :controller do
       end
       let(:collection2) do
         Collection.create do |col|
-          col.apply_depositor_metadata(@user.user_key)
+          col.apply_depositor_metadata(user.user_key)
         end
       end
 
@@ -168,7 +182,7 @@ describe CollectionsController, :type => :controller do
   describe "#destroy" do
     describe "valid collection" do
       before do
-        @collection = Collection.create { |c| c.apply_depositor_metadata(@user.user_key) }
+        @collection = Collection.create { |c| c.apply_depositor_metadata(user.user_key) }
         expect(controller).to receive(:authorize!).and_return(true)
       end
 
@@ -208,7 +222,7 @@ describe CollectionsController, :type => :controller do
       @asset3 = GenericFile.create!(title: "Third of the Assets")
       @collection = Collection.new(id:"abc123")
       @collection.title = "My collection"
-      @collection.apply_depositor_metadata(@user.user_key)
+      @collection.apply_depositor_metadata(user.user_key)
       @collection.members = [@asset1, @asset2, @asset3]
       @collection.save!
       expect(controller).to receive(:authorize!).and_return(true)
@@ -220,7 +234,7 @@ describe CollectionsController, :type => :controller do
         @asset4 = GenericFile.create!(title: "#{@asset1.id}")
         @collection2 = Collection.new(id: "abc1234")
         @collection2.title = "Other collection"
-        @collection2.apply_depositor_metadata(@user.user_key)
+        @collection2.apply_depositor_metadata(user.user_key)
         @collection2.members = [@asset4]
         @collection2.save
       end

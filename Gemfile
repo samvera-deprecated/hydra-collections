@@ -9,8 +9,9 @@ group :development, :test do
   gem 'devise'
   gem 'capybara'
   gem 'jettywrapper'
-  gem 'byebug', require: false
+  gem 'byebug', require: false unless ENV['CI']
   gem 'coveralls', require: false
+  gem 'rspec-activemodel-mocks'
 end
 
 file = File.expand_path("Gemfile", ENV['ENGINE_CART_DESTINATION'] || ENV['RAILS_ROOT'] || File.expand_path("../spec/internal", __FILE__))

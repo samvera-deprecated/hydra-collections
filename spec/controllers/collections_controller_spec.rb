@@ -15,7 +15,6 @@ describe CollectionsController, :type => :controller do
 
       def to_solr(solr_doc={})
         super.tap do |solr_doc|
-          solr_doc = index_collection_ids(solr_doc)
           solr_doc["label_tesim"] = self.title
         end
       end
@@ -90,9 +89,7 @@ describe CollectionsController, :type => :controller do
 
   describe "#update" do
     before do
-      @collection = Collection.new
-      @collection.apply_depositor_metadata(@user.user_key)
-      @collection.save
+      @collection = Collection.create { |c| c.apply_depositor_metadata(@user.user_key) }
       @asset1 = GenericFile.create!
       @asset2 = GenericFile.create!
       @asset3 = GenericFile.create!
@@ -116,7 +113,7 @@ describe CollectionsController, :type => :controller do
       it "should support adding batches of members" do
         @collection.members << @asset1
         @collection.save
-        put :update, id: @collection.id, collection: { members:"add" }, batch_document_ids: [@asset2, @asset3]
+        put :update, id: @collection, collection: { members:"add" }, batch_document_ids: [@asset2, @asset3]
         expect(response).to redirect_to collections.collection_path(@collection)
         expect(assigns[:collection].members).to match_array [@asset2, @asset3, @asset1]
       end
@@ -124,45 +121,26 @@ describe CollectionsController, :type => :controller do
       it "should support removing batches of members" do
         @collection.members = [@asset1, @asset2, @asset3]
         @collection.save
-        put :update, id: @collection.id, collection: { members: "remove" }, batch_document_ids: [@asset1, @asset3]
+        put :update, id: @collection, collection: { members: "remove" }, batch_document_ids: [@asset1, @asset3]
         expect(response).to redirect_to collections.collection_path(@collection)
         expect(assigns[:collection].members).to eq([@asset2])
       end
     end
 
     it "should support setting members array" do
-      put :update, id: @collection.id, collection: { members: "add" }, batch_document_ids: [@asset2, @asset3, @asset1]
+      put :update, id: @collection, collection: { members: "add" }, batch_document_ids: [@asset2, @asset3, @asset1]
       expect(response).to redirect_to collections.collection_path(@collection)
       expect(assigns[:collection].members).to match_array [@asset2, @asset3, @asset1]
     end
 
     it "should set/un-set collection on members" do
       # Add to collection (sets collection on members)
-      put :update, id: @collection.id, collection: { members: "add"}, batch_document_ids: [@asset2, @asset3]
+      put :update, id: @collection, collection: { members: "add" }, batch_document_ids: [@asset2, @asset3]
       expect(assigns[:collection].members).to match_array [@asset2, @asset3]
-
-      ## Check that member lists collection in its solr doc
-      @asset2.reload
-      expect(@asset2.to_solr[Solrizer.solr_name(:collection)]).to eq [@collection.id]
-      ## Check that member was re-indexed with collection info
-      asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
-      doc = asset_results["response"]["docs"].first
-      expect(doc["id"]).to eq(@asset2.id)
-      expect(doc[Solrizer.solr_name(:collection)]).to eq [@collection.id]
 
       # Remove from collection (un-sets collection on members)
       put :update, id: @collection, collection: { members:"remove" }, batch_document_ids: [@asset2]
       expect(assigns[:collection].members).to_not include(@asset2)
-
-      ## Check that member no longer lists collection in its solr doc
-      @asset2.reload
-      expect(@asset2.to_solr[Solrizer.solr_name(:collection)]).to eq([])
-
-      ## Check that member was re-indexed without collection info
-      asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset2.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
-      doc = asset_results["response"]["docs"].first
-      expect(doc["id"]).to eq(@asset2.id)
-      expect(doc[Solrizer.solr_name(:collection)]).to be_nil
     end
 
     context "when moving members between collections" do
@@ -171,14 +149,13 @@ describe CollectionsController, :type => :controller do
         @collection.save
       end
       let(:collection2) do
-        Collection.new.tap do |col|
+        Collection.create do |col|
           col.apply_depositor_metadata(@user.user_key)
-          col.save
         end
       end
 
       it "moves the members" do
-        put :update, id: @collection, collection: {members: "move"}, 
+        put :update, id: @collection, collection: {members: "move"},
           destination_collection_id: collection2, batch_document_ids: [@asset2, @asset3]
         expect(@collection.reload.members).to eq [@asset1]
         expect(collection2.reload.members).to match_array [@asset2, @asset3]
@@ -189,20 +166,21 @@ describe CollectionsController, :type => :controller do
   describe "#destroy" do
     describe "valid collection" do
       before do
-        @collection = Collection.new
-        @collection.apply_depositor_metadata(@user.user_key)
-        @collection.save
+        @collection = Collection.create { |c| c.apply_depositor_metadata(@user.user_key) }
         expect(controller).to receive(:authorize!).and_return(true)
       end
+
       it "should delete collection" do
-        delete :destroy, id: @collection.id
+        delete :destroy, id: @collection
         expect(response).to redirect_to Rails.application.routes.url_helpers.catalog_index_path
         expect(flash[:notice]).to eq("Collection was successfully deleted.")
       end
+
       it "should after_destroy" do
         expect(controller).to receive(:after_destroy).and_call_original
-        delete :destroy, id: @collection.id
+        delete :destroy, id: @collection
       end
+
       it "should call update members" do
         @asset1 = GenericFile.create!
         @collection.members << @asset1
@@ -210,20 +188,12 @@ describe CollectionsController, :type => :controller do
         @asset1 = @asset1.reload
         @asset1.update_index
         expect(@asset1.collections).to eq [@collection]
-        asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
-        expect(asset_results["response"]["numFound"]).to eq(1)
-        doc = asset_results["response"]["docs"].first
-        expect(doc[Solrizer.solr_name(:collection)]).to eq([@collection.id])
 
         delete :destroy, id: @collection
-        expect(@asset1.reload.collections).to eq([])
-        asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
-        expect(asset_results["response"]["numFound"]).to eq(1)
-        doc = asset_results["response"]["docs"].first
-        expect(doc[Solrizer.solr_name(:collection)]).to be_nil
-        @asset1.destroy
+        expect(@asset1.reload.collections).to eq []
       end
     end
+
     it "should not delete an invalid collection" do
        expect {delete :destroy, id: 'zz:-1'}.to raise_error
     end

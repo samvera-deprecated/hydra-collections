@@ -2,12 +2,13 @@ module Hydra
   module Collection
     extend ActiveSupport::Concern
     extend ActiveSupport::Autoload
+    extend Deprecation
     include Hydra::WithDepositor # for access to apply_depositor_metadata
     include Hydra::AccessControls::Permissions
     include Hydra::Collections::Collectible
 
     included do
-      has_and_belongs_to_many :members, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasCollectionMember, class_name: "ActiveFedora::Base" , after_remove: :update_member
+      has_and_belongs_to_many :members, predicate: ActiveFedora::RDF::Fcrepo::RelsExt.hasCollectionMember, class_name: "ActiveFedora::Base"
 
       property :depositor, predicate: ::RDF::URI.new("http://id.loc.gov/vocabulary/relators/dpt"), multiple: false do |index|
         index.as :symbol, :stored_searchable
@@ -66,17 +67,16 @@ module Hydra
 
       before_create :set_date_uploaded
       before_save :set_date_modified
-      before_destroy :update_all_members
-
-      after_save :update_all_members
     end
 
     def update_all_members
+      Deprecation.warn(Collection, 'update_all_members is deprecated and will be removed in version 5.0')
       self.members.collect { |m| update_member(m) }
     end
 
     # TODO: Use solr atomic updates to accelerate this process
     def update_member member
+      Deprecation.warn(Collection, 'update_member is deprecated and will be removed in version 5.0')
       # because the member may have its collections cached, reload that cache so that it indexes the correct fields.
       member.collections(true) if member.respond_to? :collections
       member.update_index

@@ -25,6 +25,7 @@ describe Hydra::Collections::Collectible do
       @collectible.save
       @collectible.collections << @collection1
       @collectible.collections << @collection2
+      expect(Deprecation).to receive(:warn)
       expect(@collectible.index_collection_ids["collection_sim"]).to eq [@collection1.id, @collection2.id]
     end
   end

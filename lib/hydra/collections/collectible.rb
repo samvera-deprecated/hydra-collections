@@ -19,6 +19,7 @@ module Hydra::Collections::Collectible
   #    return solr_doc
   #   end
   def index_collection_ids(solr_doc={})
+    Deprecation.warn(Hydra::Collections::Collectible, 'index_collection_ids is deprecated and will be removed in version 5.0')
     # CollectionAssociation#ids_reader loads from solr on each call, so only call it once
     # see https://github.com/projecthydra/active_fedora/issues/644
     ids = collection_ids

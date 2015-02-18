@@ -5,13 +5,6 @@ describe Collection, :type => :model do
     @user = FactoryGirl.find_or_create(:user)
     class GenericFile < ActiveFedora::Base
       include Hydra::Collections::Collectible
-
-      def to_solr(solr_doc={}, opts={})
-        super(solr_doc, opts).tap do |solr_doc|
-          solr_doc = index_collection_ids(solr_doc)
-        end
-      end
-
     end
   end
   after(:all) do
@@ -33,6 +26,13 @@ describe Collection, :type => :model do
       expect(subject['title_tesim']).to eq ['A good title']
       expect(subject['depositor_tesim']).to eq [user.user_key]
       expect(subject['depositor_ssim']).to eq [user.user_key]
+    end
+
+    context "with members" do
+      before do
+        collection.members << gf1
+      end
+
     end
   end
 
@@ -99,13 +99,9 @@ describe Collection, :type => :model do
       it "should allow files to be removed" do
         expect(gf1.collections).to eq [subject] # This line forces the "collections" to be cached.
         # We need to ensure that deleting causes the collection to be flushed.
-        solr_doc_before_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.id).send(:solr_doc)
-        expect(solr_doc_before_remove["collection_tesim"]).to eq [subject.id]
         subject.reload.members.delete(gf1)
         subject.save
         expect(subject.reload.members).to eq [gf2]
-        solr_doc_after_remove = ActiveFedora::SolrInstanceLoader.new(ActiveFedora::Base, gf1.id).send(:solr_doc)
-        expect(solr_doc_after_remove["collection_tesim"]).to be_nil
       end
     end
   end
@@ -129,7 +125,6 @@ describe Collection, :type => :model do
       subject.save
       expect(subject.date_modified).to eq modified_date
       expect(gf1.reload.collections).to include(subject)
-      expect(gf1.to_solr[Solrizer.solr_name(:collection)]).to eq [subject.id]
     end
   end
 

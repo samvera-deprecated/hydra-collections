@@ -13,24 +13,11 @@ end
 class OtherCollection < ActiveFedora::Base
   include Hydra::Collection
   include Hydra::Collections::Collectible
-
-  def to_solr(solr_doc={})
-    super.tap do |solr_doc|
-      index_collection_ids(solr_doc)
-    end
-  end
 end
 
 class Member < ActiveFedora::Base
   include Hydra::Collections::Collectible
   attr_accessor :title
-
-  def to_solr(solr_doc={})
-    super.tap do |solr_doc|
-      index_collection_ids(solr_doc)
-    end
-  end
-
 end
 
 # make sure a collection by another name still assigns the @collection variable

@@ -3,8 +3,7 @@ module Hydra
     extend ActiveSupport::Concern
 
     included do
-      include Blacklight::Configurable
-      include Blacklight::SolrHelper
+      include Blacklight::Base
 
       include Hydra::Collections::AcceptsBatches
       include Hydra::Collections::SelectsCollections

@@ -174,7 +174,7 @@ module Hydra
     # include filters into the query to only include the collection memebers
     def include_collection_ids(solr_parameters, user_parameters)
       solr_parameters[:fq] ||= []
-      solr_parameters[:fq] << Solrizer.solr_name(:collection, :facetable)+':"'+@collection.id+'"'
+      solr_parameters[:fq] << "{!join from=hasCollectionMember_ssim to=id}id:#{@collection.id}"
     end
   end # module CollectionsControllerBehavior
 end # module Hydra

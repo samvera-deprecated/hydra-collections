@@ -3,6 +3,7 @@ module Hydra::Collections
     extend ActiveSupport::Concern
 
     included do
+      Deprecation.warn(Actions, "Hydra::Collections::Actions is deprecated and will be removed in 6.0.0")
       before_create :set_date_uploaded
       before_save :set_date_modified
     end

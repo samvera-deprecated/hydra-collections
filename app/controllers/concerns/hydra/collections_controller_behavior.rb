@@ -2,14 +2,15 @@ module Hydra
   module CollectionsControllerBehavior
     extend ActiveSupport::Concern
 
-    included do
-      include Blacklight::Base
+    include Blacklight::Base
 
+    included do
       include Hydra::Collections::AcceptsBatches
       include Hydra::Collections::SelectsCollections
 
       # This is needed as of BL 3.7
       self.copy_blacklight_config_from(CatalogController)
+
 
       # Catch permission errors
       rescue_from Hydra::AccessDenied, CanCan::AccessDenied do |exception|
@@ -28,7 +29,7 @@ module Hydra
       load_and_authorize_resource :except=>[:index], instance_name: :collection
 
       #This includes only the collection members in the search
-      self.solr_search_params_logic += [:include_collection_ids]
+      self.search_params_logic += [:include_collection_ids]
     end
 
     def new
@@ -117,6 +118,10 @@ module Hydra
       end
     end
 
+    def collection
+      @collection
+    end
+
     protected
 
     def collection_params
@@ -134,7 +139,7 @@ module Hydra
       solr_params =  { rows: 100 }.merge(params.symbolize_keys).merge(q: query)
 
       # run the solr query to find the collections
-      (@response, @member_docs) = get_search_results(solr_params)
+      (@response, @member_docs) = search_results(solr_params, search_params_logic)
     end
 
     def process_member_changes
@@ -169,12 +174,6 @@ module Hydra
       else
         flash[:error] = "An error occured. Files were not moved to #{destination_collection.title} Collection."
       end
-    end
-
-    # include filters into the query to only include the collection memebers
-    def include_collection_ids(solr_parameters, user_parameters)
-      solr_parameters[:fq] ||= []
-      solr_parameters[:fq] << "{!join from=hasCollectionMember_ssim to=id}id:#{@collection.id}"
     end
   end # module CollectionsControllerBehavior
 end # module Hydra

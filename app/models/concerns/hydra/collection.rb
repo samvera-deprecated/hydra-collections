@@ -9,7 +9,6 @@ module Hydra
     include Hydra::Collections::Collectible
     include Hydra::Collections::Metadata
     include Hydra::Collections::Relations
-    include Hydra::Collections::Actions
 
     def update_all_members
       Deprecation.warn(Collection, 'update_all_members is deprecated and will be removed in version 5.0')

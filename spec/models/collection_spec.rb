@@ -106,28 +106,6 @@ describe Collection, :type => :model do
     end
   end
 
-  it "should set the date uploaded on create" do
-    subject.save
-    expect(subject.date_uploaded).to be_kind_of(Date)
-  end
-
-  describe "when updating" do
-    let(:gf1) { GenericFile.create }
-
-    it "should update the date modified on update" do
-      uploaded_date = Date.today
-      modified_date = Date.tomorrow
-      subject.save
-      allow(Date).to receive(:today).and_return(uploaded_date, modified_date)
-      subject.save
-      expect(subject.date_modified).to eq uploaded_date
-      subject.members = [gf1]
-      subject.save
-      expect(subject.date_modified).to eq modified_date
-      expect(gf1.reload.collections).to include(subject)
-    end
-  end
-
   it "should have a title" do
     subject.title = "title"
     subject.save

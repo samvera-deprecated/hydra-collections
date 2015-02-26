@@ -5,10 +5,9 @@ class TestAppGenerator < Rails::Generators::Base
 
   def update_gemfile
     append_to_file "Gemfile" do
-      "\n   gem 'factory_girl_rails'"
+      "\ngem 'factory_girl_rails'"
     end
   end
-
 
   def run_blacklight_generator
     say_status("warning", "GENERATING BL", :yellow)       
@@ -21,7 +20,7 @@ class TestAppGenerator < Rails::Generators::Base
 
     generate 'hydra:head', '-f'
   end
-  
+
   def run_migrations
     rake("db:migrate")
   end
@@ -42,11 +41,15 @@ class TestAppGenerator < Rails::Generators::Base
     remove_file("public/index.html")
     remove_file("test/factories/users.rb")
   end
-  
-  def copy_view_overrides
-    directory("app/views/catalog")
+
+   def copy_view_overrides
+     directory("app/views/catalog")
+   end
+
+  def overwrite_blacklight_config
+    copy_file 'config/blacklight.yml', force: true
   end
-  
+
   # Inject javascript into application.js
   def inject_javascript
     insert_into_file "app/assets/javascripts/application.js", :after => '//= require_tree .' do

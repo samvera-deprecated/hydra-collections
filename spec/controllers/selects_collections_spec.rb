@@ -5,7 +5,7 @@ class SelectsCollectionsController < ApplicationController
   include Hydra::Controller::ControllerBehavior
   include Hydra::Collections::SelectsCollections
 
-  SelectsCollectionsController.solr_search_params_logic += [:add_access_controls_to_solr_params]
+  SelectsCollectionsController.search_params_logic += [:add_access_controls_to_solr_params]
 
 end
 
@@ -13,16 +13,13 @@ end
 describe SelectsCollectionsController, :type => :controller do
 
   describe "#find_collections" do
-    it "should override solr_search_params_logic to use collection_search_params_logic, then switch it back" do
-      # Looks like we can only test this indirectly b/c blacklight doesn't let you explicitly pass solr_search_params_logic when running searches -- you have to set the controller's solr_search_params_logic class attribute
-      original_solr_logic = subject.solr_search_params_logic
-      expect(subject.collection_search_params_logic).to eq([:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter])
-      expect(subject.class).to receive(:solr_search_params_logic=).with(subject.collection_search_params_logic)
-      expect(subject.class).to receive(:solr_search_params_logic=).with(original_solr_logic)
+    it "should use collection_search_params_logic" do
+      expect(subject.collection_search_params_logic).to eq([:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter, :some_rows])
+      expect(subject).to receive(:search_results).with({ q: '' }, subject.collection_search_params_logic)
       subject.find_collections
     end
   end
-  
+
   describe "Select Collections" do
     before do
       @user = FactoryGirl.find_or_create(:user)

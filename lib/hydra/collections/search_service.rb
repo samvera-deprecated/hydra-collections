@@ -2,7 +2,7 @@ module Hydra
   module Collections
     class SearchService
       include Blacklight::Configurable
-      include Blacklight::SolrHelper
+      include Blacklight::SearchHelper
 
       def initialize(session, user_key)
         @session = session
@@ -10,7 +10,7 @@ module Hydra
         self.class.copy_blacklight_config_from(::CatalogController)
       end
 
-      solr_search_params_logic << :apply_gated_search
+      self.search_params_logic << :apply_gated_search
 
       def last_search_documents
         return [] if @session[:history].blank?

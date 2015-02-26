@@ -1,11 +1,9 @@
 module Hydra
   module Collection
     extend ActiveSupport::Concern
-    extend ActiveSupport::Autoload
     extend Deprecation
     include Hydra::WithDepositor # for access to apply_depositor_metadata
     include Hydra::AccessControls::Permissions
-    include Hydra::Collections::Collectible
     include Hydra::Collections::Collectible
     include Hydra::Collections::Metadata
     include Hydra::Collections::Relations

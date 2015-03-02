@@ -88,8 +88,7 @@ module Hydra
 
     def update
       process_member_changes
-      @collection.update_attributes(collection_params.except(:members))
-      if @collection.save
+      if @collection.update(collection_params.except(:members))
         after_update
       else
         after_update_error

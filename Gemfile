@@ -14,6 +14,8 @@ group :development, :test do
   gem 'rspec-activemodel-mocks'
 end
 
+gem 'slop', '~> 3.6' # because rails installs byebug in the Gemfile
+
 file = File.expand_path("Gemfile", ENV['ENGINE_CART_DESTINATION'] || ENV['RAILS_ROOT'] || File.expand_path("../spec/internal", __FILE__))
 if File.exists?(file)
   puts "Loading #{file} ..." if $DEBUG # `ruby -d` or `bundle -v`

@@ -10,13 +10,13 @@ class TestAppGenerator < Rails::Generators::Base
   end
 
   def run_blacklight_generator
-    say_status("warning", "GENERATING BL", :yellow)       
+    say_status("warning", "GENERATING BL", :yellow)
 
     generate "blacklight:install", '--devise'
   end
 
   def run_hydra_head_generator
-    say_status("warning", "GENERATING HH", :yellow)       
+    say_status("warning", "GENERATING HH", :yellow)
 
     generate 'hydra:head', '-f'
   end
@@ -28,8 +28,9 @@ class TestAppGenerator < Rails::Generators::Base
   # Inject call to Hydra::Collections.add_routes in config/routes.rb
   def inject_routes
     insert_into_file "config/routes.rb", :after => '.draw do' do
-      "\n  # Add Collections routes."
-      "\n  mount Hydra::Collections::Engine => '/'"
+      "\n  # Add Collections routes." +
+      "\n  mount Hydra::Collections::Engine => '/'" +
+      "\n  resources :other_collections, except: :index"
     end
   end
 
@@ -42,9 +43,13 @@ class TestAppGenerator < Rails::Generators::Base
     remove_file("test/factories/users.rb")
   end
 
-   def copy_view_overrides
-     directory("app/views/catalog")
-   end
+  def copy_view_overrides
+    directory("app/views/catalog")
+  end
+
+  def copy_test_controller
+    copy_file "app/controllers/other_collections_controller.rb"
+  end
 
   def overwrite_blacklight_config
     copy_file 'config/blacklight.yml', force: true

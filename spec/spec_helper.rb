@@ -22,20 +22,11 @@ FactoryGirl.find_definitions
 # HttpLogger.ignore = [/localhost:8983\/solr/]
 # HttpLogger.colorize = false
 
-module EngineRoutes
-  def self.included(base)
-    base.routes { Hydra::Collections::Engine.routes }
-  end
-end
-
 require 'active_fedora/cleaner'
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.include Devise::TestHelpers, :type => :controller
-  config.before(:each, type: "controller") { @routes = Hydra::Collections::Engine.routes }
-  config.include EngineRoutes, :type => :controller
   config.infer_spec_type_from_file_location!
-  # Stub out test stuff.
   config.before(:each) do
     ActiveFedora::Cleaner.clean!
   end

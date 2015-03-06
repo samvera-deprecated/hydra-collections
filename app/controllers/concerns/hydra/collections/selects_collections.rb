@@ -21,29 +21,33 @@ module Hydra::Collections::SelectsCollections
   end
 
   #
-  def find_collections (access_level='')
+  def find_collections (access_level = nil)
     # need to know the user if there is an access level applied otherwise we are just doing public collections
     authenticate_user! unless access_level.blank?
 
-    # update the permission filters for the query of need be
-    original_permissions = discovery_permissions
-    self.class.send(:define_method, "discovery_permissions")  { access_levels[access_level] } unless access_level.blank?
-
     # run the solr query to find the collections
-    (resp, doc_list) = search_results({q: ''},collection_search_params_logic)
-
-    #reset to original discovery logic
-    self.class.send(:define_method, "discovery_permissions")  { original_permissions } unless access_level.blank?
+    query = collections_search_builder(access_level).with({q: ''}).query
+    response = repository.search(query)
 
     # return the user's collections (or public collections if no access_level is applied)
-    @user_collections = doc_list
+    @user_collections = response.documents
   end
 
-  # Defines which solr_search_params_logic should be used when searching for Collections
+  def collections_search_builder_class
+    Hydra::Collections::SearchBuilder
+  end
+
+  def collections_search_builder(access_level = nil)
+    @collections_search_builder ||= collections_search_builder_class.new(collection_search_params_logic, self).tap do |builder|
+      builder.current_ability = current_ability
+      builder.discovery_perms = access_levels[access_level] if access_level
+    end
+  end
+
+  # Defines which search_params_logic should be used when searching for Collections
   def collection_search_params_logic
-    base_logic = [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params]
-    base_logic += [:add_collection_filter, :some_rows]
-    base_logic
+    [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params,
+      :add_collection_filter, :some_rows]
   end
 
 end

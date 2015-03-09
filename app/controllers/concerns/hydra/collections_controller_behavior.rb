@@ -143,9 +143,7 @@ module Hydra
     # Queries Solr for members of the collection.
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
-
-      #default the rows to 100 if not specified then merge in the user parameters and the attach the collection query
-      solr_params =  { rows: 100 }.merge(params.symbolize_keys).merge(q: params[:cq])
+      solr_params =  params.symbolize_keys.merge(q: params[:cq])
 
       # run the solr query to find the collection members
       query = collection_member_search_builder.with(solr_params).query
@@ -157,7 +155,7 @@ module Hydra
       Hydra::Collections::SearchBuilder
     end
 
-    def collection_member_search_builder(access_level = nil)
+    def collection_member_search_builder
       @collection_member_search_builder ||= collection_member_search_builder_class.new(collection_member_search_logic, self).tap do |builder|
         builder.current_ability = current_ability
       end

@@ -1,5 +1,5 @@
 module Hydra::Collections
-  class SearchBuilder < Blacklight::Solr::SearchBuilder
+  class SearchBuilder < Hydra::SearchBuilder
 
     def collection
       scope.collection
@@ -18,6 +18,14 @@ module Hydra::Collections
     def add_collection_filter(solr_parameters)
       solr_parameters[:fq] ||= []
       solr_parameters[:fq] << "#{Solrizer.solr_name("has_model", :symbol)}:Collection"
+    end
+
+    def discovery_perms= perms
+      @discovery_perms = perms
+    end
+
+    def discovery_permissions
+      @discovery_perms || super
     end
   end
 end

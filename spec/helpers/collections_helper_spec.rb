@@ -9,7 +9,7 @@ describe CollectionsHelper, :type => :helper do
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
       expect(form.attr('action')).to eq("#{collections.new_collection_path}")
-      i = form.children.first.children.first
+      i = form.xpath('.//input').first
       expect(i.attr('type')).to eq('submit')
     end
     it "should create a button with my text" do
@@ -17,7 +17,7 @@ describe CollectionsHelper, :type => :helper do
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
       expect(form.attr('action')).to eq("#{collections.new_collection_path}")
-      i = form.children.first.children.first
+      i = form.xpath('.//input').first
       expect(i.attr('value')).to eq('Create My Button')
     end
   end
@@ -31,7 +31,7 @@ describe CollectionsHelper, :type => :helper do
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
       expect(form.attr('action')).to eq collections.collection_path(@collection)
-      i = form.children.first.children[1]
+      i = form.xpath('.//input')[1]
       expect(i.attr('type')).to eq('submit')
     end
     it "should create a button with my text" do
@@ -39,7 +39,7 @@ describe CollectionsHelper, :type => :helper do
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
       expect(form.attr('action')).to eq collections.collection_path(@collection)
-      i = form.children.first.children[1]
+      i = form.xpath('.//input')[1]
       expect(i.attr('value')).to eq("Delete My Button")
     end
   end
@@ -93,7 +93,7 @@ describe CollectionsHelper, :type => :helper do
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
       expect(form.attr('action')).to eq collections.collection_path(@collection)
-      i = form.children[2]
+      i = form.xpath('.//input')[2]
       expect(i.attr('value')).to eq("remove")
       expect(i.attr('name')).to eq("collection[members]")
     end

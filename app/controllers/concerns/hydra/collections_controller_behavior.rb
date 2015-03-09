@@ -3,10 +3,10 @@ module Hydra
     extend ActiveSupport::Concern
 
     include Blacklight::Base
+    include Hydra::Collections::SelectsCollections
 
     included do
       include Hydra::Collections::AcceptsBatches
-      include Hydra::Collections::SelectsCollections
 
       # This is needed as of BL 3.7
       self.copy_blacklight_config_from(CatalogController)
@@ -123,6 +123,11 @@ module Hydra
 
     protected
 
+    # Defines which search_params_logic should be used when searching for Collections
+    def collection_search_params_logic
+      search_params_logic
+    end
+
     def collection_params
       params.require(:collection).permit(:part_of, :contributor, :creator, :title,
         :description, :publisher, :date_created, :subject, :language, :rights,
@@ -138,7 +143,10 @@ module Hydra
       solr_params =  { rows: 100 }.merge(params.symbolize_keys).merge(q: query)
 
       # run the solr query to find the collections
-      (@response, @member_docs) = search_results(solr_params, search_params_logic)
+      # (@response, @member_docs) = search_results(solr_params, search_params_logic)
+      query = collections_search_builder.with(solr_params).query
+      @response = repository.search(query)
+      @member_docs = @response.documents
     end
 
     def process_member_changes

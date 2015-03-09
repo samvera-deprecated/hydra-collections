@@ -3,6 +3,8 @@ require 'spec_helper'
 describe CollectionsController, :type => :controller do
   let(:collections) { Hydra::Collections::Engine.routes.url_helpers }
 
+  routes { Hydra::Collections::Engine.routes }
+
   before(:all) do
     CollectionsController.configure_blacklight do |config|
       config.default_solr_params = {:qf => 'label_tesim'}

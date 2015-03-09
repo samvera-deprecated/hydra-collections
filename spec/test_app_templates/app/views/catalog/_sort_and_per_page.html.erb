@@ -1,13 +1,8 @@
 <div id="sortAndPerPage">
-   <div class="page_links">
-     <%= render :partial => "paginate_compact" %>
-   </div>
-    <%= render :partial => 'sort_widget' %>
-
-    <%= render :partial => 'per_page_widget' %>
-
+  <div id="sortAndPerPage" class="clearfix">
+    <%= render "paginate_compact", object: @response if show_pagination? %>
     <%= button_for_create_collection %>
-
     <%= render partial: 'collections/form_for_select_collection', locals: {user_collections: @user_collections}  %>
+  </div>
 
 </div>

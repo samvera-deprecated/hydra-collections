@@ -1,3 +1,3 @@
-Hydra::Collections::Engine.routes.draw do 
-  resources :collections, except: :index
+Hydra::Collections::Engine.routes.draw do
+  resources :collections
 end

@@ -3,6 +3,8 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in hydra-collections.gemspec
 gemspec
 
+gem 'kaminari', github: 'harai/kaminari', branch: 'route_prefix_prototype'
+
 group :development, :test do
   gem 'sqlite3'
   gem "factory_girl_rails"

@@ -12,6 +12,7 @@ describe CollectionsController, :type => :controller do
 
     class GenericFile < ActiveFedora::Base
       include Hydra::Collections::Collectible
+      include Hydra::AccessControls::Permissions
 
       property :title, predicate: ::RDF::DC.title, multiple: false
 
@@ -231,18 +232,14 @@ describe CollectionsController, :type => :controller do
     end
 
     context "with a number of assets" do
-      let(:asset1) { GenericFile.create!(title: "First of the Assets") }
-      let(:asset2) { GenericFile.create!(title: "Second of the Assets") }
-      let(:asset3) { GenericFile.create!(title: "Third of the Assets") }
+      let(:asset1) { GenericFile.create!(title: "First of the Assets", read_users: [user.user_key]) }
+      let(:asset2) { GenericFile.create!(title: "Second of the Assets", read_users: [user.user_key]) }
+      let(:asset3) { GenericFile.create!(title: "Third of the Assets", read_users: [user.user_key]) }
       let!(:collection) do
         Collection.create!(id: "abc123", title: "My collection",
                            members: [asset1, asset2, asset3]) do |col|
           col.apply_depositor_metadata(user.user_key)
         end
-      end
-
-      before do
-        allow(controller).to receive(:apply_gated_search)
       end
 
       # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
@@ -259,7 +256,7 @@ describe CollectionsController, :type => :controller do
       end
 
       describe "additional collections" do
-        let(:asset4) { GenericFile.create!(title: "#{asset1.id}") }
+        let(:asset4) { GenericFile.create!(title: "#{asset1.id}", read_users: [user.user_key]) }
         let!(:collection2) do
           Collection.create!(id: "abc1234", title: "Other collection", members: [asset4]) do |col|
             col.apply_depositor_metadata(user.user_key)

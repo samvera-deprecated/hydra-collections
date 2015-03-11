@@ -131,7 +131,7 @@ module Hydra
 
     # Defines which search_params_logic should be used when searching for Collection members
     def collection_member_search_logic
-      search_params_logic + [:include_collection_ids]
+      search_params_logic + [:include_collection_ids, :add_access_controls_to_solr_params]
     end
 
     def collection_params

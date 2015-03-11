@@ -12,6 +12,7 @@ describe CollectionsController, :type => :controller do
 
     class GenericFile < ActiveFedora::Base
       include Hydra::Collections::Collectible
+      include Hydra::AccessControls::Permissions
 
       property :title, predicate: ::RDF::DC.title, multiple: false
 
@@ -215,73 +216,77 @@ describe CollectionsController, :type => :controller do
     end
   end
 
-  describe "with a number of assets #show" do
+  describe "#show" do
     before do
-      @asset1 = GenericFile.create!(title: "First of the Assets")
-      @asset2 = GenericFile.create!(title: "Second of the Assets")
-      @asset3 = GenericFile.create!(title: "Third of the Assets")
-      @collection = Collection.new(id:"abc123")
-      @collection.title = "My collection"
-      @collection.apply_depositor_metadata(user.user_key)
-      @collection.members = [@asset1, @asset2, @asset3]
-      @collection.save!
       expect(controller).to receive(:authorize!).and_return(true)
-      allow(controller).to receive(:apply_gated_search)
     end
 
-    describe "additional collections" do
-      before do
-        @asset4 = GenericFile.create!(title: "#{@asset1.id}")
-        @collection2 = Collection.new(id: "abc1234")
-        @collection2.title = "Other collection"
-        @collection2.apply_depositor_metadata(user.user_key)
-        @collection2.members = [@asset4]
-        @collection2.save
-      end
-
-      it "should show only the collections assets" do
-        get :show, id: @collection
-        expect(assigns[:collection].title).to eq @collection.title
-        expect(assigns[:member_docs].map(&:id)).to match_array [@asset1.id, @asset2.id, @asset3.id]
-      end
-
-      it "should show only the other collections assets" do
-        get :show, id: @collection2
-        expect(assigns[:collection].title).to eq @collection2.title
-        expect(assigns[:member_docs].map(&:id)).to match_array [@asset4.id]
+    context "when there are no assets in the collection" do
+      let(:collection) { Collection.create(title: "Empty collection") }
+      it "shows no assets" do
+        get :show, id: collection
+        expect(response).to be_successful
+        expect(assigns[:collection].title).to eq("Empty collection")
+        expect(assigns[:member_docs]).to be_empty
       end
     end
 
-    it "when the collection is empty it should show no assets" do
-      get :show, id: Collection.create(title: "Empty collection")
-      expect(assigns[:collection].title).to eq("Empty collection")
-      expect(assigns[:member_docs]).to be_empty
-    end
-
-    # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
-    it "should query the collections" do
-      get :show, id: @collection.id, cq:"\"#{@asset1.title}\""
-      expect(assigns[:collection].title).to eq @collection.title
-      expect(assigns[:member_docs].map(&:id)).to match_array [@asset1.id]
-    end
-
-    context "When there are search matches that are not in the collection" do
-      before do
-        GenericFile.create!(title: "#{@asset1.id} #{@asset1.title}")
-        GenericFile.create!(title: @asset1.title.to_s)
+    context "with a number of assets" do
+      let(:asset1) { GenericFile.create!(title: "First of the Assets", read_users: [user.user_key]) }
+      let(:asset2) { GenericFile.create!(title: "Second of the Assets", read_users: [user.user_key]) }
+      let(:asset3) { GenericFile.create!(title: "Third of the Assets", read_users: [user.user_key]) }
+      let!(:collection) do
+        Collection.create!(id: "abc123", title: "My collection",
+                           members: [asset1, asset2, asset3]) do |col|
+          col.apply_depositor_metadata(user.user_key)
+        end
       end
+
       # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
-      it "should query the collections and show only the collection assets" do
-        get :show, id: @collection, cq: "\"#{@asset1.title}\""
-        expect(assigns[:collection].title).to eq @collection.title
-        expect(assigns[:member_docs].map(&:id)).to match_array [@asset1.id]
+      it "queries the collections" do
+        get :show, id: collection, cq:"\"#{asset1.title}\""
+        expect(assigns[:collection].title).to eq collection.title
+        expect(assigns[:member_docs].map(&:id)).to match_array [asset1.id]
       end
-    end
 
-    it "should query the collections with rows" do
-      get :show, id: @collection, rows:"2"
-      expect(assigns[:collection].title).to eq @collection.title
-      expect(assigns[:member_docs].size).to eq 2
+      it "returns the specified number of rows" do
+        get :show, id: collection, rows: "2"
+        expect(assigns[:collection].title).to eq collection.title
+        expect(assigns[:member_docs].size).to eq 2
+      end
+
+      describe "additional collections" do
+        let(:asset4) { GenericFile.create!(title: "#{asset1.id}", read_users: [user.user_key]) }
+        let!(:collection2) do
+          Collection.create!(id: "abc1234", title: "Other collection", members: [asset4]) do |col|
+            col.apply_depositor_metadata(user.user_key)
+          end
+        end
+        it "shows only the collections assets" do
+          get :show, id: collection
+          expect(assigns[:collection].title).to eq collection.title
+          expect(assigns[:member_docs].map(&:id)).to match_array [asset1.id, asset2.id, asset3.id]
+        end
+
+        it "shows only the other collections assets" do
+          get :show, id: collection2
+          expect(assigns[:collection].title).to eq collection2.title
+          expect(assigns[:member_docs].map(&:id)).to match_array [asset4.id]
+        end
+      end
+
+      context "When there are search matches that are not in the collection" do
+        before do
+          GenericFile.create!(title: "#{asset1.id} #{asset1.title}")
+          GenericFile.create!(title: asset1.title.to_s)
+        end
+        # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
+        it "only shows the collection assets" do
+          get :show, id: collection, cq: "\"#{asset1.title}\""
+          expect(assigns[:collection].title).to eq collection.title
+          expect(assigns[:member_docs].map(&:id)).to match_array [asset1.id]
+        end
+      end
     end
   end
 end

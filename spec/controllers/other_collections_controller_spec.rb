@@ -10,6 +10,7 @@ describe OtherCollectionsController, :type => :controller do
 
     class Member < ActiveFedora::Base
       include Hydra::Collections::Collectible
+      include Hydra::AccessControls::Permissions
       attr_accessor :title
     end
   end
@@ -29,9 +30,9 @@ describe OtherCollectionsController, :type => :controller do
   end
 
   describe "#show" do
-    let(:asset1) { Member.create!(title: "First of the Assets") }
-    let(:asset2) { Member.create!(title: "Second of the Assets") }
-    let(:asset3) { Member.create!(title: "Third of the Assets") }
+    let(:asset1) { Member.create!(title: "First of the Assets", read_users: [user.user_key]) }
+    let(:asset2) { Member.create!(title: "Second of the Assets", read_users: [user.user_key]) }
+    let(:asset3) { Member.create!(title: "Third of the Assets", read_users: [user.user_key]) }
     let(:collection) do
       OtherCollection.create(id: 'foo123', title: "My collection",
                              members: [asset1, asset2, asset3]) do |collection|

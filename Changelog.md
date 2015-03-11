@@ -1,3 +1,15 @@
+# 5.0.1
+
+* Fixed bug where access controls were not enforced by default
+
+# 5.0.0
+
+* Support for Blacklight 5.10 (HydraHead 9.1)
+
+# 4.0.0
+
+* Works with Fedora 4 (ActiveFedora/HydraHead 9)
+
 # 2.0.4
 
 * Updating dependencies

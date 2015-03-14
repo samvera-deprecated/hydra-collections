@@ -9,6 +9,7 @@ module Hydra
     autoload :AcceptsBatches
     autoload :SelectsCollections
     autoload :SolrDocumentBehavior
+    autoload :SearchBehaviors
     class Engine < ::Rails::Engine
       engine_name "collections"
       config.autoload_paths += %W(

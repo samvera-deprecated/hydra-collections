@@ -71,7 +71,7 @@ class TestAppGenerator < Rails::Generators::Base
   
   # Inject collections call into balacklight catalog
   def inject_collections
-    insert_into_file "app/controllers/catalog_controller.rb", :after => 'Hydra::Controller::ControllerBehavior' do
+    insert_into_file "app/controllers/catalog_controller.rb", :after => 'Hydra::Catalog' do
       "\n  include Hydra::Collections::SelectsCollections\n  before_filter :find_collections, :only=>:index"
     end
   end

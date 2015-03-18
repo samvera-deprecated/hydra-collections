@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-include Rails.application.routes.url_helpers
-
 describe CatalogController, :type => :controller do
 
   before do

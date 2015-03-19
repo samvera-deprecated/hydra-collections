@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["cam156@psu.edu"]
   spec.description   = "A rails engine for managing Hydra Collections"
   spec.summary       = "A rails engine for managing Hydra Collections"
-  spec.homepage      = "https://github.com/projecthydra-labs/hydra-collections"
+  spec.homepage      = "https://github.com/projecthydra/hydra-collections"
   spec.license       = "APACHE2"
 
   spec.files         = `git ls-files`.split($/)

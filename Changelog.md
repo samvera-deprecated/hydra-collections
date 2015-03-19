@@ -1,3 +1,7 @@
+# 5.0.2
+
+* Using new Hydra::Catalog module and Hydra::Collections::SearchBehaviors
+
 # 5.0.1
 
 * Fixed bug where access controls were not enforced by default

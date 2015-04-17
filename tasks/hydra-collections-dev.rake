@@ -3,8 +3,6 @@ require 'rspec/core/rake_task'
 require 'jettywrapper'
 require 'engine_cart/rake_task'
 
-Jettywrapper.hydra_jetty_version = "v8.1.0"
-
 RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.rspec_opts = ['--backtrace'] if ENV['CI']
 end

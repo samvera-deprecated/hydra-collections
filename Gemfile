@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in hydra-collections.gemspec
 gemspec
 
-gem 'kaminari', github: 'harai/kaminari', branch: 'route_prefix_prototype'
+gem 'kaminari', github: 'jcoyne/kaminari', branch: 'sufia'
 
 group :development, :test do
   gem 'sqlite3'

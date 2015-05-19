@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'collections/_thumbnail_default.html.erb' do
-  let(:document) { SolrDocument.new :id => 'xyz', :format => 'a', :thumbnail_url => 'http://localhost/logo.png' }
+  let(:document) { SolrDocument.new id: 'xyz', format: 'a', thumbnail_url: 'http://localhost/logo.png' }
   let :blacklight_config do
     Blacklight::Configuration.new do |config|
       config.index.thumbnail_field = :thumbnail_url
@@ -9,7 +9,7 @@ describe 'collections/_thumbnail_default.html.erb' do
   end
 
   before do
-    assign :response, double(:params => {}, :start => 0)
+    assign :response, double(start: 0)
     allow(view).to receive(:blacklight_config).and_return(blacklight_config)
     allow(view).to receive(:render_grouped_response?).and_return(false)
     allow(view).to receive(:current_search_session).and_return nil

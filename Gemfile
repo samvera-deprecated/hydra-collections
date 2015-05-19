@@ -3,8 +3,6 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in hydra-collections.gemspec
 gemspec
 
-gem 'kaminari', github: 'jcoyne/kaminari', branch: 'sufia'
-
 group :development, :test do
   gem 'sqlite3'
   gem "factory_girl_rails"
@@ -23,6 +21,9 @@ if File.exists?(file)
   puts "Loading #{file} ..." if $DEBUG # `ruby -d` or `bundle -v`
   instance_eval File.read(file)
 else
+  extra_file = File.expand_path("../spec/test_app_templates/Gemfile.extra", __FILE__)
+  instance_eval File.read(extra_file)
+
   gem 'rails', ENV['RAILS_VERSION'] if ENV['RAILS_VERSION']
 
   if ENV['RAILS_VERSION'] and ENV['RAILS_VERSION'] !~ /^4.2/

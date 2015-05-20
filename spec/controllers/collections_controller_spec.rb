@@ -10,9 +10,10 @@ describe CollectionsController, :type => :controller do
       config.default_solr_params = {:qf => 'label_tesim'}
     end
 
-    class GenericFile < ActiveFedora::Base
+    class GenericWork < ActiveFedora::Base
       include Hydra::Collections::Collectible
       include Hydra::AccessControls::Permissions
+      include Hydra::Works::GenericWorkBehavior
 
       property :title, predicate: ::RDF::DC.title, multiple: false
 
@@ -25,7 +26,7 @@ describe CollectionsController, :type => :controller do
   end
 
   after(:all) do
-    Object.send(:remove_const, :GenericFile)
+    Object.send(:remove_const, :GenericWork)
   end
 
   let(:user) { FactoryGirl.create(:user) }
@@ -41,7 +42,7 @@ describe CollectionsController, :type => :controller do
   describe "#index" do
     let!(:collection1) { Collection.create { |c| c.apply_depositor_metadata(user.user_key) } }
     let!(:collection2) { Collection.create { |c| c.apply_depositor_metadata(user.user_key) } }
-    let!(:generic_file) { GenericFile.create }
+    let!(:generic_file) { GenericWork.create }
 
     it "should show a list of collections" do
       get :index
@@ -69,8 +70,8 @@ describe CollectionsController, :type => :controller do
       expect(response).to redirect_to collections.collection_path(assigns[:collection])
     end
     it "should add docs to collection if batch ids provided" do
-      @asset1 = ActiveFedora::Base.create!
-      @asset2 = ActiveFedora::Base.create!
+      @asset1 = Hydra::PCDM::Object.create!
+      @asset2 = Hydra::PCDM::Object.create!
       post :create, batch_document_ids: [@asset1, @asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       expect(assigns[:collection].members).to eq([@asset1, @asset2])
     end
@@ -80,26 +81,26 @@ describe CollectionsController, :type => :controller do
     end
 
     it "should add one doc to collection if batch ids provided and add the collection id to the document in the colledction" do
-      @asset1 = GenericFile.create!
+      @asset1 = GenericWork.create!
       post :create, batch_document_ids: [@asset1], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       expect(assigns[:collection].members).to eq [@asset1]
       asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
       expect(doc["id"]).to eq(@asset1.id)
-      afterupdate = GenericFile.find(@asset1.id)
+      afterupdate = GenericWork.find(@asset1.id)
       expect(doc[Solrizer.solr_name(:collection)]).to eq(afterupdate.to_solr[Solrizer.solr_name(:collection)])
     end
     it "should add docs to collection if batch ids provided and add the collection id to the documents int he colledction" do
-      @asset1 = GenericFile.create!
-      @asset2 = GenericFile.create!
+      @asset1 = GenericWork.create!
+      @asset2 = GenericWork.create!
       post :create, batch_document_ids: [@asset1,@asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       expect(assigns[:collection].members).to eq([@asset1,@asset2])
       asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
       expect(doc["id"]).to eq(@asset1.id)
-      afterupdate = GenericFile.find(@asset1.id)
+      afterupdate = GenericWork.find(@asset1.id)
       expect(doc[Solrizer.solr_name(:collection)]).to eq(afterupdate.to_solr[Solrizer.solr_name(:collection)])
     end
   end
@@ -107,9 +108,9 @@ describe CollectionsController, :type => :controller do
   describe "#update" do
     before do
       @collection = Collection.create { |c| c.apply_depositor_metadata(user.user_key) }
-      @asset1 = GenericFile.create!
-      @asset2 = GenericFile.create!
-      @asset3 = GenericFile.create!
+      @asset1 = GenericWork.create!
+      @asset2 = GenericWork.create!
+      @asset3 = GenericWork.create!
       allow(controller).to receive(:authorize!).and_return(true)
       expect(controller).to receive(:authorize!).at_least(:once)
     end
@@ -199,7 +200,7 @@ describe CollectionsController, :type => :controller do
       end
 
       it "should call update members" do
-        @asset1 = GenericFile.create!
+        @asset1 = GenericWork.create!
         @collection.members << @asset1
         @collection.save
         @asset1 = @asset1.reload
@@ -232,9 +233,9 @@ describe CollectionsController, :type => :controller do
     end
 
     context "with a number of assets" do
-      let(:asset1) { GenericFile.create!(title: "First of the Assets", read_users: [user.user_key]) }
-      let(:asset2) { GenericFile.create!(title: "Second of the Assets", read_users: [user.user_key]) }
-      let(:asset3) { GenericFile.create!(title: "Third of the Assets", read_users: [user.user_key]) }
+      let(:asset1) { GenericWork.create!(title: "First of the Assets", read_users: [user.user_key]) }
+      let(:asset2) { GenericWork.create!(title: "Second of the Assets", read_users: [user.user_key]) }
+      let(:asset3) { GenericWork.create!(title: "Third of the Assets", read_users: [user.user_key]) }
       let!(:collection) do
         Collection.create!(id: "abc123", title: "My collection",
                            members: [asset1, asset2, asset3]) do |col|
@@ -256,7 +257,7 @@ describe CollectionsController, :type => :controller do
       end
 
       describe "additional collections" do
-        let(:asset4) { GenericFile.create!(title: "#{asset1.id}", read_users: [user.user_key]) }
+        let(:asset4) { GenericWork.create!(title: "#{asset1.id}", read_users: [user.user_key]) }
         let!(:collection2) do
           Collection.create!(id: "abc1234", title: "Other collection", members: [asset4]) do |col|
             col.apply_depositor_metadata(user.user_key)
@@ -277,8 +278,8 @@ describe CollectionsController, :type => :controller do
 
       context "When there are search matches that are not in the collection" do
         before do
-          GenericFile.create!(title: "#{asset1.id} #{asset1.title}")
-          GenericFile.create!(title: asset1.title.to_s)
+          GenericWork.create!(title: "#{asset1.id} #{asset1.title}")
+          GenericWork.create!(title: asset1.title.to_s)
         end
         # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
         it "only shows the collection assets" do

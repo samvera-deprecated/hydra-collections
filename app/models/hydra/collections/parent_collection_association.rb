@@ -4,6 +4,10 @@ module Hydra::Collections
         ActiveFedora::QueryResultBuilder.reify_solr_results(load_from_solr(rows: 1000))
       end
 
+      def count_records
+        @reflection.klass.count(conditions: construct_query)
+      end
+
     protected
       def find_reflection
         'members'.freeze

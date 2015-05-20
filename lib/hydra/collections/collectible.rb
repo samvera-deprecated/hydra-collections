@@ -9,9 +9,12 @@ module Hydra::Collections
 
     # Find the collections that contain this object
     def collections(force_reload = false)
-      @reflection ||= ActiveFedora::Reflection::AssociationReflection.new(:parent_collection, :collections, { class_name: 'ActiveFedora::Base' } , self)
-      @parent_collections ||= ParentCollectionAssociation.new(self, @reflection)
-      @parent_collections.reader(force_reload)
+      parent_collection_association.reader(force_reload)
+    end
+
+    # Find the ids of the collections that contain this object
+    def collection_ids
+      parent_collection_association.ids_reader
     end
 
     # Add this method to your solrization logic (ie. in to_solr) in order to populate the 'collection' facet
@@ -36,6 +39,15 @@ module Hydra::Collections
       index_collection_ids(solr_doc)
     end
     deprecation_deprecate :index_collection_pids
+
+    protected
+
+      def parent_collection_association
+        @parent_collections ||= begin
+          reflection = ActiveFedora::Reflection::AssociationReflection.new(:parent_collection, :collections, { class_name: 'ActiveFedora::Base' } , self)
+          ParentCollectionAssociation.new(self, reflection)
+        end
+      end
 
   end
 end

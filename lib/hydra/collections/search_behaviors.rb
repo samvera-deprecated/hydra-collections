@@ -7,7 +7,7 @@ module Hydra::Collections::SearchBehaviors
   # include filters into the query to only include the collection memebers
   def include_collection_ids(solr_parameters)
     solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << "{!join from=hasCollectionMember_ssim to=id}id:#{collection.id}"
+    solr_parameters[:fq] << "{!join from=members_ssim to=id}id:#{collection.id}"
   end
 
   def some_rows(solr_parameters)

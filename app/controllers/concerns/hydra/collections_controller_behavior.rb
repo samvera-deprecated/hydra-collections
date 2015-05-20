@@ -172,7 +172,10 @@ module Hydra
 
     def add_members_to_collection collection = nil
       collection ||= @collection
-      collection.member_ids = batch.concat(collection.member_ids)
+      batch.each do |id|
+        Hydra::PCDM::AddObjectToCollection.call(collection, ActiveFedora::Base.find(id))
+      end
+      #TODO this old way was more efficient #collection.member_ids = batch.concat(collection.member_ids)
     end
 
     def remove_members_from_collection

@@ -7,33 +7,24 @@ describe Hydra::Collections::Collectible do
     end
   end
 
-  let(:collection1) { FactoryGirl.create(:collection) }
+  let(:collection1) { FactoryGirl.build(:collection) }
   let(:collection2) { FactoryGirl.create(:collection) }
-  let(:collectible) { CollectibleThing.new }
+  let(:collectible) { CollectibleThing.create }
 
   after do
     Object.send(:remove_const, :CollectibleThing)
   end
 
   describe "collections associations" do
-    it "should allow adding and removing" do
-      collectible.save
+    before do
       collection1.members << collectible
       collection1.save
-      collectible.collections << collection2
-      reloaded = CollectibleThing.find(collectible.id)
-      expect(collection2.reload.members).to eq [collectible]
-      expect(reloaded.collections).to eq [collection1, collection2]
+      collection2.members << collectible
+      collection2.save
     end
-  end
 
-  describe "index_collection_ids" do
-    it "should add ids for all associated collections" do
-      collectible.save
-      collectible.collections << collection1
-      collectible.collections << collection2
-      expect(Deprecation).to receive(:warn)
-      expect(collectible.index_collection_ids["collection_sim"]).to eq [collection1.id, collection2.id]
+    it "queries the members" do
+      expect(collectible.reload.collections).to eq [collection1, collection2]
     end
   end
 end

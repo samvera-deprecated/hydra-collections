@@ -30,5 +30,9 @@ describe Hydra::Collections::Collectible do
     it "counts the members" do
       expect(collectible.reload.collections.size).to eq 2
     end
+
+    it "queries the ids" do
+      expect(collectible.reload.collection_ids).to eq [collection1.id, collection2.id]
+    end
   end
 end

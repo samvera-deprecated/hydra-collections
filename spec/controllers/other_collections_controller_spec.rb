@@ -5,13 +5,11 @@ describe OtherCollectionsController, :type => :controller do
   before(:all) do
     class OtherCollection < ActiveFedora::Base
       include Hydra::Collection
-      include Hydra::Collections::Collectible
     end
 
     class Member < ActiveFedora::Base
       include Hydra::Collections::Collectible
       include Hydra::AccessControls::Permissions
-      attr_accessor :title
     end
   end
 
@@ -20,19 +18,17 @@ describe OtherCollectionsController, :type => :controller do
     Object.send(:remove_const, :OtherCollection)
   end
 
-  let(:user) { FactoryGirl.find_or_create(:user) }
+  let(:user) { FactoryGirl.create(:user) }
 
   before do
     allow(controller).to receive(:has_access?).and_return(true)
     sign_in user
-    # allow_any_instance_of(User).to receive(:groups).and_return([])
-    # allow(controller).to receive(:clear_session_user) ## Don't clear out the authenticated session
   end
 
   describe "#show" do
-    let(:asset1) { Member.create!(title: "First of the Assets", read_users: [user.user_key]) }
-    let(:asset2) { Member.create!(title: "Second of the Assets", read_users: [user.user_key]) }
-    let(:asset3) { Member.create!(title: "Third of the Assets", read_users: [user.user_key]) }
+    let(:asset1) { Member.create!(read_users: [user.user_key]) }
+    let(:asset2) { Member.create!(read_users: [user.user_key]) }
+    let(:asset3) { Member.create!(read_users: [user.user_key]) }
     let(:collection) do
       OtherCollection.create(id: 'foo123', title: "My collection",
                              members: [asset1, asset2, asset3]) do |collection|
@@ -44,7 +40,7 @@ describe OtherCollectionsController, :type => :controller do
       allow(controller).to receive(:apply_gated_search)
     end
 
-    it "should show the collections" do
+    it "shows the collections" do
       get :show, id: collection
       expect(assigns[:collection].title).to eq collection.title
       ids = assigns[:member_docs].map(&:id)

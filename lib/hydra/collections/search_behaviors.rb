@@ -1,4 +1,10 @@
 module Hydra::Collections::SearchBehaviors
+  extend ActiveSupport::Concern
+
+  included do
+    class_attribute :from_field
+    self.from_field = 'member_ids_ssim'
+  end
 
   def collection
     scope.collection
@@ -7,7 +13,7 @@ module Hydra::Collections::SearchBehaviors
   # include filters into the query to only include the collection memebers
   def include_collection_ids(solr_parameters)
     solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << "{!join from=members_ssim to=id}id:#{collection.id}"
+    solr_parameters[:fq] << "{!join from=#{from_field} to=id}id:#{collection.id}"
   end
 
   def some_rows(solr_parameters)

@@ -47,12 +47,8 @@ describe Collection, :type => :model do
   end
 
   describe "the ability" do
-    let(:collection) do
-      Collection.new.tap do |collection|
-        collection.apply_depositor_metadata(user)
-        collection.save
-      end
-    end
+    let(:collection) { Collection.create { |c| c.apply_depositor_metadata(user) } }
+
     subject { Ability.new(user) }
 
     it "should allow the depositor to edit and read" do
@@ -93,11 +89,13 @@ describe Collection, :type => :model do
     context "removing members" do
       before do
         subject.members = [gf1, gf2]
-        subject.save
+        subject.save!
       end
 
-      it "should allow files to be removed" do
-        expect(gf1.collections).to eq [subject] # This line forces the "collections" to be cached.
+      it "allows files to be removed" do
+        # force the "parent_collections" to be cached:
+        expect(gf1.parent_collections).to eq [subject]
+
         # We need to ensure that deleting causes the collection to be flushed.
         subject.reload.members.delete(gf1)
         subject.save

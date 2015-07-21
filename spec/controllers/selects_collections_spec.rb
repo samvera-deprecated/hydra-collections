@@ -47,14 +47,13 @@ describe SelectsCollectionsController, :type => :controller do
       context "when there are more than 10" do
         before do
           11.times do |i|
-            Collection.new(title:"Test Public #{i}").tap do |col|
+            Collection.create(title:"Test Public #{i}", read_groups: ["public"]) do |col|
               col.apply_depositor_metadata(@user.user_key)
-              col.read_groups = ["public"]
-              col.save!
             end
           end
         end
-        it "should return all public collections" do
+
+        it "returns all public collections" do
           subject.find_collections
           expect(assigns[:user_collections].count).to eq(12)
         end

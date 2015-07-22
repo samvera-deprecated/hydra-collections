@@ -5,49 +5,21 @@ module Hydra::Collections
   module Collectible
     extend ActiveSupport::Concern
     extend Deprecation
-    self.deprecation_horizon = "hydra-collections 4.0"
 
-    # Find the collections that contain this object
-    def collections(force_reload = false)
-      parent_collection_association.reader(force_reload)
+    included do
+      include Hydra::Works::GenericWorkBehavior
+      Deprecation.warn(Collectible, "Hydra::Collections::Collectible is deprecated. include Hydra::Works::GenericWorkBehavior instead. Hydra::Collections::Collectible will be removed in Hydra::Collections 7.0")
     end
 
-    # Find the ids of the collections that contain this object
     def collection_ids
-      parent_collection_association.ids_reader
+      Deprecation.warn(Collectible, "collection_ids is deprecated and will be removed in Hydra::Collections 7.0. Use parent_collections.map(&:id) instead.")
+      parent_collections.map(&:id)
     end
 
-    # Add this method to your solrization logic (ie. in to_solr) in order to populate the 'collection' facet
-    # with the pids of any collections that contain the current object.
-    # @example
-    #   def to_solr(solr_doc={}, opts={})
-    #    super(solr_doc, opts)
-    #    index_collection_ids(solr_doc)
-    #    return solr_doc
-    #   end
-    def index_collection_ids(solr_doc={})
-      Deprecation.warn(Hydra::Collections::Collectible, 'index_collection_ids is deprecated and will be removed in version 5.0')
-      # CollectionAssociation#ids_reader loads from solr on each call, so only call it once
-      # see https://github.com/projecthydra/active_fedora/issues/644
-      ids = collection_ids
-      solr_doc[Solrizer.solr_name(:collection, :facetable)] = ids
-      solr_doc[Solrizer.solr_name(:collection)] = ids
-      solr_doc
+    def collections
+      Deprecation.warn(Collectible, "collections is deprecated and will be removed in Hydra::Collections 7.0. Use parent_collections instead.")
+      parent_collections
     end
-
-    def index_collection_pids(solr_doc={})
-      index_collection_ids(solr_doc)
-    end
-    deprecation_deprecate :index_collection_pids
-
-    protected
-
-      def parent_collection_association
-        @parent_collections ||= begin
-          reflection = ActiveFedora::Reflection::AssociationReflection.new(:parent_collection, :collections, { class_name: 'ActiveFedora::Base' } , self)
-          ParentCollectionAssociation.new(self, reflection)
-        end
-      end
 
   end
 end

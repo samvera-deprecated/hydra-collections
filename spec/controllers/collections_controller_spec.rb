@@ -188,27 +188,25 @@ describe CollectionsController, :type => :controller do
         expect(controller).to receive(:authorize!).and_return(true)
       end
 
-      it "should delete collection" do
+      it "deletes the collection" do
         delete :destroy, id: @collection
         expect(response).to redirect_to Rails.application.routes.url_helpers.catalog_index_path
         expect(flash[:notice]).to eq("Collection was successfully deleted.")
       end
 
-      it "should after_destroy" do
+      it "calls after_destroy" do
         expect(controller).to receive(:after_destroy).and_call_original
         delete :destroy, id: @collection
       end
 
-      it "should call update members" do
-        @asset1 = GenericWork.create!
-        @collection.members << @asset1
-        @collection.save
-        @asset1 = @asset1.reload
-        @asset1.update_index
-        expect(@asset1.collections).to eq [@collection]
+      it "updates members" do
+        asset1 = GenericWork.create!
+        @collection.members << asset1
+        @collection.save!
+        expect(asset1.parent_collections).to eq [@collection]
 
         delete :destroy, id: @collection
-        expect(@asset1.reload.collections).to eq []
+        expect(asset1.parent_collections).to eq []
       end
     end
 

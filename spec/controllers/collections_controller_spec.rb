@@ -11,7 +11,6 @@ describe CollectionsController, :type => :controller do
     end
 
     class GenericWork < ActiveFedora::Base
-      include Hydra::Collections::Collectible
       include Hydra::AccessControls::Permissions
       include Hydra::Works::GenericWorkBehavior
 
@@ -70,8 +69,8 @@ describe CollectionsController, :type => :controller do
       expect(response).to redirect_to collections.collection_path(assigns[:collection])
     end
     it "should add docs to collection if batch ids provided" do
-      @asset1 = Hydra::PCDM::Object.create!
-      @asset2 = Hydra::PCDM::Object.create!
+      @asset1 = GenericWork.create!
+      @asset2 = GenericWork.create!
       post :create, batch_document_ids: [@asset1, @asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
       expect(assigns[:collection].members).to eq([@asset1, @asset2])
     end

@@ -1,4 +1,5 @@
 require "hydra/head"
+require 'hydra/works'
 
 module Hydra
   module Collections

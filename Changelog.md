@@ -1,3 +1,14 @@
+# 6.0.0.alpha
+
+Hydra::Collections 6.0.0.alpha is the first release that sits atop the Portland Common Data Model. It includes the following changes:
+
+* Depend upon hydra-works 0.1.0, which brings PCDM-related dependencies. Collections defined by Hydra::Collections are now PCDM collections.
+* Add ParentCollectionAssociation#count_records to calculate the number of a collection's members.
+* Change the default join column for querying members of a collection (was `hasCollectionMember_ssim`, is now `member_ids_ssim`)
+* Deprecate the Hydra::Collections::Collectible module (in favor of Hydra::Works::GenericWorkBehavior).
+* Update rails to 4.2.1, blacklight to 5.14.0, and kaminari to the latest in Justin Coyne's fork
+* Pull latest hydra-jetty (was pinned to 8.1.0)
+
 # 5.0.2
 
 * Using new Hydra::Catalog module and Hydra::Collections::SearchBehaviors

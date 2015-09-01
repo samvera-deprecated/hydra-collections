@@ -72,7 +72,7 @@ describe CollectionsController, :type => :controller do
       @asset1 = ActiveFedora::Base.create!
       @asset2 = ActiveFedora::Base.create!
       post :create, batch_document_ids: [@asset1, @asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
-      expect(assigns[:collection].members).to eq([@asset1, @asset2])
+      expect(assigns[:collection].members).to match_array [@asset1, @asset2]
     end
     it "should call after_create" do
        expect(controller).to receive(:after_create).and_call_original
@@ -94,7 +94,7 @@ describe CollectionsController, :type => :controller do
       @asset1 = GenericFile.create!
       @asset2 = GenericFile.create!
       post :create, batch_document_ids: [@asset1,@asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
-      expect(assigns[:collection].members).to eq([@asset1,@asset2])
+      expect(assigns[:collection].members).to match_array [@asset1, @asset2]
       asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first

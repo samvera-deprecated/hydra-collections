@@ -11,16 +11,35 @@ module Hydra::Collections::SelectsCollections
     { read: [:read, :edit], edit: [:edit] }
   end
 
-  # add one of the following methods as a before filter on any page that shows the form_for_select_collection
+  ##
+  # Return list of collections for which the current user has read access.
+  # Add this or find_collections_with_edit_access as a before filter on any page that shows the form_for_select_collection
+  #
+  # @return [Array<SolrDocument>] Solr documents for each collection the user has read access
   def find_collections_with_read_access
     find_collections(:read)
   end
 
-  def find_collections_with_edit_access
+  ##
+  # Return list of collections for which the current user has edit access.  Optionally prepend with default
+  # that can be used in a select menu to instruct user to select a collection.
+  # Add this or find_collections_with_read_access as a before filter on any page that shows the form_for_select_collection
+  #
+  # @param [TrueClass|FalseClass] :include_default if true, prepends the default_option; otherwise, if false, returns only collections
+  # @param [Fixnum] :default_id for select menus, this is the id of the first selection representing the instructions
+  # @param [String] :default_title for select menus, this is the text displayed as the first item serving as instructions
+  #
+  # @return [Array<SolrDocument>] Solr documents for each collection the user has edit access, plus optional instructions
+  def find_collections_with_edit_access(include_default=false, default_id=-1, default_title="Select collection...")
     find_collections(:edit)
+    default_option = SolrDocument.new(id: default_id, title_tesim: default_title)
+    @user_collections.unshift(default_option) if include_default
   end
 
-  #
+  ##
+  # Return list of collections matching the passed in access_level for the current user.
+  # @param [Symbol] :access_level one of :read or :edit
+  # @return [Array<SolrDocument>] Solr documents for each collection the user has the appropriate access level
   def find_collections (access_level = nil)
     # need to know the user if there is an access level applied otherwise we are just doing public collections
     authenticate_user! unless access_level.blank?

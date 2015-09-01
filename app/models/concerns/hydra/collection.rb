@@ -21,5 +21,9 @@ module Hydra
       member.update_index
     end
 
+    def add_members new_member_ids
+      return if new_member_ids.nil? || new_member_ids.size < 1
+      self.members << ActiveFedora::Base.find(new_member_ids)
+    end
  end
 end

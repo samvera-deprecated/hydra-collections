@@ -1,1 +1,2 @@
 gem 'kaminari', github: 'jcoyne/kaminari', branch: 'sufia'
+gem 'active-fedora', github: 'projecthydra/active_fedora'

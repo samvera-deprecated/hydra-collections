@@ -7,5 +7,12 @@ module Hydra
     include Hydra::AccessControls::Permissions
     include Hydra::Collections::Metadata
     include Hydra::Works::CollectionBehavior
+
+
+    def add_members new_member_ids
+      return if new_member_ids.nil? || new_member_ids.size < 1
+      self.members << ActiveFedora::Base.find(new_member_ids)
+    end
+
   end
 end

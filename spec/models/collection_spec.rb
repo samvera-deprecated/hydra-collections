@@ -14,6 +14,7 @@ describe Collection, :type => :model do
 
   let(:gf1) { GenericFile.create }
   let(:gf2) { GenericFile.create }
+  let(:gf3) { GenericFile.create }
 
   let(:user) { @user }
 
@@ -71,7 +72,7 @@ describe Collection, :type => :model do
         subject { Collection.create(members: [gf1, gf2]) }
 
         it "should have many files" do
-          expect(subject.reload.members).to eq [gf1, gf2]
+          expect(subject.reload.members).to match_array [gf1, gf2]
         end
       end
 
@@ -84,7 +85,14 @@ describe Collection, :type => :model do
           subject.reload
           subject.members << gf2
           subject.save
-          expect(subject.reload.members).to eq [gf1, gf2]
+          expect(subject.reload.members).to match_array [gf1, gf2]
+        end
+
+        it "should allow multiple files to be added" do
+          subject.reload
+          subject.add_members [gf2.id, gf3.id]
+          subject.save
+          expect(subject.reload.members).to match_array [gf1, gf2, gf3]
         end
       end
     end

@@ -90,6 +90,11 @@ describe SelectsCollectionsController, :type => :controller do
           subject.find_collections_with_edit_access
           expect(assigns[:user_collections].map(&:id)).to match_array [@collection.id, @collection3.id]
         end
+
+        it "should return only public or editable collections & instructions" do
+          subject.find_collections_with_edit_access(true)
+          expect(assigns[:user_collections].map(&:id)).to match_array [-1, @collection.id, @collection3.id]
+        end
       end
     end
   end

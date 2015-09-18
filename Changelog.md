@@ -1,6 +1,13 @@
-# 6.0.0.alpha
+# 6.0.0.rc1
+Hydra::Collections 6.0.0 is the first release that sits atop the Portland Common Data Model. It includes the following changes:
 
-Hydra::Collections 6.0.0.alpha is the first release that sits atop the Portland Common Data Model. It includes the following changes:
+* Update for hydra-works 0.2.0 [Justin Coyne]
+* add instructions to list of editable collections; add_members to
+collection [E. Lynette Rayle]
+* Pass the document_counter to index_default [Justin Coyne]
+* Update changelog with v6.0.0.alpha entry [Michael J. Giarlo]
+
+# 6.0.0.alpha
 
 * Depend upon hydra-works 0.1.0, which brings PCDM-related dependencies. Collections defined by Hydra::Collections are now PCDM collections.
 * Add ParentCollectionAssociation#count_records to calculate the number of a collection's members.

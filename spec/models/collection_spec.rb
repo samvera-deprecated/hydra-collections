@@ -4,7 +4,7 @@ describe Collection, :type => :model do
   before(:all) do
     @user = FactoryGirl.find_or_create(:user)
     class GenericFile < ActiveFedora::Base
-      include Hydra::Collections::Collectible
+      include Hydra::Works::GenericWorkBehavior
     end
   end
   after(:all) do
@@ -101,8 +101,8 @@ describe Collection, :type => :model do
       end
 
       it "allows files to be removed" do
-        # force the "parent_collections" to be cached:
-        expect(gf1.parent_collections).to eq [subject]
+        # force the "in_collections" to be cached:
+        expect(gf1.in_collections).to eq [subject]
 
         # We need to ensure that deleting causes the collection to be flushed.
         subject.reload.members.delete(gf1)
@@ -144,7 +144,7 @@ describe Collection, :type => :model do
       end
 
       class Member < ActiveFedora::Base
-        include Hydra::Collections::Collectible
+        include Hydra::Works::GenericWorkBehavior
       end
     end
     after do
@@ -162,7 +162,7 @@ describe Collection, :type => :model do
 
     it "have members that know about the collection" do
       member.reload
-      expect(member.collections).to eq [collection]
+      expect(member.in_collections).to eq [collection]
     end
   end
 end

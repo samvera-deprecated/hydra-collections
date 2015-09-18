@@ -12,13 +12,13 @@ module Hydra::Collections
     end
 
     def collection_ids
-      Deprecation.warn(Collectible, "collection_ids is deprecated and will be removed in Hydra::Collections 7.0. Use parent_collections.map(&:id) instead.")
-      parent_collections.map(&:id)
+      Deprecation.warn(Collectible, "collection_ids is deprecated and will be removed in Hydra::Collections 7.0. Use in_collections.map(&:id) instead.")
+      in_collections.map(&:id)
     end
 
     def collections
-      Deprecation.warn(Collectible, "collections is deprecated and will be removed in Hydra::Collections 7.0. Use parent_collections instead.")
-      parent_collections
+      Deprecation.warn(Collectible, "collections is deprecated and will be removed in Hydra::Collections 7.0. Use in_collections instead.")
+      in_collections
     end
 
   end

@@ -24,46 +24,27 @@ Or install it yourself as:
 
 ### Call button_create_collection view helper in your search result page template.
   First add `helper :collections` to your `catalog_controller.rb`
-  
+
   Next, we recommend putting the view helper in catalog/[_sort_and_per_page.html.erb](https://github.com/projectblacklight/blacklight/blob/master/app/views/catalog/_sort_and_per_page.html.erb) which you will manually override in you app.
 ```erb
 <%= button_for_create_collection %>
-```    
+```
 
 ### Any time you want to refer to the routes from hydra-collections use collections.
     collections.new_collections_path
 
 ### Make your Models Collectible
 
-Add `include Hydra::Collections::Collectible` to the models for anything that you want to be able to add to collections (ie. GenericFile, Book, Article, etc.), then add `index_collection_ids` to the solrization logic (ie. put it in to_solr)
+Add `include Hydra::Works::GenericWorkBehavior` to the models for anything that you want to be able to add to collections (ie. GenericFile, Book, Article, etc.).
 
 Example:
 ```ruby
 class GenericFile < ActiveFedora::Base
-  include Hydra::Collections::Collectible
-  ...
-  def to_solr(solr_doc={}, opts={})
-    super(solr_doc, opts)
-    index_collection_ids(solr_doc)
-    return solr_doc
-  end
+  include Hydra::Works::GenericWorkBehavior
 end
 ```
 
-Any items that include the `Hydra::Collections::Collectible` module can look up which collections they belong to via `.collections`.  The `index_collection_ids` puts the ids of all associated collections into the `collection` facet.
-
-### Make the Collection show as a facet in your CatalogController
-
-```ruby
-class CatalogController < ApplicationController
-    include Blacklight::Catalog
-  ...
-    configure_blacklight do |config|
-  ...     
-        config.add_facet_field solr_name("collection", :facetable), label: "Collection", helper_method: :collection_name
-    end
-end
-```
+Any items that include the `Hydra::Works::GenericWorkBehavior` module can look up which collections they belong to via `.in_collections`.
 
 ### Make your Controller Accept a Batch
 

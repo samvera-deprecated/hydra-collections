@@ -17,6 +17,7 @@ describe Hydra::Collections::Collectible do
 
   describe "collections associations" do
     before do
+      allow(Deprecation).to receive(:warn)
       collection1.members << collectible
       collection1.save
       collection2.members << collectible

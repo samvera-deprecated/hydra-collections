@@ -8,7 +8,7 @@ describe OtherCollectionsController, :type => :controller do
     end
 
     class Member < ActiveFedora::Base
-      include Hydra::Collections::Collectible
+      include Hydra::Works::GenericWorkBehavior
       include Hydra::AccessControls::Permissions
     end
   end

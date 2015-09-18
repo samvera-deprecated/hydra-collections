@@ -202,10 +202,10 @@ describe CollectionsController, :type => :controller do
         asset1 = GenericWork.create!
         @collection.members << asset1
         @collection.save!
-        expect(asset1.parent_collections).to eq [@collection]
+        expect(asset1.in_collections).to eq [@collection]
 
         delete :destroy, id: @collection
-        expect(asset1.parent_collections).to eq []
+        expect(asset1.in_collections).to eq []
       end
     end
 

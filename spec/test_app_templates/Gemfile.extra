@@ -1,2 +1,5 @@
 gem 'kaminari', github: 'jcoyne/kaminari', branch: 'sufia'
 gem 'active-fedora', github: 'projecthydra/active_fedora'
+gem 'activefedora-aggregation', github: 'projecthydra-labs/activefedora-aggregation'
+gem 'hydra-works', github: 'projecthydra-labs/hydra-works'
+gem 'hydra-pcdm', github: 'projecthydra-labs/hydra-pcdm'

@@ -23,15 +23,7 @@ describe Hydra::Collections::SearchService do
       expect(@group_query).to eq('edit_access_group_ssim:umg\/test.group.1')
     end
     it "should allow overriding Solr's access control suffix" do
-      module Hydra
-        module Collections
-          class SearchService
-            def solr_access_control_suffix(key)
-              "edit_#{key}_customfield"
-            end
-          end
-        end
-      end
+      allow_any_instance_of(Hydra::Collections::SearchService).to receive(:solr_access_control_suffix).and_return("edit_group_customfield")
       @service = Hydra::Collections::SearchService.new({}, '')
       params = @service.apply_gated_search({}, {})
       @public_query = params[:fq].first.split(' OR ')[0]

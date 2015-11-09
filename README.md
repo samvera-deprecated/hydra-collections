@@ -39,16 +39,16 @@ Or install it yourself as:
 
 ### Make your Models Collectible
 
-Add `include Hydra::Works::GenericWorkBehavior` to the models for anything that you want to be able to add to collections (ie. GenericFile, Book, Article, etc.).
+Add `include Hydra::Works::WorkBehavior` to the models for anything that you want to be able to add to collections (ie. GenericFile, Book, Article, etc.).
 
 Example:
 ```ruby
 class GenericFile < ActiveFedora::Base
-  include Hydra::Works::GenericWorkBehavior
+  include Hydra::Works::WorkBehavior
 end
 ```
 
-Any items that include the `Hydra::Works::GenericWorkBehavior` module can look up which collections they belong to via `.in_collections`.
+Any items that include the `Hydra::Works::WorkBehavior` module can look up which collections they belong to via `.in_collections`.
 
 ### Make your Controller Accept a Batch
 

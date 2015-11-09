@@ -12,7 +12,7 @@ describe CollectionsController, :type => :controller do
 
     class GenericWork < ActiveFedora::Base
       include Hydra::AccessControls::Permissions
-      include Hydra::Works::GenericWorkBehavior
+      include Hydra::Works::WorkBehavior
 
       property :title, predicate: ::RDF::DC.title, multiple: false
 

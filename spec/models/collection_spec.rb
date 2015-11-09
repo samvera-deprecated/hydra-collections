@@ -4,7 +4,7 @@ describe Collection, :type => :model do
   before(:all) do
     @user = FactoryGirl.find_or_create(:user)
     class GenericFile < ActiveFedora::Base
-      include Hydra::Works::GenericWorkBehavior
+      include Hydra::Works::WorkBehavior
     end
   end
   after(:all) do
@@ -144,7 +144,7 @@ describe Collection, :type => :model do
       end
 
       class Member < ActiveFedora::Base
-        include Hydra::Works::GenericWorkBehavior
+        include Hydra::Works::WorkBehavior
       end
     end
     after do

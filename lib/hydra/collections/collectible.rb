@@ -7,8 +7,8 @@ module Hydra::Collections
     extend Deprecation
 
     included do
-      include Hydra::Works::GenericWorkBehavior
-      Deprecation.warn(Collectible, "Hydra::Collections::Collectible is deprecated. include Hydra::Works::GenericWorkBehavior instead. Hydra::Collections::Collectible will be removed in Hydra::Collections 7.0")
+      include Hydra::Works::WorkBehavior
+      Deprecation.warn(Collectible, "Hydra::Collections::Collectible is deprecated. include Hydra::Works::WorkBehavior instead. Hydra::Collections::Collectible will be removed in Hydra::Collections 7.0")
     end
 
     def collection_ids

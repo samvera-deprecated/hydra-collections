@@ -62,7 +62,7 @@ describe CollectionsHelper, :type => :helper do
       before(:all) do
         class OtherCollection < ActiveFedora::Base
           include Hydra::Collection
-          include Hydra::Works::GenericWorkBehavior
+          include Hydra::Works::WorkBehavior
         end
 
         @collection = OtherCollection.create

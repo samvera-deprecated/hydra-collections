@@ -86,14 +86,25 @@ describe SelectsCollectionsController, :type => :controller do
       describe "signed in" do
         before { sign_in @user }
 
-        it "should return only public or editable collections" do
+        it "returns only public or editable collections" do
           subject.find_collections_with_edit_access
           expect(assigns[:user_collections].map(&:id)).to match_array [@collection.id, @collection3.id]
         end
 
-        it "should return only public or editable collections & instructions" do
+        it "returns only public or editable collections & instructions" do
           subject.find_collections_with_edit_access(true)
           expect(assigns[:user_collections].map(&:id)).to match_array [-1, @collection.id, @collection3.id]
+        end
+
+        context "after querying for read access" do
+          before do
+            subject.find_collections
+            subject.find_collections_with_edit_access
+          end
+
+          it "returns collections with edit access" do
+            expect(assigns[:user_collections].map(&:id)).to match_array [@collection.id, @collection3.id]
+          end
         end
       end
     end

@@ -57,7 +57,7 @@ module Hydra::Collections::SelectsCollections
   end
 
   def collections_search_builder(access_level = nil)
-    @collections_search_builder ||= collections_search_builder_class.new(collection_search_params_logic, self).tap do |builder|
+    collections_search_builder_class.new(collection_search_params_logic, self).tap do |builder|
       builder.current_ability = current_ability
       builder.discovery_perms = access_levels[access_level] if access_level
     end

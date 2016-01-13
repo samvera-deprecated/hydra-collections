@@ -14,7 +14,7 @@ describe CollectionsController, :type => :controller do
       include Hydra::Collections::Collectible
       include Hydra::AccessControls::Permissions
 
-      property :title, predicate: ::RDF::DC.title, multiple: false
+      property :title, predicate: ::RDF::Vocab::DC.title, multiple: false
 
       def to_solr(solr_doc={})
         super.tap do |solr_doc|
@@ -39,15 +39,15 @@ describe CollectionsController, :type => :controller do
   end
 
   describe "#index" do
-    let!(:collection1) { Collection.create { |c| c.apply_depositor_metadata(user.user_key) } }
-    let!(:collection2) { Collection.create { |c| c.apply_depositor_metadata(user.user_key) } }
+    let!(:collection1) { Collection.create(title: 'Beta') { |c| c.apply_depositor_metadata(user.user_key) } }
+    let!(:collection2) { Collection.create(title: 'Alpha') { |c| c.apply_depositor_metadata(user.user_key) } }
     let!(:generic_file) { GenericFile.create }
 
-    it "should show a list of collections" do
+    it "shows a list of collections sorted alphabetically" do
       get :index
       expect(response).to be_successful
       expect(assigns[:document_list].map(&:id)).not_to include generic_file.id
-      expect(assigns[:document_list].map(&:id)).to eq [collection1.id, collection2.id]
+      expect(assigns[:document_list].map(&:id)).to eq [collection2.id, collection1.id]
     end
   end
 

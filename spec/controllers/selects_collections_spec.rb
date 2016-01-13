@@ -11,8 +11,8 @@ end
 describe SelectsCollectionsController, :type => :controller do
 
   describe "#find_collections" do
-    it "should use collection_search_params_logic" do
-      expect(subject.collection_search_params_logic).to eq([:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter, :some_rows])
+    it "uses collection_search_params_logic" do
+      expect(subject.collection_search_params_logic).to eq [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter, :some_rows, :sort_by_title]
       expect(Hydra::Collections::SearchBuilder).to receive(:new).with(subject.collection_search_params_logic, subject).and_call_original
       subject.find_collections
     end

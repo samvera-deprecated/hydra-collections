@@ -66,7 +66,7 @@ module Hydra::Collections::SelectsCollections
   # Defines which search_params_logic should be used when searching for Collections
   def collection_search_params_logic
     [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params,
-      :add_collection_filter, :some_rows]
+      :add_collection_filter, :some_rows, :sort_by_title]
   end
 
 end

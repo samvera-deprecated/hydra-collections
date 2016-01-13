@@ -126,6 +126,16 @@ describe CollectionsController, :type => :controller do
        put :update, id: @collection.id, collection: { title: "New Title", description: "New Description" }
     end
 
+    context "when updating fails" do
+      before do
+        allow_any_instance_of(Collection).to receive(:save).and_return(false)
+      end
+      it "should render edit succesfully" do
+        put :update, id: @collection.id, collection: { title: "New Title" }
+        expect(response).to render_template "edit"
+      end
+    end
+
     context "when there are existing members in the collection" do
       it "should support adding batches of members" do
         @collection.members << @asset1

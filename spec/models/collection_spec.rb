@@ -23,8 +23,9 @@ describe Collection, :type => :model do
 
     subject { collection.to_solr }
 
-    it "should have title and depositor information" do
+    it "has title and depositor information" do
       expect(subject['title_tesim']).to eq ['A good title']
+      expect(subject['title_si']).to eq 'A good title'
       expect(subject['depositor_tesim']).to eq [user.user_key]
       expect(subject['depositor_ssim']).to eq [user.user_key]
     end

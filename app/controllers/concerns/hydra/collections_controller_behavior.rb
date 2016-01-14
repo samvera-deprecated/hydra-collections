@@ -87,7 +87,7 @@ module Hydra
 
     def after_update_error
       respond_to do |format|
-        format.html { render action: collections.edit_collection_path(@collection) }
+        format.html { render action: "edit" }
         format.json { render json: @collection.errors, status: :unprocessable_entity }
       end
     end

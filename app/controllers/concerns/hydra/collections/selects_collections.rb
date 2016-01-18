@@ -57,16 +57,9 @@ module Hydra::Collections::SelectsCollections
   end
 
   def collections_search_builder(access_level = nil)
-    collections_search_builder_class.new(collection_search_params_logic, self).tap do |builder|
+    collections_search_builder_class.new(self).tap do |builder|
       builder.current_ability = current_ability
       builder.discovery_perms = access_levels[access_level] if access_level
     end
   end
-
-  # Defines which search_params_logic should be used when searching for Collections
-  def collection_search_params_logic
-    [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params,
-      :add_collection_filter, :some_rows, :sort_by_title]
-  end
-
 end

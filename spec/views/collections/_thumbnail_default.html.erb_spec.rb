@@ -8,14 +8,19 @@ describe 'collections/_thumbnail_default.html.erb' do
     end
   end
 
+  let(:blacklight_configuration_context) do
+    Blacklight::Configuration::Context.new(controller)
+  end
+  let(:search_state) { double('SearchState', url_for_document: '/foo') }
+
   before do
     assign :response, double(start: 0)
     allow(view).to receive(:blacklight_config).and_return(blacklight_config)
     allow(view).to receive(:render_grouped_response?).and_return(false)
     allow(view).to receive(:current_search_session).and_return nil
     allow(view).to receive(:search_session).and_return({})
-    allow(view).to receive(:url_for_document).and_return('/foo')
-    allow(view).to receive(:session_tracking_params).and_return({})
+    allow(view).to receive(:search_state).and_return(search_state)
+    allow(view).to receive(:blacklight_configuration_context).and_return(blacklight_configuration_context)
     render 'collections/thumbnail_default', document: document, document_counter: 1
   end
 

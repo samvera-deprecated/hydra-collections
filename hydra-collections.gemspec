@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'hydra-head', '~> 9.1'
   spec.add_dependency 'deprecation', '~> 0.1'
-  spec.add_dependency 'blacklight', '~> 5.10'
+  spec.add_dependency 'blacklight', '>= 5.10'
   spec.add_dependency 'rdf-vocab', '~> 0'
 
   spec.add_development_dependency 'engine_cart', '~> 0.8'

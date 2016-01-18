@@ -10,7 +10,7 @@ module Hydra
         self.class.copy_blacklight_config_from(::CatalogController)
       end
 
-      self.search_params_logic << :apply_gated_search
+      # self.search_params_logic << :apply_gated_search
 
       def last_search_documents
         return [] if @session[:history].blank?

@@ -3,7 +3,9 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in hydra-collections.gemspec
 gemspec
 
-gem 'kaminari', github: 'jcoyne/kaminari', branch: 'sufia'
+gem 'hydra-head', github: 'projecthydra/hydra-head', branch: 'blacklight_6'
+gem 'blacklight', github: 'projectblacklight/blacklight'
+gem 'blacklight-access_controls', github: 'projectblacklight/blacklight-access_controls', branch: 'blacklight_6'
 
 group :development, :test do
   gem 'sqlite3'

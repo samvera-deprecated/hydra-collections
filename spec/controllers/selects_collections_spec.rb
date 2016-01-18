@@ -5,15 +5,15 @@ class SelectsCollectionsController < ApplicationController
   include Hydra::Controller::ControllerBehavior
   include Hydra::Collections::SelectsCollections
 
-  SelectsCollectionsController.search_params_logic += [:add_access_controls_to_solr_params]
+  #SelectsCollectionsController.search_params_logic += [:add_access_controls_to_solr_params]
 end
 
 describe SelectsCollectionsController, :type => :controller do
 
   describe "#find_collections" do
-    it "uses collection_search_params_logic" do
-      expect(subject.collection_search_params_logic).to eq [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter, :some_rows, :sort_by_title]
-      expect(Hydra::Collections::SearchBuilder).to receive(:new).with(subject.collection_search_params_logic, subject).and_call_original
+    it "uses the search builder" do
+      expect(subject.collections_search_builder_class.default_processor_chain).to eq [:default_solr_parameters, :add_query_to_solr, :add_access_controls_to_solr_params, :add_collection_filter, :some_rows, :sort_by_title]
+      expect(Hydra::Collections::SearchBuilder).to receive(:new).with(subject).and_call_original
       subject.find_collections
     end
   end

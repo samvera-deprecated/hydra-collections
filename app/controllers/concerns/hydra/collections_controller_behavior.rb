@@ -103,14 +103,14 @@ module Hydra
 
     def after_destroy (id)
       respond_to do |format|
-        format.html { redirect_to catalog_index_path, notice: 'Collection was successfully deleted.' }
+        format.html { redirect_to search_catalog_path, notice: 'Collection was successfully deleted.' }
         format.json { render json: {id:id}, status: :destroyed, location: @collection }
       end
     end
 
     def after_destroy_error (id)
       respond_to do |format|
-        format.html { redirect_to catalog_index_path, notice: 'Collection could not be deleted.' }
+        format.html { redirect_to search_catalog_path, notice: 'Collection could not be deleted.' }
         format.json { render json: {id:id}, status: :destroy_error, location: @collection }
       end
     end
@@ -128,11 +128,6 @@ module Hydra
     end
 
     protected
-
-    # Defines which search_params_logic should be used when searching for Collection members
-    def collection_member_search_logic
-      search_params_logic + [:include_collection_ids, :add_access_controls_to_solr_params]
-    end
 
     def collection_params
       params.require(:collection).permit(:part_of, :contributor, :creator, :title,
@@ -152,11 +147,11 @@ module Hydra
     end
 
     def collection_member_search_builder_class
-      Hydra::Collections::SearchBuilder
+      Hydra::Collections::MemberSearchBuilder
     end
 
     def collection_member_search_builder
-      @collection_member_search_builder ||= collection_member_search_builder_class.new(collection_member_search_logic, self).tap do |builder|
+      @collection_member_search_builder ||= collection_member_search_builder_class.new(self).tap do |builder|
         builder.current_ability = current_ability
       end
     end

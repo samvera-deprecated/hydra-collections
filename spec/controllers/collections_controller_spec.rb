@@ -189,7 +189,7 @@ describe CollectionsController, :type => :controller do
 
       it "should delete collection" do
         delete :destroy, id: @collection
-        expect(response).to redirect_to Rails.application.routes.url_helpers.catalog_index_path
+        expect(response).to redirect_to Rails.application.routes.url_helpers.search_catalog_path
         expect(flash[:notice]).to eq("Collection was successfully deleted.")
       end
 

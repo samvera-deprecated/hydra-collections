@@ -1,5 +1,2 @@
 gem 'kaminari', github: 'jcoyne/kaminari', branch: 'sufia'
-gem 'hydra-head', github: 'projecthydra/hydra-head', branch: 'blacklight_6'
-gem 'blacklight', github: 'projectblacklight/blacklight'
-gem 'blacklight-access_controls', github: 'projectblacklight/blacklight-access_controls', branch: 'blacklight_6'
 

@@ -130,9 +130,10 @@ module Hydra
     protected
 
     def collection_params
-      params.require(:collection).permit(:part_of, :contributor, :creator, :title,
-        :description, :publisher, :date_created, :subject, :language, :rights,
-        :resource_type, :identifier, :based_near, :tag, :related_url, :members)
+      params.require(:collection).permit(:part_of, :contributor, :creator,
+        :publisher, :date_created, :subject, :language, :rights,
+        :resource_type, :identifier, :based_near, :tag, :related_url, :members,
+        title: [], description: [])
     end
 
     # Queries Solr for members of the collection.

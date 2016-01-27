@@ -2,13 +2,11 @@ require 'spec_helper'
 
 describe Collection, :type => :model do
   before(:all) do
-    @user = FactoryGirl.find_or_create(:user)
     class GenericFile < ActiveFedora::Base
       include Hydra::Works::WorkBehavior
     end
   end
   after(:all) do
-    @user.destroy
     Object.send(:remove_const, :GenericFile)
   end
 
@@ -16,10 +14,10 @@ describe Collection, :type => :model do
   let(:gf2) { GenericFile.create }
   let(:gf3) { GenericFile.create }
 
-  let(:user) { @user }
+  let(:user) { FactoryGirl.create(:user) }
 
   describe "#to_solr" do
-    let(:collection) { Collection.new(title: "A good title", depositor: user.user_key) }
+    let(:collection) { FactoryGirl.build(:collection, user: user, title: ['A good title']) }
 
     subject { collection.to_solr }
 
@@ -113,16 +111,16 @@ describe Collection, :type => :model do
     end
   end
 
-  it "should have a title" do
-    subject.title = "title"
+  it "has a title" do
+    subject.title = ["title"]
     subject.save
-    expect(subject.title).to eq "title"
+    expect(subject.reload.title).to eq ["title"]
   end
 
-  it "should have a description" do
-    subject.description = "description"
+  it "has a description" do
+    subject.description = ["description"]
     subject.save
-    expect(subject.reload.description).to eq "description"
+    expect(subject.reload.description).to eq ["description"]
   end
 
   describe "#destroy" do

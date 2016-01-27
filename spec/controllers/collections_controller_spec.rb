@@ -39,8 +39,8 @@ describe CollectionsController, :type => :controller do
   end
 
   describe "#index" do
-    let!(:collection1) { Collection.create(title: 'Beta') { |c| c.apply_depositor_metadata(user.user_key) } }
-    let!(:collection2) { Collection.create(title: 'Alpha') { |c| c.apply_depositor_metadata(user.user_key) } }
+    let!(:collection1) { FactoryGirl.create(:collection, title: ['Beta'], user: user) }
+    let!(:collection2) { FactoryGirl.create(:collection, title: ['Alpha'], user: user) }
     let!(:generic_file) { GenericWork.create }
 
     it "shows a list of collections sorted alphabetically" do
@@ -52,49 +52,60 @@ describe CollectionsController, :type => :controller do
   end
 
   describe '#new' do
-    it 'should assign @collection' do
+    it 'assigns @collection' do
       get :new
       expect(assigns(:collection)).to be_kind_of(Collection)
     end
   end
 
   describe '#create' do
-    it "should create a Collection" do
+    it "creates a Collection" do
       expect {
-        post :create, collection: {title: "My First Collection ", description: "The Description\r\n\r\nand more"}
+        post :create, collection: { title: ["My First Collection"],
+                                    description: ["The Description\r\n\r\nand more"] }
       }.to change { Collection.count }.by(1)
-      expect(assigns[:collection].title).to eq("My First Collection ")
-      expect(assigns[:collection].description).to eq("The Description\r\n\r\nand more")
+      expect(assigns[:collection].title).to eq ["My First Collection"]
+      expect(assigns[:collection].description).to eq ["The Description\r\n\r\nand more"]
       expect(assigns[:collection].depositor).to eq(user.user_key)
       expect(response).to redirect_to collections.collection_path(assigns[:collection])
     end
-    it "should add docs to collection if batch ids provided" do
+
+    it "adds docs to collection if batch ids provided" do
       @asset1 = GenericWork.create!
       @asset2 = GenericWork.create!
-      post :create, batch_document_ids: [@asset1, @asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
-      expect(assigns[:collection].members).to eq([@asset1, @asset2])
-    end
-    it "should call after_create" do
-       expect(controller).to receive(:after_create).and_call_original
-       post :create, collection: {title: "My First Collection ", description: "The Description\r\n\r\nand more"}
+      post :create, batch_document_ids: [@asset1, @asset2],
+                    collection: { title: ["My Secong Collection"],
+                                  description: ["The Description\r\n\r\nand more"] }
+      expect(assigns[:collection].members).to eq [@asset1, @asset2]
     end
 
-    it "should add one doc to collection if batch ids provided and add the collection id to the document in the colledction" do
+    it "calls after_create" do
+       expect(controller).to receive(:after_create).and_call_original
+       post :create, collection: { title: ["My First Collection"],
+                                   description: ["The Description\r\n\r\nand more"] }
+    end
+
+    it "adds one doc to collection if batch ids provided and add the collection id to the document in the colledction" do
       @asset1 = GenericWork.create!
-      post :create, batch_document_ids: [@asset1], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
+      post :create, batch_document_ids: [@asset1],
+                    collection: { title: ["My Secong Collection"],
+                                  description: ["The Description\r\n\r\nand more"] }
       expect(assigns[:collection].members).to eq [@asset1]
       asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
-      expect(doc["id"]).to eq(@asset1.id)
+      expect(doc["id"]).to eq @asset1.id
       afterupdate = GenericWork.find(@asset1.id)
       expect(doc[Solrizer.solr_name(:collection)]).to eq(afterupdate.to_solr[Solrizer.solr_name(:collection)])
     end
-    it "should add docs to collection if batch ids provided and add the collection id to the documents int he colledction" do
+
+    it "adds docs to collection if batch ids provided and add the collection id to the documents int he colledction" do
       @asset1 = GenericWork.create!
       @asset2 = GenericWork.create!
-      post :create, batch_document_ids: [@asset1,@asset2], collection: {title: "My Secong Collection ", description: "The Description\r\n\r\nand more"}
-      expect(assigns[:collection].members).to eq([@asset1,@asset2])
+      post :create, batch_document_ids: [@asset1, @asset2],
+                    collection: { title: ["My Secong Collection"],
+                                  description: ["The Description\r\n\r\nand more"] }
+      expect(assigns[:collection].members).to eq [@asset1, @asset2]
       asset_results = ActiveFedora::SolrService.instance.conn.get "select", params:{fq:["id:\"#{@asset1.id}\""],fl:['id',Solrizer.solr_name(:collection)]}
       expect(asset_results["response"]["numFound"]).to eq(1)
       doc = asset_results["response"]["docs"].first
@@ -105,8 +116,8 @@ describe CollectionsController, :type => :controller do
   end
 
   describe "#update" do
+    let(:collection) { FactoryGirl.create(:collection, user: user) }
     before do
-      @collection = Collection.create { |c| c.apply_depositor_metadata(user.user_key) }
       @asset1 = GenericWork.create!
       @asset2 = GenericWork.create!
       @asset3 = GenericWork.create!
@@ -114,16 +125,16 @@ describe CollectionsController, :type => :controller do
       expect(controller).to receive(:authorize!).at_least(:once)
     end
 
-    it "should update collection metadata" do
-      put :update, id: @collection.id, collection: { title: "New Title", description: "New Description" }
-      expect(response).to redirect_to collections.collection_path(@collection)
-      expect(assigns[:collection].title).to eq("New Title")
-      expect(assigns[:collection].description).to eq("New Description")
+    it "updates collection metadata" do
+      put :update, id: collection.id, collection: { title: ["New Title"], description: ["New Description"] }
+      expect(response).to redirect_to collections.collection_path(collection)
+      expect(assigns[:collection].title).to eq(["New Title"])
+      expect(assigns[:collection].description).to eq(["New Description"])
     end
 
-    it "should call after_update" do
+    it "calls after_update" do
        expect(controller).to receive(:after_update).and_call_original
-       put :update, id: @collection.id, collection: { title: "New Title", description: "New Description" }
+       put :update, id: collection.id, collection: { title: ["New Title"], description: ["New Description"] }
     end
 
     context "when updating fails" do
@@ -131,49 +142,49 @@ describe CollectionsController, :type => :controller do
         allow_any_instance_of(Collection).to receive(:save).and_return(false)
       end
       it "should render edit succesfully" do
-        put :update, id: @collection.id, collection: { title: "New Title" }
+        put :update, id: collection.id, collection: { title: ["New Title"] }
         expect(response).to render_template "edit"
       end
     end
 
     context "when there are existing members in the collection" do
       it "should support adding batches of members" do
-        @collection.members << @asset1
-        @collection.save
-        put :update, id: @collection, collection: { members:"add" }, batch_document_ids: [@asset2, @asset3]
-        expect(response).to redirect_to collections.collection_path(@collection)
+        collection.members << @asset1
+        collection.save!
+        put :update, id: collection, collection: { members:"add" }, batch_document_ids: [@asset2, @asset3]
+        expect(response).to redirect_to collections.collection_path(collection)
         expect(assigns[:collection].members).to match_array [@asset2, @asset3, @asset1]
       end
 
       it "should support removing batches of members" do
-        @collection.members = [@asset1, @asset2, @asset3]
-        @collection.save
-        put :update, id: @collection, collection: { members: "remove" }, batch_document_ids: [@asset1, @asset3]
-        expect(response).to redirect_to collections.collection_path(@collection)
+        collection.members = [@asset1, @asset2, @asset3]
+        collection.save!
+        put :update, id: collection, collection: { members: "remove" }, batch_document_ids: [@asset1, @asset3]
+        expect(response).to redirect_to collections.collection_path(collection)
         expect(assigns[:collection].members).to eq([@asset2])
       end
     end
 
     it "should support setting members array" do
-      put :update, id: @collection, collection: { members: "add" }, batch_document_ids: [@asset2, @asset3, @asset1]
-      expect(response).to redirect_to collections.collection_path(@collection)
+      put :update, id: collection, collection: { members: "add" }, batch_document_ids: [@asset2, @asset3, @asset1]
+      expect(response).to redirect_to collections.collection_path(collection)
       expect(assigns[:collection].members).to match_array [@asset2, @asset3, @asset1]
     end
 
     it "should set/un-set collection on members" do
       # Add to collection (sets collection on members)
-      put :update, id: @collection, collection: { members: "add" }, batch_document_ids: [@asset2, @asset3]
+      put :update, id: collection, collection: { members: "add" }, batch_document_ids: [@asset2, @asset3]
       expect(assigns[:collection].members).to match_array [@asset2, @asset3]
 
       # Remove from collection (un-sets collection on members)
-      put :update, id: @collection, collection: { members:"remove" }, batch_document_ids: [@asset2]
+      put :update, id: collection, collection: { members:"remove" }, batch_document_ids: [@asset2]
       expect(assigns[:collection].members).to_not include(@asset2)
     end
 
     context "when moving members between collections" do
       before do
-        @collection.members = [@asset1, @asset2, @asset3]
-        @collection.save
+        collection.members = [@asset1, @asset2, @asset3]
+        collection.save!
       end
       let(:collection2) do
         Collection.create do |col|
@@ -182,9 +193,9 @@ describe CollectionsController, :type => :controller do
       end
 
       it "moves the members" do
-        put :update, id: @collection, collection: {members: "move"},
+        put :update, id: collection, collection: {members: "move"},
           destination_collection_id: collection2, batch_document_ids: [@asset2, @asset3]
-        expect(@collection.reload.members).to eq [@asset1]
+        expect(collection.reload.members).to eq [@asset1]
         expect(collection2.reload.members).to match_array [@asset2, @asset3]
       end
     end
@@ -192,34 +203,34 @@ describe CollectionsController, :type => :controller do
 
   describe "#destroy" do
     describe "valid collection" do
+      let!(:collection) { FactoryGirl.create(:collection, user: user) }
       before do
-        @collection = Collection.create { |c| c.apply_depositor_metadata(user.user_key) }
         expect(controller).to receive(:authorize!).and_return(true)
       end
 
       it "deletes the collection" do
-        delete :destroy, id: @collection
+        delete :destroy, id: collection
         expect(response).to redirect_to Rails.application.routes.url_helpers.search_catalog_path
         expect(flash[:notice]).to eq("Collection was successfully deleted.")
       end
 
       it "calls after_destroy" do
         expect(controller).to receive(:after_destroy).and_call_original
-        delete :destroy, id: @collection
+        delete :destroy, id: collection
       end
 
       it "updates members" do
         asset1 = GenericWork.create!
-        @collection.members << asset1
-        @collection.save!
-        expect(asset1.in_collections).to eq [@collection]
+        collection.members << asset1
+        collection.save!
+        expect(asset1.in_collections).to eq [collection]
 
-        delete :destroy, id: @collection
+        delete :destroy, id: collection
         expect(asset1.in_collections).to eq []
       end
     end
 
-    it "should not delete an invalid collection" do
+    it "does not delete an invalid collection" do
        expect {delete :destroy, id: 'zz:-1'}.to raise_error
     end
   end
@@ -230,11 +241,11 @@ describe CollectionsController, :type => :controller do
     end
 
     context "when there are no assets in the collection" do
-      let(:collection) { Collection.create(title: "Empty collection") }
+      let(:collection) { FactoryGirl.create(:collection) }
       it "shows no assets" do
         get :show, id: collection
         expect(response).to be_successful
-        expect(assigns[:collection].title).to eq("Empty collection")
+        expect(assigns[:collection]).to eq collection
         expect(assigns[:member_docs]).to be_empty
       end
     end
@@ -244,10 +255,7 @@ describe CollectionsController, :type => :controller do
       let(:asset2) { GenericWork.create!(title: "Second of the Assets", read_users: [user.user_key]) }
       let(:asset3) { GenericWork.create!(title: "Third of the Assets", read_users: [user.user_key]) }
       let!(:collection) do
-        Collection.create!(id: "abc123", title: "My collection",
-                           members: [asset1, asset2, asset3]) do |col|
-          col.apply_depositor_metadata(user.user_key)
-        end
+        FactoryGirl.create(:collection, members: [asset1, asset2, asset3], user: user)
       end
 
       # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
@@ -266,9 +274,7 @@ describe CollectionsController, :type => :controller do
       describe "additional collections" do
         let(:asset4) { GenericWork.create!(title: "#{asset1.id}", read_users: [user.user_key]) }
         let!(:collection2) do
-          Collection.create!(id: "abc1234", title: "Other collection", members: [asset4]) do |col|
-            col.apply_depositor_metadata(user.user_key)
-          end
+          FactoryGirl.create(:collection, members: [asset4], user: user)
         end
         it "shows only the collections assets" do
           get :show, id: collection

@@ -49,8 +49,7 @@ describe CollectionsHelper, :type => :helper do
     let(:collection) { FactoryGirl.create(:collection) }
 
     it "generates a form that can remove the item" do
-      @collection = collection # The helper uses an instance variable
-      str = button_for_remove_from_collection item
+      str = button_for_remove_from_collection collection, item
       doc = Nokogiri::HTML(str)
       form = doc.xpath('//form').first
       expect(form.attr('action')).to eq collections.collection_path(collection)
@@ -73,8 +72,7 @@ describe CollectionsHelper, :type => :helper do
       end
 
       it "generates a form that can remove the item" do
-        @collection = collection # helper depends on the ivar being set
-        str = button_for_remove_from_collection item
+        str = button_for_remove_from_collection collection, item
         doc = Nokogiri::HTML(str)
         form = doc.xpath('//form').first
         expect(form.attr('action')).to eq collections.collection_path(collection)

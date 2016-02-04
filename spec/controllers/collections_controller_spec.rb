@@ -252,7 +252,7 @@ describe CollectionsController, :type => :controller do
 
       # NOTE: This test depends on title_tesim being in the qf in solrconfig.xml
       it "queries the collections" do
-        get :show, id: collection, cq:"\"#{asset1.title}\""
+        get :show, id: collection, cq: "First"
         expect(assigns[:collection].title).to eq collection.title
         expect(assigns[:member_docs].map(&:id)).to match_array [asset1.id]
       end

@@ -138,12 +138,21 @@ module Hydra
     # Queries Solr for members of the collection.
     # Populates @response and @member_docs similar to Blacklight Catalog#index populating @response and @documents
     def query_collection_members
-      solr_params =  params.symbolize_keys.merge(q: params[:cq])
-
-      # run the solr query to find the collection members
-      query = collection_member_search_builder.with(solr_params).query
-      @response = repository.search(query)
+      @response = repository.search(query_for_collection_members)
       @member_docs = @response.documents
+    end
+
+    # @return <Hash> a representation of the solr query that find the collection members
+    def query_for_collection_members
+      collection_member_search_builder.with(params_for_members_query).query
+    end
+
+    # You can override this method if you need to provide additional inputs to the search
+    # builder. For example:
+    #   search_field: 'all_fields'
+    # @return <Hash> the inputs required for the collection member search builder
+    def params_for_members_query
+      params.symbolize_keys.merge(q: params[:cq])
     end
 
     def collection_member_search_builder_class

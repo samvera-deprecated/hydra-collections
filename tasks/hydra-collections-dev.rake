@@ -1,18 +1,28 @@
 require 'rspec/core'
 require 'rspec/core/rake_task'
-require 'jettywrapper'
+require 'solr_wrapper'
+require 'fcrepo_wrapper'
 require 'engine_cart/rake_task'
 
 RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.rspec_opts = ['--backtrace'] if ENV['CI']
 end
 
-desc 'Spin up hydra-jetty and run specs'
-task ci: ['engine_cart:clean', 'engine_cart:generate', 'jetty:clean'] do
+desc 'Start solr, fcrepo, and run specs'
+task ci: ['engine_cart:generate'] do
   puts 'running continuous integration'
-  jetty_params = Jettywrapper.load_config
-  error = Jettywrapper.wrap(jetty_params) do
-    Rake::Task['spec'].invoke
+  # setting port: nil assigns a random port.
+  # TODO: set port to nil (random)
+  solr_params = { port: '8985', verbose: true, managed: true }
+  fcrepo_params = { port: '8986', verbose: true, managed: true,
+                    no_jms: true, fcrepo_home_dir: 'fcrepo4-test-data' }
+  SolrWrapper.wrap(solr_params) do |solr|
+    ENV['SOLR_TEST_PORT'] = solr.port
+    solr.with_collection(name: 'hydra-test', dir: File.join(File.expand_path("..", File.dirname(__FILE__)), "solr", "config")) do
+      FcrepoWrapper.wrap(fcrepo_params) do |fcrepo|
+        ENV['FCREPO_TEST_PORT'] = fcrepo.port
+        Rake::Task['spec'].invoke
+      end
+    end
   end
-  raise "test failures: #{error}" if error
 end

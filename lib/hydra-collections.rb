@@ -5,7 +5,6 @@ module Hydra
   module Collections
     extend ActiveSupport::Autoload
     autoload :Version
-    autoload :Collectible
     autoload :SearchService
     autoload :AcceptsBatches
 

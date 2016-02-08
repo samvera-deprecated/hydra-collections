@@ -19,4 +19,4 @@ test/tmp
 test/version_tmp
 tmp
 .internal_test_app
-jetty
+fcrepo4-test-data

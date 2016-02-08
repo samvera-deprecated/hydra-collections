@@ -8,7 +8,8 @@ group :development, :test do
   gem "factory_girl_rails"
   gem 'devise'
   gem 'capybara'
-  gem 'jettywrapper'
+  gem 'fcrepo_wrapper'
+  gem 'solr_wrapper'
   gem 'byebug', require: false unless ENV['CI']
   gem 'coveralls', require: false
   gem 'rspec-activemodel-mocks'

@@ -2,10 +2,6 @@
 
 Add collections to your Hydra application.  These collections are typically created by depositors (instead of librarians or curators).  Any collectible item can belong to many different collections.  The collection does not confer access rights onto any of the members of the collections.
 
-## CAVEAT (READ THIS)
-
-If you do **not** require PCDM, or do not know what PCDM is, please disregard this README (which is for a release candidate version of Hydra::Collections that relies upon a new stack of gems in support of PCDM) and use [Hydra::Collections' latest stable branch README](https://github.com/projecthydra/hydra-collections/blob/5.0-stable/README.md) instead.
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -124,7 +120,7 @@ Add `updates-batches` class to your button for submitting the batch
 Example:
 ```erb
 <%= button_to label, collections.collection_path(collection_id), method: :put,
-      class: "btn btn-primary updates-collection submits-batches collection-update", 
+      class: "btn btn-primary updates-collection submits-batches collection-update",
       'data-behavior'=>'hydra-collections', id: 'hydra-collection-update' %>
 ```
 
@@ -143,12 +139,7 @@ In order to make modifications to the gem code and run the tests, clone the repo
 
 ```
     $ bundle install
-    $ rake jetty:unzip
-    $ rake jetty:config
-    $ rake jetty:start
-    $ rake engine_cart:clean
-    $ rake engine_cart:generate
-    $ rake spec
+    $ bundle exec rake ci
 ```
 
 ## License

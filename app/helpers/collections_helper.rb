@@ -15,8 +15,8 @@ module CollectionsHelper
     render '/collections/button_for_delete_collection', collection: collection, label: label, confirm: confirm
   end
 
-  def button_for_remove_from_collection(document, label = 'Remove From Collection')
-    render '/collections/button_remove_from_collection', label: label, document: document
+  def button_for_remove_from_collection(collection, document, label = 'Remove From Collection')
+    render '/collections/button_remove_from_collection', collection: collection, label: label, document: document
   end
 
   def button_for_remove_selected_from_collection(collection, label = 'Remove From Collection')

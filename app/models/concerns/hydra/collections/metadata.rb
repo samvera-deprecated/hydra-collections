@@ -16,11 +16,11 @@ module Hydra::Collections
         index.as :stored_searchable, :facetable
       end
 
-      property :title, predicate: RDF::Vocab::DC.title, multiple: false do |index|
+      property :title, predicate: RDF::Vocab::DC.title do |index|
         index.as :stored_searchable, :sortable
       end
 
-      property :description, predicate: RDF::Vocab::DC.description, multiple: false do |index|
+      property :description, predicate: RDF::Vocab::DC.description do |index|
         index.type :text
         index.as :stored_searchable
       end

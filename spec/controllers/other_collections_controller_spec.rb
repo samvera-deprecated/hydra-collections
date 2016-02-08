@@ -30,7 +30,7 @@ describe OtherCollectionsController, :type => :controller do
     let(:asset2) { Member.create!(read_users: [user.user_key]) }
     let(:asset3) { Member.create!(read_users: [user.user_key]) }
     let(:collection) do
-      OtherCollection.create(id: 'foo123', title: "My collection",
+      OtherCollection.create(id: 'foo123', title: ["My collection"],
                              members: [asset1, asset2, asset3]) do |collection|
         collection.apply_depositor_metadata(user.user_key)
       end

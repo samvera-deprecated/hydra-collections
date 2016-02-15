@@ -14,13 +14,13 @@
   <% end %>
 
   <div class="field">
-    <%= f.label 'title[0]', 'Title' %><br />
-    <%= f.text_field_tag 'title[0]'%>
+    <%= label_tag 'collection_title', 'Title' %><br />
+    <%= text_field_tag 'collection[title][]', nil, id: 'collection_title' %>
   </div>
 
   <div class="field">
-    <%= f.label 'description[0]', 'Description' %><br />
-    <%= f.text_area_tag 'description[0]' %>
+    <%= label_tag 'collection_description', 'Description' %><br />
+    <%= text_area_tag 'collection[description][]', nil, id: 'collection_description' %>
   </div>
 
   <%= hidden_collection_members %>

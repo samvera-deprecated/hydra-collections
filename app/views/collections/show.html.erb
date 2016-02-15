@@ -1,5 +1,5 @@
-<h1><%=@collection.title%><h1>
-<h3><%=@collection.description%> </h3>
+<h1><%= @collection.title.first %><h1>
+<h3><%= @collection.description.first %> </h3>
 <h3><u>Contained Files</u></h3>
 <%= render 'search_form'%>
 <%= render 'document_list', documents: @member_docs %>

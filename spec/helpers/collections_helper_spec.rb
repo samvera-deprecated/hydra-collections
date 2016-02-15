@@ -3,6 +3,19 @@ require 'spec_helper'
 include Hydra::Collections::Engine.routes.url_helpers
 
 describe CollectionsHelper, :type => :helper do
+  describe "has_collection_search_parameters?" do
+    subject { helper }
+    context "when cq is set" do
+      before { allow(helper).to receive(:params).and_return(cq: 'foo') }
+      it { is_expected.to have_collection_search_parameters }
+    end
+
+    context "when cq is not set" do
+      before { allow(helper).to receive(:params).and_return(cq: '') }
+      it { is_expected.not_to have_collection_search_parameters }
+    end
+  end
+
   describe "button_for_create_collection" do
     it "creates a button to the collections new path" do
       str = String.new(helper.button_for_create_collection)

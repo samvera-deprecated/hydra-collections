@@ -1,5 +1,29 @@
-<h1><%= @collection.title.first %><h1>
-<h3><%= @collection.description.first %> </h3>
-<h3><u>Contained Files</u></h3>
-<%= render 'search_form'%>
-<%= render 'document_list', documents: @member_docs %>
+<div id="sidebar" class="col-md-3 col-sm-4">
+  <%= render 'search_sidebar' %>
+</div>
+
+<div id="content" class="col-md-9 col-sm-8">
+  <div itemscope itemtype="http://schema.org/CollectionPage" class="row">
+    <header>
+      <h1><%= @collection.title.first %></h1>
+      <p class="collection_description"><%= Array(@collection.description).join("\n") %></p>
+    </header>
+  </div>
+
+  <%= render 'sort_and_per_page' %>
+
+
+  <div>
+    <!-- Use CSS class h2 rather than HTML h2 tag to allow header and search box to align vertically -->
+    <span class="h2">
+      <% if has_collection_search_parameters? %>
+          <%= "Search Results within this Collection" %>
+      <% else %>
+          <%= "Items in this Collection" %>
+      <% end %>
+    </span>
+    <%= render 'search_form' %>
+  </div>
+
+  <%= render_document_index @member_docs %>
+</div>

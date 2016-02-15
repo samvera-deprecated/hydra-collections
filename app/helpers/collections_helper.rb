@@ -1,5 +1,9 @@
 # View Helpers for Hydra Collections functionality
 module CollectionsHelper
+  def has_collection_search_parameters?
+    !params[:cq].blank?
+  end
+
   # Displays the Collections create collection button.  Put this in your search result page template.  We recommend putting it in catalog/_sort_and_per_page.html.erb
   def button_for_create_collection(label = 'Create Collection')
     render '/collections/button_create_collection', label: label

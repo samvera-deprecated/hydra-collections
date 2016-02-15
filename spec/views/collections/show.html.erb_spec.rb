@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'collections/show.html.erb' do
   let(:response) { Blacklight::Solr::Response.new(sample_response, {}) }
-  let(:collection) { mock_model(Collection, id: '123', title: "My Collection", description: "Just a collection") }
+  let(:collection) { mock_model(Collection, id: '123', title: ["My Collection"], description: ["Just a collection"]) }
 
   let(:blacklight_config) { CatalogController.blacklight_config }
   let(:member_docs) { [ SolrDocument.new(id: '234'), SolrDocument.new(id: '456') ] }

@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'hydra-head', '~> 9.1'
+  spec.add_dependency 'active-fedora', '~> 9.9'
   spec.add_dependency 'deprecation', '~> 0.1'
   spec.add_dependency 'blacklight', '~> 6.0'
   spec.add_dependency 'hydra-works', '~> 0.4'

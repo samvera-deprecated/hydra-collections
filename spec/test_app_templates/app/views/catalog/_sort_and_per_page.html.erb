@@ -1,8 +1,7 @@
 <div id="sortAndPerPage">
   <div id="sortAndPerPage" class="clearfix">
-    <%= render "paginate_compact", object: @response if show_pagination? %>
+    <%= render partial: "paginate_compact", object: @response if show_pagination? %>
     <%= button_for_create_collection %>
-    <%= render partial: 'collections/form_for_select_collection', locals: {user_collections: @user_collections}  %>
+    <%= render 'collections/form_for_select_collection', user_collections: @user_collections %>
   </div>
-
 </div>

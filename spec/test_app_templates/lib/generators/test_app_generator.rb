@@ -51,10 +51,6 @@ class TestAppGenerator < Rails::Generators::Base
     copy_file "app/controllers/other_collections_controller.rb"
   end
 
-  def overwrite_blacklight_config
-    copy_file 'config/blacklight.yml', force: true
-  end
-
   # Inject javascript into application.js
   def inject_javascript
     insert_into_file "app/assets/javascripts/application.js", :after => '//= require_tree .' do

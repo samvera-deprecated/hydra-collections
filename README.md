@@ -12,6 +12,9 @@ And then execute:
 
     $ bundle
 
+Finally run:
+    $ rails generate hydra:collections:install
+
 Or install it yourself as:
 
     $ gem install hydra-collections

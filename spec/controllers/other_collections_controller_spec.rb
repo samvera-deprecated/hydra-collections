@@ -5,6 +5,7 @@ describe OtherCollectionsController, :type => :controller do
   before(:all) do
     class OtherCollection < ActiveFedora::Base
       include Hydra::Collection
+      property :title, predicate: ::RDF::Vocab::DC.title
     end
 
     class Member < ActiveFedora::Base

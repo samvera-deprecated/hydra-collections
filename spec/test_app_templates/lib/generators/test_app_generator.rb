@@ -21,6 +21,12 @@ class TestAppGenerator < Rails::Generators::Base
     generate 'hydra:head', '-f'
   end
 
+  def run_collections_generator
+    say_status("warning", "GENERATING Collection", :yellow)
+
+    generate 'hydra:collections:install'
+  end
+
   def run_migrations
     rake("db:migrate")
   end

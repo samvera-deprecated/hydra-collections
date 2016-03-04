@@ -1,11 +1,7 @@
 module Hydra::Collections
-  module Metadata
+  module BasicMetadata
     extend ActiveSupport::Concern
     included do
-      property :depositor, predicate: RDF::Vocab::MARCRelators.dpt, multiple: false do |index|
-        index.as :symbol, :stored_searchable
-      end
-
       property :part_of, predicate: RDF::Vocab::DC.isPartOf
 
       property :contributor, predicate: RDF::Vocab::DC.contributor do |index|

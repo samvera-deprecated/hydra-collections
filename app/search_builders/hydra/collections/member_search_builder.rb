@@ -1,5 +1,5 @@
 module Hydra::Collections
-  class MemberSearchBuilder < Hydra::SearchBuilder
+  class MemberSearchBuilder < ::SearchBuilder
 
     class_attribute :from_field
     self.from_field = 'member_ids_ssim'

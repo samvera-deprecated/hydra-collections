@@ -1,5 +1,5 @@
 module Hydra
   module Collections
-    VERSION = "8.1.1"
+    VERSION = '8.2.0'.freeze
   end
 end

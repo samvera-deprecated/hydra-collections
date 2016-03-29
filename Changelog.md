@@ -1,3 +1,29 @@
+# 8.2.0
+* Avoid using the deprecated Hydra::SearchBuilder [Justin Coyne]
+
+# 8.1.1
+* Move title to RequiredMetadata [Justin Coyne]
+
+# 8.1.0
+* Generate the collection model [Justin Coyne]
+* Extract CollectionsHelperBehavior [Justin Coyne]
+
+# 8.0.0
+
+* Display pagination and facets on show page. [Justin Coyne]
+* Display only the first title [Justin Coyne]
+* Must have partial key in render for the object to pass as the local 'paginate_compact' [Justin Coyne]
+* Removed unnecessary template [Justin Coyne]
+* Draw the form correctly. Fixes #111 [Justin Coyne]
+* Test using with_test_server [Justin Coyne]
+* Remove Fcrepo 3 config. Fixes #51 [Justin Coyne]
+* Remove deprecated modules [Justin Coyne]
+* Update to work with AF 9.8 and solr 5 [Justin Coyne]
+* Refactor CollectionSearchBuilder creation [Justin Coyne]
+* button_for_remove_from_collection takes collection as an argument [Justin Coyne]
+* Remove unused method collection_name [Justin Coyne]
+* Title and description should be multivalued [Justin Coyne]
+
 # 7.0.0
 
 * Update to Blacklight 6.0.0 [Justin Coyne]

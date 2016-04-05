@@ -1,0 +1,21 @@
+require: rubocop-rspec
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  DisplayCopNames: true
+  Include:
+    - '**/Rakefile'
+    - '**/config.ru'
+  Exclude:
+    - 'script/**/*'
+    - 'spec/test_app_templates/**/*'
+    - 'vendor/**/*'
+
+Metrics/AbcSize:
+  Max: 16
+
+Metrics/LineLength:
+  Max: 220
+
+RSpec/InstanceVariable:
+  Enabled: false

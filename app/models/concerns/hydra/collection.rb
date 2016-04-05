@@ -10,7 +10,7 @@ module Hydra
 
 
     def add_members new_member_ids
-      return if new_member_ids.nil? || new_member_ids.size < 1
+      return if new_member_ids.nil? || new_member_ids.empty?
       self.members << ActiveFedora::Base.find(new_member_ids)
     end
 
